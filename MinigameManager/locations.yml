@@ -1,6 +1,6 @@
-# General rotation options
+# General rotation options; filled with arbitrary example locations
 rotations:
-  # The main lobby that players are teleported to. People in different rotations cannot see each other.
+  # The main lobby that players are teleported to when they join a rotation or a minigame finishes.
   lobby:
     world: world
     x: 0
@@ -8,14 +8,27 @@ rotations:
     z: 0
     yaw: 0
     pitch: 0
+  # The main spawn where people are teleported to when they leave a rotation
+  spawn:
+    world: world
+    x: -10
+    y: 90
+    z: -10
+    yaw: 0
+    pitch: 0
 # Locations for the default minigames
 default-minigames:
   Spleef:
     # Spleef spawn locations
     spawns:
+      # Optional section for displaying the name and author of the map. Can be omitted if no info is present, but both must be set if one is set
+      mapinfo:
+        # Generic arena name and author for example
+        name: Spleef Arena
+        author: the Server Admins
       # These can be named anything to help keep yourself organized
       not_center:
-        # The world, x, y, z, yaw, and pitch to be spawned at
+        # The world, x, y, z, yaw, and pitch to be spawned at. Typically, world is identical for all of these.
         world: world
         x: 10
         y: 90

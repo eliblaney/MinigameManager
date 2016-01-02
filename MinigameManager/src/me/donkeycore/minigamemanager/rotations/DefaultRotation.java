@@ -43,24 +43,16 @@ public final class DefaultRotation implements Rotation {
 	}
 	
 	protected void leave(UUID uuid) {
-		if (players.contains(uuid)) {
-			players.remove(uuid);
-			Player p = Bukkit.getPlayer(uuid);
-			if (p != null) {
-				// TODO: Teleport to lobby
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.LEAVE)));
-			}
-		} else
-			throw new IllegalArgumentException("Player was not in rotation!");
+		leave(uuid, false);
 	}
 	
-	protected void kick(UUID uuid) {
+	protected void leave(UUID uuid, boolean kicked) {
 		if (players.contains(uuid)) {
 			players.remove(uuid);
 			Player p = Bukkit.getPlayer(uuid);
 			if (p != null) {
-				// TODO: Teleport to lobby
-				p.sendMessage(MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.KICK));
+				p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("spawn"));
+				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
 		} else
 			throw new IllegalArgumentException("Player was not in rotation!");
@@ -172,7 +164,7 @@ public final class DefaultRotation implements Rotation {
 	protected void setState(RotationState state) {
 		this.state = state;
 	}
-
+	
 	@Override
 	public Minigame getCurrentMinigame() {
 		return minigame;

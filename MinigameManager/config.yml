@@ -26,11 +26,17 @@ messages:
   # When the countdown timer is ticking [Available variables: %minigame%, %time%]
   countdown: "&e%minigame% will start in &l%time%&e!"
 
-# Everything to do with rotations
+  # How the map information is to be displayed if available. More info in locations.yml
+  mapinfo: |
+    &e&m-----------------------------------
+    &e> Now playing on &6%name%
+    &e> by &6%author%
+    &e&m-----------------------------------
+
+# Everything to do with rotations and the rotation lobby
 rotations:
   # The amount of rotations in total (Requires reload)
   amount: 1
-
   # Minimum players required to join a game
   # NOTE - A minigame that requires more players
   # than the current amount will not start until
@@ -38,9 +44,10 @@ rotations:
   minimum-players: 5
   # Additional players cannot join this rotation when the maximum is reached
   maximum-players: 10
-
   # The time to count down each time a new minigame is ready to play
   countdown-seconds: 30
+  # Whether people in different rotations can see each other in the lobby
+  lobby-hide-players: true
 
 # Minigame-specific configuration
 minigames:

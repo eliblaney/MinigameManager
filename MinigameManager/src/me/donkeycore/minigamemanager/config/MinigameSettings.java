@@ -46,6 +46,10 @@ public class MinigameSettings {
 		return getConfig().getConfigurationSection("rotations").getInt("countdown-seconds");
 	}
 	
+	public boolean hidePlayersInLobby() {
+		return getConfig().getConfigurationSection("rotations").getBoolean("lobby-hide-players");
+	}
+	
 	// Configuration section: Minigames
 	
 	public boolean defaultsEnabled() {

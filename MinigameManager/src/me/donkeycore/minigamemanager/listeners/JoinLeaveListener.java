@@ -24,7 +24,7 @@ public class JoinLeaveListener implements Listener {
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
-		manager.getRotationManager().leave(event.getPlayer());
+		manager.getRotationManager().leave(event.getPlayer(), false);
 	}
 	
 }

@@ -77,9 +77,10 @@ public abstract class Minigame {
 	public void onEnd() {}
 	
 	/**
-	 * Call this to end the minigame and continue to the next rotation
+	 * Call this to end the minigame and continue to the next rotation<br>
+	 * <b>Note:</b> If this method is being overriden, make sure there is a call to {@link Rotation#finish()}
 	 */
-	public final void end() {
+	public void end() {
 		r.finish();
 	}
 	

@@ -30,9 +30,10 @@ public interface RotationManager {
 	 * Have a player leave the rotation they are in
 	 * 
 	 * @param player The player to leave
+	 * @param kicked Whether the player was kicked
 	 * @return Whether the player was found in a rotation and removed
 	 */
-	boolean leave(Player player);
+	boolean leave(Player player, boolean kicked);
 	
 	/**
 	 * Called to choose a minigame and begin the countdown if allowed<br>

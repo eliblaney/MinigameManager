@@ -70,14 +70,13 @@ public class MinigameConfig {
 	}
 	
 	public Location[] getMinigameSpawns(String minigame) {
-		ConfigurationSection mcs = getConfig().getConfigurationSection(minigame);
-		if (mcs == null)
-			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
-		ConfigurationSection cs = mcs.getConfigurationSection("spawns");
+		ConfigurationSection cs = getConfig().getConfigurationSection("spawns");
 		Set<String> keys = cs.getKeys(false);
 		Location[] locations = new Location[keys.size()];
 		int i = 0;
 		for (String key : keys) {
+			if(key.equalsIgnoreCase("mapinfo"))
+				continue;
 			World world = Bukkit.getWorld(cs.getString("world"));
 			if (world == null)
 				throw new RuntimeException("Invalid world for " + key + " (from " + minigame + " spawns)");
@@ -89,6 +88,19 @@ public class MinigameConfig {
 			locations[i++] = new Location(world, x, y, z, yaw, pitch);
 		}
 		return locations;
+	}
+	
+	public String[] getMapInfo(String minigame, String key) {
+		ConfigurationSection kcs = getConfig().getConfigurationSection(key);
+		if (kcs == null)
+			throw new IllegalArgumentException(key + " is not a valid key (minigame: " + minigame + ")");
+		ConfigurationSection cs = kcs.getConfigurationSection("mapinfo");
+		if (cs == null)
+			return new String[0];
+		String[] mapinfo = new String[2];
+		mapinfo[0] = cs.getString("name");
+		mapinfo[1] = cs.getString("author");
+		return mapinfo;
 	}
 	
 }

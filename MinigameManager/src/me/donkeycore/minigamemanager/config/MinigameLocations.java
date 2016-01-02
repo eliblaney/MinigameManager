@@ -92,6 +92,8 @@ public class MinigameLocations {
 		Location[] locations = new Location[keys.size()];
 		int i = 0;
 		for (String key : keys) {
+			if (key.equalsIgnoreCase("mapinfo"))
+				continue;
 			World world = Bukkit.getWorld(cs.getString("world"));
 			if (world == null)
 				throw new RuntimeException("Invalid world for " + key + " (from " + minigame + " spawns)");
@@ -103,6 +105,22 @@ public class MinigameLocations {
 			locations[i++] = new Location(world, x, y, z, yaw, pitch);
 		}
 		return locations;
+	}
+	
+	public String[] getMapInfo(String minigame, String key) {
+		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
+		if (mcs == null)
+			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
+		ConfigurationSection kcs = mcs.getConfigurationSection(key);
+		if (kcs == null)
+			throw new IllegalArgumentException(key + " is not a valid key (minigame: " + minigame + ")");
+		ConfigurationSection cs = kcs.getConfigurationSection("mapinfo");
+		if (cs == null)
+			return new String[0];
+		String[] mapinfo = new String[2];
+		mapinfo[0] = cs.getString("name");
+		mapinfo[1] = cs.getString("author");
+		return mapinfo;
 	}
 	
 }

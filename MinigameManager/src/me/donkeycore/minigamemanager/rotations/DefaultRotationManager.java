@@ -42,9 +42,9 @@ public final class DefaultRotationManager implements RotationManager {
 	 */
 	@Override
 	public void finish(int id) {
-		Validate.isTrue(id > 0 && id < rotations.size());
+		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation id!");
 		Rotation r = rotations.get(id);
-		// TODO: r.teleportAll(lobby);
+		r.teleportAll(manager.getMinigameLocations().getRotationLocation("lobby"));
 		chooseMinigame(r);
 	}
 	
@@ -62,7 +62,7 @@ public final class DefaultRotationManager implements RotationManager {
 			if (r.getPlayers().size() >= maxPlayers)
 				continue;
 			r.join(player.getUniqueId());
-			if(r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
+			if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
 				chooseMinigame(r);
 			return true;
 		}
@@ -85,7 +85,7 @@ public final class DefaultRotationManager implements RotationManager {
 		if (r.getPlayers().size() >= maxPlayers)
 			return false;
 		r.join(player.getUniqueId());
-		if(r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
+		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
 			chooseMinigame(r);
 		return true;
 	}
@@ -94,15 +94,16 @@ public final class DefaultRotationManager implements RotationManager {
 	 * Have a player leave the rotation they are in
 	 * 
 	 * @param player The player to leave
+	 * @param kicked Whether the player was kicked
 	 * @return Whether the player was found in a rotation and removed
 	 */
 	@Override
-	public boolean leave(Player player) {
+	public boolean leave(Player player, boolean kicked) {
 		Validate.notNull(player);
 		UUID uuid = player.getUniqueId();
 		for (DefaultRotation r : rotations) {
 			if (r.hasPlayer(uuid)) {
-				r.leave(uuid);
+				r.leave(uuid, kicked);
 				return true;
 			}
 		}
@@ -138,12 +139,13 @@ public final class DefaultRotationManager implements RotationManager {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Called to choose a minigame and begin the countdown if allowed<br>
 	 * <b>Warning:</b> Async
 	 * 
-	 * @param rotation The rotation to execute the process for; must be of type DefaultRotation
+	 * @param rotation The rotation to execute the process for; must be of type
+	 *            DefaultRotation
 	 */
 	@Override
 	public void chooseMinigame(Rotation rotation) {
@@ -158,10 +160,10 @@ public final class DefaultRotationManager implements RotationManager {
 			public void run() {
 				Minigame minigame = null;
 				int tries = 10;
-				// Try 10O times to get a random minigame before giving up
-				do {
+				// Try 10 times to get a random minigame before giving up
+				do
 					minigame = getRandomMinigame(r);
-				} while (--tries > 0 && minigame == null);
+				while (--tries > 0 && minigame == null);
 				if (minigame == null) {
 					// Message players
 					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
@@ -182,13 +184,16 @@ public final class DefaultRotationManager implements RotationManager {
 	protected void start(DefaultRotation r, Minigame minigame) {
 		// Set the rotation minigame and copy current players to another list
 		r.beginMinigame(minigame);
-		// Expanding out Rotation.teleportAll in case the minigame has random spawns
+		// Teleport everybody to possibly random spawns and optionally send them a mapinfo message 
 		for (UUID u : r.getPlayers()) {
 			Player player = Bukkit.getPlayer(u);
 			if (player == null)
 				r.leave(u);
 			else
 				player.teleport(minigame.getStartingLocation());
+			String[] mapinfo = manager.getMinigameLocations().getMapInfo(minigame.getName(), "spawns");
+			if(mapinfo.length > 0)
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
 		}
 		// Start the fun
 		minigame.onStart();
@@ -204,7 +209,7 @@ public final class DefaultRotationManager implements RotationManager {
 		for (DefaultRotation r : rotations) {
 			r.finish();
 			for (UUID u : r.getPlayers())
-				r.kick(u);
+				r.leave(u, true);
 		}
 	}
 	

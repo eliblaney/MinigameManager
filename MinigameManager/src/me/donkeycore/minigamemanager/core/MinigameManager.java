@@ -18,16 +18,19 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 
+/*
+ * TODO:
+ * - /mm [help|info minigame|start #|stop #|reload]
+ * - info minigame: display information from the MinigameAttributes annotation
+ * - locations
+ * - players in same lobby can be hidden from each other
+ * - sign support
+ */
 /**
+ * Main MinigameManager plugin class with API methods
+ * 
  * @author DonkeyCore
- * 		
- *         TODO:
- *         - /mm [help|info minigame|start #|stop #|reload]
- *         - info minigame: display information from the MinigameAttributes
- *         annotation
- *         - locations
- *         - players in same area must be hidden from each other
- * 		
+ * @version 0.1
  */
 public final class MinigameManager extends JavaPlugin {
 	
@@ -63,7 +66,7 @@ public final class MinigameManager extends JavaPlugin {
 		getLogger().info("Initializing config... (Part 1: General)");
 		saveDefaultConfig();
 		this.config = new MinigameSettings(this);
-		getLogger().info("Initialziing config... (Part 2: Locations");
+		getLogger().info("Initializing config... (Part 2: Locations)");
 		this.locations = new MinigameLocations(this);
 		getLogger().info("Registering commands...");
 		getCommand("minigamemanager").setExecutor(new CommandMinigame(this));
@@ -74,9 +77,9 @@ public final class MinigameManager extends JavaPlugin {
 		try {
 			rotationManager = rmClass.getConstructor(MinigameManager.class, int.class).newInstance(this, config.getNumberOfRotations());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			rotationManager = new DefaultRotationManager(this, config.getNumberOfRotations());
-			getLogger().warning("Could not load rotation manager: " + rmClass.getSimpleName() + ", using DefaultRotationManager instead.");
 			e.printStackTrace();
+			getLogger().warning("Could not load rotation manager: " + rmClass.getSimpleName() + ", using DefaultRotationManager instead.");
+			rotationManager = new DefaultRotationManager(this, config.getNumberOfRotations());
 		}
 		getLogger().info(description.getName() + " v" + description.getVersion() + " by DonkeyCore has been enabled!");
 	}

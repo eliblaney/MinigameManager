@@ -31,7 +31,7 @@ public class CommandLeave implements CommandExecutor {
 				return false;
 			}
 			Player player = (Player) sender;
-			if(manager.getRotationManager().leave(player))
+			if(manager.getRotationManager().leave(player, false))
 				Bukkit.getPluginManager().callEvent(new RotationLeaveEvent(player));
 			else
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_IN_ROTATION)));
