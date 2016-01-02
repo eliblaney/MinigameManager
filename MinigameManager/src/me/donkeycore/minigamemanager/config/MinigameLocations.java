@@ -69,7 +69,7 @@ public class MinigameLocations {
 	}
 	
 	public Location getRotationLocation(String key) {
-		ConfigurationSection cs = getConfig().getConfigurationSection(key);
+		ConfigurationSection cs = getConfig().getConfigurationSection("rotations").getConfigurationSection(key);
 		if (cs == null)
 			throw new IllegalArgumentException(key + " is not a valid key for a location");
 		World world = Bukkit.getWorld(cs.getString("world"));

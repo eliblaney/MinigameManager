@@ -149,7 +149,7 @@ public final class DefaultRotationManager implements RotationManager {
 	 */
 	@Override
 	public void chooseMinigame(Rotation rotation) {
-		Validate.notNull(rotation);
+		Validate.notNull(rotation, "The rotation cannot be null!");
 		Validate.isTrue(rotation instanceof DefaultRotation, "Rotation type " + rotation.getClass().getSimpleName() + " is invalid for " + getClass().getSimpleName());
 		DefaultRotation r = (DefaultRotation) rotation;
 		// Don't want to do anything if shutting down
