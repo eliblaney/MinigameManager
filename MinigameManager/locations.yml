@@ -1,0 +1,24 @@
+# General rotation options
+rotations:
+  # The main lobby that players are teleported to. People in different rotations cannot see each other.
+  lobby:
+    world: world
+    x: 0
+    y: 90
+    z: 0
+# Locations for the default minigames
+default-minigames:
+  Spleef:
+    # Spleef spawn locations
+    spawns:
+      # These can be named anything to help keep yourself organized
+      not_center:
+        world: world
+        x: 10
+        y: 90
+        z: 10
+      a_bit_farther:
+        world: world
+        x: 20
+        y: 90
+        z: 20

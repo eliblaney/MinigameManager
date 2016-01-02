@@ -1,0 +1,57 @@
+##########################################
+#         MinigameManager config         #
+#              by DonkeyCore             #
+##########################################
+
+# Messages for various events
+messages:
+  # When a player joins a rotation [Available variables: %rotation%]
+  join: "&aYou have joined rotation %rotation%!"
+  # When a player leaves a rotation
+  leave: "&cYou have left the rotation!"
+  # When a player is kicked from a rotation
+  kick: "&cYou have been kicked from the rotation!"
+
+  # When a player tries to join a rotation, but they are all full
+  full-rotations: "&cThere are no available rotations! Try again later."
+  # When a player tries to join a SPECIFIC rotation, but it is full
+  full-rotation: "&cThat rotation is full! Try a different one."
+  # When a player tries to leave a rotation, but they aren't in one
+  not-in-rotation: "&cYou are not currently in a rotation!"
+
+  # When there isn't enough players to start a minigame
+  not-enough-players: "&cNot enough players!"
+  # When the rotation announces the next minigame [Available variables: %minigame%]
+  next-minigame: "&eThe next minigame will be &l%minigame%&e!"
+  # When the countdown timer is ticking [Available variables: %minigame%, %time%]
+  countdown: "&e%minigame% will start in &l%time%&e!"
+
+# Everything to do with rotations
+rotations:
+  # The amount of rotations in total (Requires reload)
+  amount: 1
+
+  # Minimum players required to join a game
+  # NOTE - A minigame that requires more players
+  # than the current amount will not start until
+  # there is enough players to do so
+  minimum-players: 5
+  # Additional players cannot join this rotation when the maximum is reached
+  maximum-players: 10
+
+  # The time to count down each time a new minigame is ready to play
+  countdown-seconds: 30
+
+# Minigame-specific configuration
+minigames:
+  # Configure the default minigames
+  default-minigames:
+    # Should default minigames be in the rotation?
+    enabled: true
+    # Configure each default minigame specifically
+    defaults:
+      Spleef:
+        # Should this minigame be enabled?
+        enabled: true
+        # Minimum players required to start, the more the merrier!
+        minimum-players: 5
