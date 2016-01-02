@@ -14,24 +14,26 @@ import me.donkeycore.minigamemanager.api.SubstitutionHandler;
 import me.donkeycore.minigamemanager.commands.CommandJoin;
 import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
-import me.donkeycore.minigamemanager.config.MinigameConfig;
+import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 
 /**
  * @author DonkeyCore
- * 
- * TODO:
- * - /mm [help|info minigame|start #|stop #|reload]
- * - Minigame attributes that describe the minigame
- *   - type (last man standing, tower defense, etc)
- *   - author
- * - locations
- *
+ * 		
+ *         TODO:
+ *         - /mm [help|info minigame|start #|stop #|reload]
+ *         - info minigame: display information from the MinigameAttributes
+ *         annotation
+ *         - locations
+ *         - players in same area must be hidden from each other
+ * 		
  */
 public final class MinigameManager extends JavaPlugin {
 	
 	private static MinigameManager instance = null;
-	private MinigameConfig config;
+	private MinigameSettings config;
+	private MinigameLocations locations;
 	private RotationManager rotationManager;
 	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
 	
@@ -58,9 +60,11 @@ public final class MinigameManager extends JavaPlugin {
 		instance = this;
 		PluginDescriptionFile description = getDescription();
 		getLogger().info("Enabling " + description.getName() + " v" + description.getVersion() + "...");
-		getLogger().info("Initializing config...");
+		getLogger().info("Initializing config... (Part 1: General)");
 		saveDefaultConfig();
-		this.config = new MinigameConfig(this);
+		this.config = new MinigameSettings(this);
+		getLogger().info("Initialziing config... (Part 2: Locations");
+		this.locations = new MinigameLocations(this);
 		getLogger().info("Registering commands...");
 		getCommand("minigamemanager").setExecutor(new CommandMinigame(this));
 		getCommand("join").setExecutor(new CommandJoin(this));
@@ -110,10 +114,20 @@ public final class MinigameManager extends JavaPlugin {
 	/**
 	 * Get the configuration class for the plugin
 	 * 
-	 * @return An instance of {@link MinigameConfig}
+	 * @return An instance of {@link MinigameSettings}
 	 */
-	public MinigameConfig getMinigameConfig() {
+	public MinigameSettings getMinigameConfig() {
 		return config;
+	}
+	
+	/**
+	 * Get the configuration class for rotation locations and the default
+	 * minigames' locations
+	 * 
+	 * @return An instance of {@link MinigameLocations}
+	 */
+	public MinigameLocations getMinigameLocations() {
+		return locations;
 	}
 	
 	/**

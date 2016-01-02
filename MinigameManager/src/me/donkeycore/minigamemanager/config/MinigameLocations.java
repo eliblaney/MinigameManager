@@ -14,29 +14,28 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public class MinigameConfig {
+import me.donkeycore.minigamemanager.core.MinigameManager;
+
+public class MinigameLocations {
 	
-	private final JavaPlugin plugin;
+	private final MinigameManager manager;
 	private FileConfiguration config;
 	private File configFile;
-	private String fileName;
 	
-	public MinigameConfig(JavaPlugin plugin, FileConfiguration config, File configFile) {
-		this.plugin = plugin;
-		this.config = config;
-		this.configFile = configFile;
-		this.fileName = configFile.getName();
+	public MinigameLocations(MinigameManager manager) {
+		this.manager = manager;
+		saveDefaultConfig();
+		reloadConfig();
 	}
 	
 	public void reloadConfig() {
 		if (configFile == null)
-			configFile = new File(plugin.getDataFolder(), fileName);
+			configFile = new File(manager.getDataFolder(), "locations.yml");
 		config = YamlConfiguration.loadConfiguration(configFile);
 		Reader defConfigStream = null;
 		try {
-			defConfigStream = new InputStreamReader(plugin.getResource(fileName), "UTF8");
+			defConfigStream = new InputStreamReader(manager.getResource("locations.yml"), "UTF8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -58,19 +57,34 @@ public class MinigameConfig {
 		try {
 			getConfig().save(configFile);
 		} catch (IOException ex) {
-			plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
+			manager.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
 		}
 	}
 	
 	public void saveDefaultConfig() {
 		if (configFile == null)
-			configFile = new File(plugin.getDataFolder(), fileName);
+			configFile = new File(manager.getDataFolder(), "locations.yml");
 		if (!configFile.exists())
-			plugin.saveResource("locations.yml", false);
+			manager.saveResource("locations.yml", false);
+	}
+	
+	public Location getRotationLocation(String key) {
+		ConfigurationSection cs = getConfig().getConfigurationSection(key);
+		if (cs == null)
+			throw new IllegalArgumentException(key + " is not a valid key for a location");
+		World world = Bukkit.getWorld(cs.getString("world"));
+		if (world == null)
+			throw new RuntimeException("Invalid world for " + key);
+		double x = cs.getDouble("x");
+		double y = cs.getDouble("y");
+		double z = cs.getDouble("z");
+		float yaw = Float.parseFloat(cs.getString("yaw"));
+		float pitch = Float.parseFloat(cs.getString("pitch"));
+		return new Location(world, x, y, z, yaw, pitch);
 	}
 	
 	public Location[] getMinigameSpawns(String minigame) {
-		ConfigurationSection mcs = getConfig().getConfigurationSection(minigame);
+		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
 		if (mcs == null)
 			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
 		ConfigurationSection cs = mcs.getConfigurationSection("spawns");
