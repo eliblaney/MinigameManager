@@ -43,6 +43,13 @@ public interface RotationManager {
 	void chooseMinigame(Rotation rotation);
 	
 	/**
+	 * Get all of the currently active rotations
+	 * 
+	 * @return An array of {@link Rotation} instances
+	 */
+	Rotation[] getRotations();
+	
+	/**
 	 * Get a rotation by its ID
 	 * 
 	 * @param id The ID of the rotation
@@ -58,13 +65,6 @@ public interface RotationManager {
 	 *         rotation
 	 */
 	Rotation getRotation(Player player);
-	
-	/**
-	 * Finish a minigame in a rotation and proceed to selecting the next one
-	 * 
-	 * @param id The id of the rotation to finish the minigame for
-	 */
-	void finish(int id);
 	
 	/**
 	 * Stop all rotations, kick everyone from rotations, and stop next rotation

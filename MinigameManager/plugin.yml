@@ -15,7 +15,7 @@ commands:
   minigamemanager:
     description: "Main plugin administration command"
     permission: minigamemanager.admin
-    usage: "§cUsage: /<command> help"
+    usage: "§cUsage: /<command> help|info minigame|<start|stop|status> <rotation>|reload"
     aliases: [minigame, mm]
 permissions:
   minigamemanager.*:

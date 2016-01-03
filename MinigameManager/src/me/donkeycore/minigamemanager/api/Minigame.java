@@ -35,18 +35,6 @@ public abstract class Minigame {
 	}
 	
 	/**
-	 * Register the minigame class with MinigameManager<br>
-	 * This should be called for any minigames that should be enabled during the
-	 * plugin's onEnable() method
-	 * 
-	 * @param minimumPlayers The minimum amount of players required for this
-	 *            minigame to start
-	 */
-	public final void registerMinigame(int minimumPlayers) {
-		getMinigameManager().registerMinigame(getClass(), minimumPlayers);
-	}
-	
-	/**
 	 * Get the rotation that this minigame is associated with
 	 * 
 	 * @return The rotation that the minigame is associated with

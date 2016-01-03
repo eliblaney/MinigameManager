@@ -41,6 +41,8 @@ public final class DefaultRotation implements Rotation {
 			players.add(uuid);
 			p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
 			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN).replace("%rotation%", "" + id)));
+			if(getState() == RotationState.INGAME)
+				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + id)));
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				if (!players.contains(player.getUniqueId())) {
 					p.hidePlayer(player);
@@ -66,45 +68,23 @@ public final class DefaultRotation implements Rotation {
 			throw new IllegalArgumentException("Player was not in rotation!");
 	}
 	
-	/**
-	 * Check if a player is currently in the rotation
-	 * 
-	 * @param uuid The UUID of the player to check
-	 * @return Whether the player is in the rotation
-	 */
 	@Override
 	public boolean hasPlayer(UUID uuid) {
 		Validate.notNull(uuid);
 		return players.contains(uuid);
 	}
 	
-	/**
-	 * Get all players in the rotation, both playing and not
-	 * 
-	 * @return A list of UUIDs of all players in the rotation
-	 */
 	@Override
 	public List<UUID> getPlayers() {
 		return players;
 	}
 	
-	/**
-	 * Check if a player is currently in-game
-	 * 
-	 * @param uuid The UUID of the player to check
-	 * @return Whether the player is in-game
-	 */
 	@Override
 	public boolean isInGame(UUID uuid) {
 		Validate.notNull(uuid);
 		return inGame.contains(uuid);
 	}
 	
-	/**
-	 * Get all currently in-game players
-	 * 
-	 * @return A list of UUIDs of currently in-game players
-	 */
 	@Override
 	public List<UUID> getInGame() {
 		return inGame;
@@ -113,28 +93,21 @@ public final class DefaultRotation implements Rotation {
 	protected void beginMinigame(Minigame minigame) {
 		Validate.notNull(minigame);
 		this.minigame = minigame;
-		this.state = RotationState.INGAME;
+		setState(RotationState.INGAME);
 		inGame.addAll(players);
 	}
 	
-	/**
-	 * Finish the current minigame and proceed the rotation to the lobby<br>
-	 */
 	@Override
 	public void finish() {
-		this.state = RotationState.LOBBY;
+		setState(RotationState.LOBBY);
 		if (minigame != null)
 			minigame.onEnd();
 		minigame = null;
 		inGame.clear();
-		rm.finish(id);
+		teleportAll(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
+		rm.chooseMinigame(this);
 	}
 	
-	/**
-	 * Announce a message to everybody in the rotation
-	 * 
-	 * @param message The message to announce
-	 */
 	@Override
 	public void announce(String message) {
 		Validate.notNull(message);
@@ -142,11 +115,6 @@ public final class DefaultRotation implements Rotation {
 			Bukkit.getPlayer(u).sendMessage(message);
 	}
 	
-	/**
-	 * Teleport everybody in the rotation to a certain location
-	 * 
-	 * @param loc The location to teleport to
-	 */
 	@Override
 	public void teleportAll(Location loc) {
 		Validate.notNull(loc);
@@ -159,11 +127,6 @@ public final class DefaultRotation implements Rotation {
 		}
 	}
 	
-	/**
-	 * Get the current state of this rotation
-	 * 
-	 * @return The current state
-	 */
 	@Override
 	public RotationState getState() {
 		return state;

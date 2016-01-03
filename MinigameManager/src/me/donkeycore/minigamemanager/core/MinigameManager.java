@@ -5,25 +5,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.donkeycore.minigamemanager.api.Minigame;
+import me.donkeycore.minigamemanager.api.Rotation;
 import me.donkeycore.minigamemanager.api.RotationManager;
 import me.donkeycore.minigamemanager.api.SubstitutionHandler;
 import me.donkeycore.minigamemanager.commands.CommandJoin;
 import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
-import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
+import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 
 /*
  * TODO:
  * - /mm [help|info minigame|start #|stop #|reload]
- * - info minigame: display information from the MinigameAttributes annotation
- * - locations
- * - players in same lobby can be hidden from each other
+ *   - info minigame: display information from the MinigameAttributes annotation
  * - sign support
  */
 /**
@@ -80,6 +80,33 @@ public final class MinigameManager extends JavaPlugin {
 			e.printStackTrace();
 			getLogger().warning("Could not load rotation manager: " + rmClass.getSimpleName() + ", using DefaultRotationManager instead.");
 			rotationManager = new DefaultRotationManager(this, config.getNumberOfRotations());
+		}
+		// Start the rotations after all plugins are finished loading
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			public void run() {
+				for (Rotation rotation : rotationManager.getRotations())
+					rotationManager.chooseMinigame(rotation);
+			}
+		});
+		if (config.defaultsEnabled()) {
+			getLogger().info("Registering default minigames...");
+			for (String minigameStr : config.getEnabledDefaultMinigames()) {
+				Class<?> clazz = null;
+				try {
+					clazz = Class.forName("me.donkeycore.minigamemanager.minigames." + minigameStr);
+				} catch (ClassNotFoundException e) {
+					getLogger().warning("Uh oh! " + minigameStr + " is not a default minigame. Skipping!");
+					continue;
+				}
+				if (clazz.getSuperclass() != Minigame.class) {
+					getLogger().warning(minigameStr + " is not a minigame. Skipping!");
+					continue;
+				}
+				@SuppressWarnings("unchecked")
+				Class<? extends Minigame> minigameClass = (Class<? extends Minigame>) clazz;
+				registerMinigame(minigameClass, config.getMinimumForMinigame(minigameStr));
+				getLogger().info("Registered: " + minigameStr);
+			}
 		}
 		getLogger().info(description.getName() + " v" + description.getVersion() + " by DonkeyCore has been enabled!");
 	}

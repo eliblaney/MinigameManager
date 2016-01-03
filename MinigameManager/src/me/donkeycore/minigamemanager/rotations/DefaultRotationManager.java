@@ -35,25 +35,6 @@ public final class DefaultRotationManager implements RotationManager {
 		this.running = true;
 	}
 	
-	/**
-	 * Finish a minigame in a rotation and proceed to selecting the next one
-	 * 
-	 * @param id The id of the rotation to finish the minigame for
-	 */
-	@Override
-	public void finish(int id) {
-		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation id!");
-		Rotation r = rotations.get(id);
-		r.teleportAll(manager.getMinigameLocations().getRotationLocation("lobby"));
-		chooseMinigame(r);
-	}
-	
-	/**
-	 * Have a player join any available rotation
-	 * 
-	 * @param player The player to join
-	 * @return Whether there were any available rotations to put the player in
-	 */
 	@Override
 	public boolean join(Player player) {
 		Validate.notNull(player);
@@ -69,13 +50,6 @@ public final class DefaultRotationManager implements RotationManager {
 		return false;
 	}
 	
-	/**
-	 * Have a player join a specific rotation
-	 * 
-	 * @param player The player to join
-	 * @param id The ID of the rotation to be joined
-	 * @return Whether the rotation was available to put the player in
-	 */
 	@Override
 	public boolean join(Player player, int id) {
 		Validate.notNull(player);
@@ -90,13 +64,6 @@ public final class DefaultRotationManager implements RotationManager {
 		return true;
 	}
 	
-	/**
-	 * Have a player leave the rotation they are in
-	 * 
-	 * @param player The player to leave
-	 * @param kicked Whether the player was kicked
-	 * @return Whether the player was found in a rotation and removed
-	 */
 	@Override
 	public boolean leave(Player player, boolean kicked) {
 		Validate.notNull(player);
@@ -110,25 +77,17 @@ public final class DefaultRotationManager implements RotationManager {
 		return false;
 	}
 	
-	/**
-	 * Get a rotation by its ID
-	 * 
-	 * @param id The ID of the rotation
-	 * @return An instance of {@link Rotation}
-	 */
+	@Override
+	public Rotation[] getRotations() {
+		return rotations.toArray(new Rotation[rotations.size()]);
+	}
+	
 	@Override
 	public Rotation getRotation(int id) {
 		Validate.isTrue(id > 0 && id < rotations.size());
 		return rotations.get(id);
 	}
 	
-	/**
-	 * Get a rotation based on a player who is currently in it
-	 * 
-	 * @param player The player inside the rotation
-	 * @return An instance of {@link Rotation} or null if the player is not in a
-	 *         rotation
-	 */
 	@Override
 	public Rotation getRotation(Player player) {
 		Validate.notNull(player);
@@ -140,13 +99,6 @@ public final class DefaultRotationManager implements RotationManager {
 		return null;
 	}
 	
-	/**
-	 * Called to choose a minigame and begin the countdown if allowed<br>
-	 * <b>Warning:</b> Async
-	 * 
-	 * @param rotation The rotation to execute the process for; must be of type
-	 *            DefaultRotation
-	 */
 	@Override
 	public void chooseMinigame(Rotation rotation) {
 		Validate.notNull(rotation, "The rotation cannot be null!");
@@ -192,17 +144,13 @@ public final class DefaultRotationManager implements RotationManager {
 			else
 				player.teleport(minigame.getStartingLocation());
 			String[] mapinfo = manager.getMinigameLocations().getMapInfo(minigame.getName(), "spawns");
-			if(mapinfo.length > 0)
+			if (mapinfo.length > 0)
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
 		}
 		// Start the fun
 		minigame.onStart();
 	}
 	
-	/**
-	 * Stop all rotations, kick everyone from rotations, and stop next rotation
-	 * cycles
-	 */
 	@Override
 	public void shutdown() {
 		this.running = false;

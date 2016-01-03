@@ -53,7 +53,7 @@ public class Countdown implements Runnable {
 	}
 	
 	// Get friendly string for amount of time left
-	private String getTimeLeft(int seconds) {
+	private static String getTimeLeft(int seconds) {
 		if (seconds < 60) {
 			if (seconds == 1)
 				return "1 second";

@@ -59,5 +59,9 @@ public class MinigameSettings {
 	public List<String> getEnabledDefaultMinigames() {
 		return getConfig().getConfigurationSection("minigames").getStringList("default-minigames");
 	}
+
+	public int getMinimumForMinigame(String minigame) {
+		return getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection(minigame).getInt("minimum-players");
+	}
 	
 }

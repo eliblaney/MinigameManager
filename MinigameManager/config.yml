@@ -7,10 +7,12 @@
 messages:
   # When a player joins a rotation [Available variables: %rotation%]
   join: "&aYou have joined rotation %rotation%!"
-  # When a player leaves a rotation
+  # When a player leaves a rotation (using /leave or quitting the game)
   leave: "&cYou have left the rotation!"
-  # When a player is kicked from a rotation
+  # When a player is kicked from a rotation (kicked by admin or during shutdown)
   kick: "&cYou have been kicked from the rotation!"
+  # A player joins, but a minigame has already started
+  join-after-start: "&eThere is a minigame currently running right now. You can play when it ends, so please wait!"
 
   # When a player tries to join a rotation, but they are all full
   full-rotations: "&cThere are no available rotations! Try again later."
@@ -53,12 +55,12 @@ rotations:
 minigames:
   # Configure the default minigames
   default-minigames:
-    # Should default minigames be in the rotation?
+    # Should any default minigames be in the rotation? (requires reload)
     enabled: true
     # Configure each default minigame specifically
     defaults:
       Spleef:
-        # Should this minigame be enabled?
+        # Should this minigame be in the rotation? (requires reload)
         enabled: true
-        # Minimum players required to start, the more the merrier!
+        # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
         minimum-players: 5

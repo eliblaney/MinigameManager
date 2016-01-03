@@ -69,7 +69,7 @@ public interface Rotation {
 	 * 
 	 * @return The current state
 	 */
-	RotationState getState();
+	public RotationState getState();
 	
 	/**
 	 * Get the current minigame
