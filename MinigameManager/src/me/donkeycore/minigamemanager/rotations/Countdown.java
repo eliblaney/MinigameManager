@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
 import me.donkeycore.minigamemanager.api.Minigame;
+import me.donkeycore.minigamemanager.api.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -39,6 +40,12 @@ public class Countdown implements Runnable {
 	public void run() {
 		if (r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame)) {
 			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
+			if (bt != null)
+				bt.cancel();
+			return;
+		}
+		if (r.getState() == RotationState.STOPPED) { // abandon ship!
+			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.ROTATION_STOPPED)));
 			if (bt != null)
 				bt.cancel();
 			return;

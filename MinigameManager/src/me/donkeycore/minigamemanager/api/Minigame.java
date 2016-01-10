@@ -9,7 +9,6 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
  * 
  * @author DonkeyCore
  */
-@MinigameAttributes(type = MinigameType.OTHER)
 public abstract class Minigame {
 	
 	private final Rotation r;
@@ -66,18 +65,33 @@ public abstract class Minigame {
 	
 	/**
 	 * Call this to end the minigame and continue to the next rotation<br>
-	 * <b>Note:</b> If this method is being overriden, make sure there is a call to {@link Rotation#finish()}
+	 * <b>Note:</b> If this method is being overriden, make sure there is a call
+	 * to {@link Rotation#finish()}
 	 */
 	public void end() {
 		r.finish();
 	}
 	
 	/**
+	 * Get the attributes belonging to this minigame
+	 * 
+	 * @return An instance of {@link MinigameAttributes}, or null if the annotation is not present (bad!)
+	 */
+	public final MinigameAttributes getAttributes() {
+		return getClass().getAnnotation(MinigameAttributes.class);
+	}
+	
+	/**
 	 * Get the minigame name as it will be displayed in chat
 	 * 
-	 * @return The minigame's friendly name
+	 * @return The minigame's friendly name, or "Unnamed" if not specified
 	 */
-	public abstract String getName();
+	public final String getName() {
+		MinigameAttributes attributes = getAttributes();
+		if(attributes == null)
+			return "Unnamed";
+		return attributes.name();
+	}
 	
 	/**
 	 * Get the spawn location for the beginning of the minigame

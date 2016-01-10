@@ -19,23 +19,21 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 
 public class MinigameLocations {
 	
-	private final MinigameManager manager;
 	private FileConfiguration config;
 	private File configFile;
 	
-	public MinigameLocations(MinigameManager manager) {
-		this.manager = manager;
+	public MinigameLocations() {
 		saveDefaultConfig();
 		reloadConfig();
 	}
 	
 	public void reloadConfig() {
 		if (configFile == null)
-			configFile = new File(manager.getDataFolder(), "locations.yml");
+			configFile = new File(MinigameManager.getPlugin().getDataFolder(), "locations.yml");
 		config = YamlConfiguration.loadConfiguration(configFile);
 		Reader defConfigStream = null;
 		try {
-			defConfigStream = new InputStreamReader(manager.getResource("locations.yml"), "UTF8");
+			defConfigStream = new InputStreamReader(MinigameManager.getPlugin().getResource("locations.yml"), "UTF8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -57,15 +55,15 @@ public class MinigameLocations {
 		try {
 			getConfig().save(configFile);
 		} catch (IOException ex) {
-			manager.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
+			MinigameManager.getPlugin().getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
 		}
 	}
 	
 	public void saveDefaultConfig() {
 		if (configFile == null)
-			configFile = new File(manager.getDataFolder(), "locations.yml");
+			configFile = new File(MinigameManager.getPlugin().getDataFolder(), "locations.yml");
 		if (!configFile.exists())
-			manager.saveResource("locations.yml", false);
+			MinigameManager.getPlugin().saveResource("locations.yml", false);
 	}
 	
 	public Location getRotationLocation(String key) {

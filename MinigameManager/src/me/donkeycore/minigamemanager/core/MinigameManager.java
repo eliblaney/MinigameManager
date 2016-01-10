@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.apache.commons.lang.Validate;
 
 import me.donkeycore.minigamemanager.api.Minigame;
+import me.donkeycore.minigamemanager.api.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.RotationManager;
 import me.donkeycore.minigamemanager.api.SubstitutionHandler;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
@@ -15,39 +16,66 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
 /*
  * TODO:
  * - /mm [help|info minigame|start #|stop #|reload]
- *   - info minigame: display information from the MinigameAttributes annotation
+ * - info minigame: display information from the MinigameAttributes annotation
  * - sign support
+ * - team API, chest API (and other minigame APIs) in the
+ * me.donkeycore.minigamemanager.api.minigame package
+ * - stuff to make minigames EASIER to make
+ * - config options:
+ * * server-wide (join rotation on join server, leave rotation on quit server)
+ * - beta test next saturday or something
+ * - future: create entire minigame from config or lua/python
+ * - gems:
+ * * config:
+ * # format ($x, x gems)
+ * # boolean: use vault currency as gems
+ * - scoreboard:
+ * * set scoreboard lines using string array
+ * 
  */
 /**
  * Main MinigameManager plugin class with API methods
  * 
  * @author DonkeyCore
- * @version 0.1
+ * @version 0.0.1
  */
-public final class MinigameManager extends JavaPlugin {
+public final class MinigameManager {
 	
 	static MinigameManager instance = null;
 	MinigameSettings config;
 	MinigameLocations locations;
 	RotationManager rotationManager;
+	private static MinigameManagerPlugin plugin;
 	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
 	
 	static {
 		SubstitutionHandler.getInstance();
 	}
 	
-	MinigameManager() {
+	MinigameManager(MinigameManagerPlugin plugin) {
+		MinigameManager.plugin = plugin;
 		if (instance != null)
 			throw new IllegalStateException("MinigameManager has already been initialized!");
+		instance = this;
 	}
 	
 	/**
-	 * Get the instance of this class if it has been enabled (null if disabled)
+	 * Get the instance of this class if the plugin has been enabled (null if
+	 * disabled)
 	 * 
 	 * @return The instance of {@link MinigameManager}
 	 */
 	public static MinigameManager getMinigameManager() {
 		return instance;
+	}
+	
+	/**
+	 * Get the instance of the plugin if it has been enabled (null if disabled)
+	 * 
+	 * @return The instance of {@link MinigameManagerPlugin}
+	 */
+	public static MinigameManagerPlugin getPlugin() {
+		return plugin;
 	}
 	
 	/**
@@ -80,12 +108,34 @@ public final class MinigameManager extends JavaPlugin {
 	
 	/**
 	 * Register a minigame with MinigameManager and insert it into the rotations
+	 * <br>
+	 * <b>Note:</b> The class <i>must</i> have a {@link MinigameAttributes}
+	 * annotation
 	 * 
 	 * @param minigame The minigame to register
 	 * @param minimumPlayers The minimum players required to start this minigame
 	 */
 	public void registerMinigame(Class<? extends Minigame> minigame, int minimumPlayers) {
+		Validate.notNull(minigame, "Minigame must not be null");
+		Validate.isTrue(minimumPlayers > 0, "Minimum players must be above 0");
+		Validate.notNull(minigame.getAnnotation(MinigameAttributes.class), "Minigame must have a @MinigameAttributes annotation");
 		this.minigames.put(minigame, minimumPlayers);
+		plugin.getLogger().info("Registered: " + minigame.getSimpleName());
+	}
+	
+	/**
+	 * Unregister a minigame with MinigameManager and remove it from the
+	 * rotations
+	 * 
+	 * @param minigame The minigame to unregister
+	 * @return Whether the minigame was removed
+	 */
+	public boolean unregisterMinigame(Class<? extends Minigame> minigame) {
+		Validate.notNull(minigame);
+		boolean b = this.minigames.remove(minigame) != null;
+		if (b)
+			plugin.getLogger().info("Unregistered: " + minigame.getSimpleName());
+		return b;
 	}
 	
 	/**

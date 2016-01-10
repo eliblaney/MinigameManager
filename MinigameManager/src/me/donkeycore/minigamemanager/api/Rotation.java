@@ -69,7 +69,7 @@ public interface Rotation {
 	 * 
 	 * @return The current state
 	 */
-	public RotationState getState();
+	RotationState getState();
 	
 	/**
 	 * Get the current minigame
@@ -78,5 +78,15 @@ public interface Rotation {
 	 *         running yet
 	 */
 	Minigame getCurrentMinigame();
+	
+	/**
+	 * Start playing again if the rotation has been stopped by an admin
+	 */
+	void resume();
+	
+	/**
+	 * Stop the rotation, return players to the lobby, but do NOT start a new minigame
+	 */
+	void stop();
 	
 }

@@ -15,6 +15,7 @@ import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.minigames.DefaultMinigame;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 
 public class MinigameManagerPlugin extends JavaPlugin {
@@ -28,14 +29,14 @@ public class MinigameManagerPlugin extends JavaPlugin {
 	public void onEnable() {
 		if (manager != null)
 			throw new IllegalStateException("MinigameManager has already been enabled!");
-		manager = new MinigameManager();
+		manager = new MinigameManager(this);
 		PluginDescriptionFile description = getDescription();
 		getLogger().info("Enabling " + description.getName() + " v" + description.getVersion() + "...");
 		getLogger().info("Initializing config... (Part 1: General)");
 		saveDefaultConfig();
-		manager.config = new MinigameSettings(manager);
+		manager.config = new MinigameSettings();
 		getLogger().info("Initializing config... (Part 2: Locations)");
-		manager.locations = new MinigameLocations(manager);
+		manager.locations = new MinigameLocations();
 		getLogger().info("Registering commands...");
 		getCommand("minigamemanager").setExecutor(new CommandMinigame(manager));
 		getCommand("join").setExecutor(new CommandJoin(manager));
@@ -56,26 +57,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 					manager.rotationManager.chooseMinigame(rotation);
 			}
 		});
-		if (manager.config.defaultsEnabled()) {
-			getLogger().info("Registering default minigames...");
-			for (String minigameStr : manager.config.getEnabledDefaultMinigames()) {
-				Class<?> clazz = null;
-				try {
-					clazz = Class.forName("me.donkeycore.minigamemanager.minigames." + minigameStr);
-				} catch (ClassNotFoundException e) {
-					getLogger().warning("Uh oh! " + minigameStr + " is not a default minigame. Skipping!");
-					continue;
-				}
-				if (clazz.getSuperclass() != Minigame.class) {
-					getLogger().warning(minigameStr + " is not a minigame. Skipping!");
-					continue;
-				}
-				@SuppressWarnings("unchecked")
-				Class<? extends Minigame> minigameClass = (Class<? extends Minigame>) clazz;
-				manager.registerMinigame(minigameClass, manager.config.getMinimumForMinigame(minigameStr));
-				getLogger().info("Registered: " + minigameStr);
-			}
-		}
+		loadDefaultMinigames();
 		getLogger().info(description.getName() + " v" + description.getVersion() + " by DonkeyCore has been enabled!");
 	}
 	
@@ -89,6 +71,42 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		manager.rotationManager.shutdown();
 		// Prepare everything for shutdown
 		getLogger().info(getDescription().getName() + " v" + getDescription().getVersion() + " by DonkeyCore has been disabled!");
+	}
+	
+	/**
+	 * Insert the default minigames into the rotation. Automatically called on
+	 * enable and '/mm reload'
+	 */
+	public void loadDefaultMinigames() {
+		if (manager.config.defaultsEnabled()) {
+			// load minigames from the config
+			getLogger().info("Registering default minigames...");
+			for (String minigameStr : manager.config.getDefaultMinigames()) {
+				Class<?> clazz = null;
+				try {
+					clazz = Class.forName("me.donkeycore.minigamemanager.minigames." + minigameStr);
+				} catch (ClassNotFoundException e) {
+					getLogger().warning("Uh oh! " + minigameStr + " is not a default minigame. Skipping!");
+					continue;
+				}
+				if (clazz.getSuperclass() != Minigame.class) {
+					getLogger().warning(minigameStr + " is not a minigame. Skipping!");
+					continue;
+				}
+				@SuppressWarnings("unchecked")
+				Class<? extends Minigame> minigameClass = (Class<? extends Minigame>) clazz;
+				if (manager.config.getEnabledDefaultMinigames().contains(minigameStr))
+					manager.registerMinigame(minigameClass, manager.config.getMinimumForMinigame(minigameStr));
+				else
+					manager.unregisterMinigame(minigameClass);
+			}
+		} else {
+			// disable any existing ones (in case of config reload)
+			for (Class<? extends Minigame> minigame : manager.getMinigames()) {
+				if (minigame.getDeclaredAnnotation(DefaultMinigame.class) != null)
+					manager.unregisterMinigame(minigame);
+			}
+		}
 	}
 	
 }

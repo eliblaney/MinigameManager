@@ -33,7 +33,7 @@ public class CommandJoin implements CommandExecutor {
 			Player player = (Player) sender;
 			int rotation;
 			try {
-				rotation = args.length == 1 ? Integer.parseInt(args[0]) : Integer.MIN_VALUE;
+				rotation = args.length == 1 ? Integer.parseInt(args[0]) - 1 : Integer.MIN_VALUE;
 			} catch (NumberFormatException e) {
 				player.sendMessage("§cThat is not a valid number!");
 				return true;

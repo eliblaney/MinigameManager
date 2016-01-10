@@ -1,25 +1,22 @@
 package me.donkeycore.minigamemanager.config;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 public class MinigameSettings {
 	
-	private final MinigameManager manager;
-	
-	public MinigameSettings(MinigameManager manager) {
-		this.manager = manager;
-	}
-	
 	private FileConfiguration getConfig() {
-		return this.manager.getConfig();
+		return MinigameManager.getPlugin().getConfig();
 	}
 	
-	public void reload() {
-		this.manager.reloadConfig();
+	public void reloadConfig() {
+		MinigameManager.getPlugin().reloadConfig();
 	}
 	
 	// Configuration section: Messages
@@ -56,12 +53,26 @@ public class MinigameSettings {
 		return getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getBoolean("enabled");
 	}
 	
-	public List<String> getEnabledDefaultMinigames() {
-		return getConfig().getConfigurationSection("minigames").getStringList("default-minigames");
+	public Set<String> getDefaultMinigames() {
+		ConfigurationSection cs = getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection("defaults");
+		return cs.getKeys(false);
 	}
-
+	
+	public List<String> getEnabledDefaultMinigames() {
+		if (!defaultsEnabled())
+			return new ArrayList<>();
+		ConfigurationSection cs = getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection("defaults");
+		Set<String> minigames = cs.getKeys(false);
+		List<String> enabled = new ArrayList<>();
+		for (String m : minigames) {
+			if (cs.getConfigurationSection(m).getBoolean("enabled"))
+				enabled.add(m);
+		}
+		return enabled;
+	}
+	
 	public int getMinimumForMinigame(String minigame) {
-		return getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection(minigame).getInt("minimum-players");
+		return getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection("defaults").getConfigurationSection(minigame).getInt("minimum-players");
 	}
 	
 }

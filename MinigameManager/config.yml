@@ -23,6 +23,8 @@ messages:
 
   # When there isn't enough players to start a minigame
   not-enough-players: "&cNot enough players!"
+  # When an admin stops a rotation (using /mm stop) OR plugin is being disabled (reload, shutdown)
+  rotation-stopped: "&cAn admin has stopped the rotation. Please be patient!"
   # When the rotation announces the next minigame [Available variables: %minigame%]
   next-minigame: "&eThe next minigame will be &l%minigame%&e!"
   # When the countdown timer is ticking [Available variables: %minigame%, %time%]
@@ -37,7 +39,7 @@ messages:
 
 # Everything to do with rotations and the rotation lobby
 rotations:
-  # The amount of rotations in total (Requires reload)
+  # The amount of rotations in total (requires reload)
   amount: 1
   # Minimum players required to join a game
   # NOTE - A minigame that requires more players
@@ -60,7 +62,7 @@ minigames:
     # Configure each default minigame specifically
     defaults:
       Spleef:
-        # Should this minigame be in the rotation? (requires reload)
+        # Should this minigame be in the rotation? (takes effect after next minigame finishes or reload)
         enabled: true
         # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
         minimum-players: 5

@@ -9,7 +9,8 @@ import me.donkeycore.minigamemanager.api.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.MinigameType;
 import me.donkeycore.minigamemanager.api.Rotation;
 
-@MinigameAttributes(type = MinigameType.LAST_MAN_STANDING)
+@DefaultMinigame
+@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING)
 public class Spleef extends Minigame {
 	
 	private final Location[] spawns;
@@ -23,11 +24,6 @@ public class Spleef extends Minigame {
 	public void onStart() {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	@Override
-	public String getName() {
-		return "Spleef";
 	}
 	
 	@Override

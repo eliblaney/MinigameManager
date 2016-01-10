@@ -53,7 +53,7 @@ public final class DefaultRotationManager implements RotationManager {
 	@Override
 	public boolean join(Player player, int id) {
 		Validate.notNull(player);
-		Validate.isTrue(id > 0 && id < rotations.size(), id + " is not a valid rotation ID! Current number of rotations: " + rotations.size());
+		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation ID! Current number of rotations: " + rotations.size());
 		DefaultRotation r = rotations.get(id);
 		int maxPlayers = manager.getMinigameConfig().getMaximumPlayers();
 		if (r.getPlayers().size() >= maxPlayers)
@@ -108,7 +108,7 @@ public final class DefaultRotationManager implements RotationManager {
 		if (!running)
 			return;
 		final DefaultRotationManager rm = this;
-		Bukkit.getScheduler().runTaskAsynchronously(manager, new Runnable() {
+		Bukkit.getScheduler().runTaskAsynchronously(MinigameManager.getPlugin(), new Runnable() {
 			public void run() {
 				Minigame minigame = null;
 				int tries = 10;
@@ -126,7 +126,7 @@ public final class DefaultRotationManager implements RotationManager {
 					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName())));
 					// Async countdown timer
 					Countdown countdown = new Countdown(manager, rm, r, minigame);
-					BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(manager, countdown, 20L, 20L);
+					BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(MinigameManager.getPlugin(), countdown, 20L, 20L);
 					countdown.setTask(bt);
 				}
 			}

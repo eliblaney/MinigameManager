@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.api;
+package me.donkeycore.minigamemanager.minigames;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,12 +7,4 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface MinigameAttributes {
-	
-	String name();
-	
-	MinigameType type();
-	
-	String[] authors() default {};
-	
-}
+public @interface DefaultMinigame {}

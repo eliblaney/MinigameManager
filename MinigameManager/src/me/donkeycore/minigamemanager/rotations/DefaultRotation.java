@@ -41,7 +41,7 @@ public final class DefaultRotation implements Rotation {
 			players.add(uuid);
 			p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
 			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN).replace("%rotation%", "" + id)));
-			if(getState() == RotationState.INGAME)
+			if (getState() == RotationState.INGAME)
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + id)));
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				if (!players.contains(player.getUniqueId())) {
@@ -99,12 +99,27 @@ public final class DefaultRotation implements Rotation {
 	
 	@Override
 	public void finish() {
-		setState(RotationState.LOBBY);
+		stop();
+		resume();
+	}
+	
+	@Override
+	public void stop() {
+		if (getState() == RotationState.STOPPED)
+			throw new IllegalStateException("Cannot stop if already stopped!");
+		setState(RotationState.STOPPED);
 		if (minigame != null)
 			minigame.onEnd();
 		minigame = null;
 		inGame.clear();
 		teleportAll(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
+	}
+	
+	@Override
+	public void resume() {
+		if (getState() != RotationState.STOPPED)
+			throw new IllegalStateException("Cannot resume if not stopped!");
+		setState(RotationState.LOBBY);
 		rm.chooseMinigame(this);
 	}
 	
