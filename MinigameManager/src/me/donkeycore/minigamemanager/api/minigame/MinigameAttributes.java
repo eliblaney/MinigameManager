@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.api;
+package me.donkeycore.minigamemanager.api.minigame;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.api;
+package me.donkeycore.minigamemanager.api.rotation;
 
 public enum RotationState {
 	

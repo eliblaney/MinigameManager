@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import me.donkeycore.minigamemanager.api.RotationManager;
+import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 import me.donkeycore.minigamemanager.events.RotationJoinEvent;
 

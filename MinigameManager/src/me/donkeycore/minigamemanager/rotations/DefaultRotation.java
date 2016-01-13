@@ -10,10 +10,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import me.donkeycore.minigamemanager.api.Minigame;
-import me.donkeycore.minigamemanager.api.Rotation;
-import me.donkeycore.minigamemanager.api.RotationManager;
-import me.donkeycore.minigamemanager.api.RotationState;
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.rotation.Rotation;
+import me.donkeycore.minigamemanager.api.rotation.RotationManager;
+import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 

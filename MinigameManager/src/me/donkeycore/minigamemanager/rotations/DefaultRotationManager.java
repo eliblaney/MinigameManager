@@ -15,10 +15,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import me.donkeycore.minigamemanager.api.Minigame;
-import me.donkeycore.minigamemanager.api.Rotation;
-import me.donkeycore.minigamemanager.api.RotationManager;
-import me.donkeycore.minigamemanager.api.RotationState;
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.rotation.Rotation;
+import me.donkeycore.minigamemanager.api.rotation.RotationManager;
+import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -52,7 +52,7 @@ public final class DefaultRotationManager implements RotationManager {
 	
 	@Override
 	public boolean join(Player player, int id) {
-		Validate.notNull(player);
+		Validate.notNull(player, "Player cannot be null!");
 		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation ID! Current number of rotations: " + rotations.size());
 		DefaultRotation r = rotations.get(id);
 		int maxPlayers = manager.getMinigameConfig().getMaximumPlayers();
@@ -66,7 +66,7 @@ public final class DefaultRotationManager implements RotationManager {
 	
 	@Override
 	public boolean leave(Player player, boolean kicked) {
-		Validate.notNull(player);
+		Validate.notNull(player, "Player cannot be null!");
 		UUID uuid = player.getUniqueId();
 		for (DefaultRotation r : rotations) {
 			if (r.hasPlayer(uuid)) {
@@ -84,13 +84,13 @@ public final class DefaultRotationManager implements RotationManager {
 	
 	@Override
 	public Rotation getRotation(int id) {
-		Validate.isTrue(id > 0 && id < rotations.size());
+		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation ID! Current number of rotations: " + rotations.size());
 		return rotations.get(id);
 	}
 	
 	@Override
 	public Rotation getRotation(Player player) {
-		Validate.notNull(player);
+		Validate.notNull(player, "Player cannot be null!");
 		UUID uuid = player.getUniqueId();
 		for (Rotation r : rotations) {
 			if (r.hasPlayer(uuid))
@@ -103,7 +103,7 @@ public final class DefaultRotationManager implements RotationManager {
 	public void chooseMinigame(Rotation rotation) {
 		Validate.notNull(rotation, "The rotation cannot be null!");
 		Validate.isTrue(rotation instanceof DefaultRotation, "Rotation type " + rotation.getClass().getSimpleName() + " is invalid for " + getClass().getSimpleName());
-		DefaultRotation r = (DefaultRotation) rotation;
+		final DefaultRotation r = (DefaultRotation) rotation;
 		// Don't want to do anything if shutting down
 		if (!running)
 			return;
@@ -134,6 +134,8 @@ public final class DefaultRotationManager implements RotationManager {
 	}
 	
 	protected void start(DefaultRotation r, Minigame minigame) {
+		Validate.notNull(r, "Rotation cannot be null!");
+		Validate.notNull(minigame, "Minigame cannot be null!");
 		// Set the rotation minigame and copy current players to another list
 		r.beginMinigame(minigame);
 		// Teleport everybody to possibly random spawns and optionally send them a mapinfo message 

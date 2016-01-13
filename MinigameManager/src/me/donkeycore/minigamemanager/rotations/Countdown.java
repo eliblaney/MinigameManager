@@ -3,8 +3,8 @@ package me.donkeycore.minigamemanager.rotations;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
-import me.donkeycore.minigamemanager.api.Minigame;
-import me.donkeycore.minigamemanager.api.RotationState;
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 

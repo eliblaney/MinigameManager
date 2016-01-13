@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.api;
+package me.donkeycore.minigamemanager.api.rotation;
 
 import org.apache.commons.lang.Validate;
 

@@ -1,9 +1,11 @@
-package me.donkeycore.minigamemanager.api;
+package me.donkeycore.minigamemanager.api.rotation;
 
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Location;
+
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
 
 /**
  * The main rotation class; represents a single rotation lobby

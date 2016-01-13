@@ -4,11 +4,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.donkeycore.minigamemanager.api.Minigame;
-import me.donkeycore.minigamemanager.api.MinigameAttributes;
-import me.donkeycore.minigamemanager.api.Rotation;
-import me.donkeycore.minigamemanager.api.RotationManager;
-import me.donkeycore.minigamemanager.api.RotationState;
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.rotation.Rotation;
+import me.donkeycore.minigamemanager.api.rotation.RotationManager;
+import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 public class CommandMinigame implements CommandExecutor {

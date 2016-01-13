@@ -6,24 +6,22 @@ import java.util.Set;
 
 import org.apache.commons.lang.Validate;
 
-import me.donkeycore.minigamemanager.api.Minigame;
-import me.donkeycore.minigamemanager.api.MinigameAttributes;
-import me.donkeycore.minigamemanager.api.RotationManager;
-import me.donkeycore.minigamemanager.api.SubstitutionHandler;
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.rotation.RotationManager;
+import me.donkeycore.minigamemanager.api.rotation.SubstitutionHandler;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
 
 /*
  * TODO:
- * - /mm [help|info minigame|start #|stop #|reload]
- * - info minigame: display information from the MinigameAttributes annotation
  * - sign support
  * - team API, chest API (and other minigame APIs) in the
  * me.donkeycore.minigamemanager.api.minigame package
  * - stuff to make minigames EASIER to make
  * - config options:
  * * server-wide (join rotation on join server, leave rotation on quit server)
- * - beta test next saturday or something
+ * - beta test at some point
  * - future: create entire minigame from config or lua/python
  * - gems:
  * * config:
@@ -31,7 +29,7 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
  * # boolean: use vault currency as gems
  * - scoreboard:
  * * set scoreboard lines using string array
- * 
+ * - ELO rating system
  */
 /**
  * Main MinigameManager plugin class with API methods

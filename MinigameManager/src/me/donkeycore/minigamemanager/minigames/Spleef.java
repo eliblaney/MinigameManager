@@ -4,10 +4,10 @@ import java.util.Random;
 
 import org.bukkit.Location;
 
-import me.donkeycore.minigamemanager.api.Minigame;
-import me.donkeycore.minigamemanager.api.MinigameAttributes;
-import me.donkeycore.minigamemanager.api.MinigameType;
-import me.donkeycore.minigamemanager.api.Rotation;
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.minigame.MinigameType;
+import me.donkeycore.minigamemanager.api.rotation.Rotation;
 
 @DefaultMinigame
 @MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING)
