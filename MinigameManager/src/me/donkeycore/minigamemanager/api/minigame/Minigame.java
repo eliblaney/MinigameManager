@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -68,7 +69,11 @@ public abstract class Minigame {
 	/**
 	 * Call this to end the minigame and continue to the next rotation<br>
 	 * <b>Note:</b> If this method is being overriden, make sure there is a call
-	 * to {@link Rotation#finish()} or a call to <pre>super.end()</pre>
+	 * to {@link Rotation#finish()} or a call to
+	 * 
+	 * <pre>
+	 * super.end()
+	 * </pre>
 	 */
 	public void end() {
 		r.finish();
@@ -120,7 +125,8 @@ public abstract class Minigame {
 	/**
 	 * Teleport all players to a location
 	 * 
-	 * @param supplier A {@link LocationSupplier} that, when given a player, returns the
+	 * @param supplier A {@link LocationSupplier} that, when given a player,
+	 *            returns the
 	 *            location to teleport that player.
 	 */
 	public void teleportAll(LocationSupplier supplier) {
@@ -135,7 +141,8 @@ public abstract class Minigame {
 	 * giveAll(func, null);
 	 * </pre>
 	 * 
-	 * @param supplier An {@link ItemStackSupplier} that, when given a player, returns
+	 * @param supplier An {@link ItemStackSupplier} that, when given a player,
+	 *            returns
 	 *            a pair
 	 *            of itemstack to give to that player and the slot (-1 for any
 	 *            available slot)
@@ -149,7 +156,8 @@ public abstract class Minigame {
 	/**
 	 * Give all the players an item
 	 * 
-	 * @param supplier An {@link ItemStackSupplier} that, when given a player, returns
+	 * @param supplier An {@link ItemStackSupplier} that, when given a player,
+	 *            returns
 	 *            a pair
 	 *            of itemstack to give to that player and the slot (-1 for any
 	 *            available slot)
@@ -190,7 +198,7 @@ public abstract class Minigame {
 	/**
 	 * Clear inventories of all players in the minigame
 	 */
-	public void clearInventories() {
+	public void clearAll() {
 		applyAll(new PlayerConsumer() {
 			
 			@Override
@@ -201,12 +209,42 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Heal all players' health and saturation
+	 */
+	public void healAll() {
+		applyAll(new PlayerConsumer() {
+			
+			@Override
+			public void apply(Player player) {
+				player.setHealth(player.getMaxHealth());
+				player.setFoodLevel(20);
+			}
+			
+		});
+	}
+	
+	/**
+	 * Set all players' gamemodes
+	 * 
+	 * @param mode the {@link GameMode} to change all players to
+	 */
+	public void setGamemode(final GameMode mode) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				player.setGameMode(mode);
+			}
+		});
+	}
+	
+	/**
 	 * Supplies a location for every player given
 	 */
 	public static interface LocationSupplier extends Function<Player, Location> {}
 	
 	/**
-	 * Supplise an itemstack and a slot to place the itemstack for every player given
+	 * Supplise an itemstack and a slot to place the itemstack for every player
+	 * given
 	 */
 	public static interface ItemStackSupplier extends Function<Player, Pair<ItemStack, Integer>> {}
 	

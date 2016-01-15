@@ -30,6 +30,9 @@ public class MinigameConfig {
 		this.fileName = configFile.getName();
 	}
 	
+	/**
+	 * Reload the configuration file
+	 */
 	public void reloadConfig() {
 		if (configFile == null)
 			configFile = new File(plugin.getDataFolder(), fileName);
@@ -46,12 +49,20 @@ public class MinigameConfig {
 		}
 	}
 	
+	/**
+	 * Get the configuration file, ready for editing
+	 * 
+	 * @return An instance of {@link FileConfiguration} representing the config
+	 */
 	public FileConfiguration getConfig() {
 		if (config == null)
 			reloadConfig();
 		return config;
 	}
 	
+	/**
+	 * Save any changes to the config made by the plugin
+	 */
 	public void saveConfig() {
 		if (config == null || configFile == null)
 			return;
@@ -62,17 +73,26 @@ public class MinigameConfig {
 		}
 	}
 	
+	/**
+	 * Save the default config if the config file has not been created yet
+	 */
 	public void saveDefaultConfig() {
 		if (configFile == null)
 			configFile = new File(plugin.getDataFolder(), fileName);
 		if (!configFile.exists())
-			plugin.saveResource("locations.yml", false);
+			plugin.saveResource(fileName, false);
 	}
 	
+	/**
+	 * Get the locations for the minigame spawns, as specified by the config
+	 * 
+	 * @param minigame The minigame string to use
+	 * @return An array of {@link Location} objects for each spawn location
+	 */
 	public Location[] getMinigameSpawns(String minigame) {
 		ConfigurationSection spawns= getConfig().getConfigurationSection("spawns");
 		Set<String> keys = spawns.getKeys(false);
-		Location[] locations = new Location[keys.size()];
+		Location[] locations = new Location[keys.size() - 1];
 		int i = 0;
 		for (String key : keys) {
 			if(key.equalsIgnoreCase("mapinfo"))
@@ -91,6 +111,13 @@ public class MinigameConfig {
 		return locations;
 	}
 	
+	/**
+	 * Get the map info information for the arena
+	 * 
+	 * @param minigame The minigame string to use
+	 * @param key The name of the arena in which the mapinfo information can be found
+	 * @return An array of length 2 with the name of the arena in the first index and the author(s) in the second
+	 */
 	public String[] getMapInfo(String minigame, String key) {
 		ConfigurationSection kcs = getConfig().getConfigurationSection(key);
 		if (kcs == null)

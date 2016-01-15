@@ -112,7 +112,7 @@ public final class DefaultRotationManager implements RotationManager {
 		if(rotation.getState() != RotationState.LOBBY)
 			return;
 		final DefaultRotationManager rm = this;
-		Bukkit.getScheduler().runTaskAsynchronously(MinigameManager.getPlugin(), new Runnable() {
+		Bukkit.getScheduler().runTask(MinigameManager.getPlugin(), new Runnable() {
 			public void run() {
 				Minigame minigame = null;
 				int tries = 10;
@@ -131,7 +131,7 @@ public final class DefaultRotationManager implements RotationManager {
 					// Async countdown timer
 					Countdown countdown = new Countdown(manager, rm, r, minigame, force);
 					force = false;
-					BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(MinigameManager.getPlugin(), countdown, 20L, 20L);
+					BukkitTask bt = Bukkit.getScheduler().runTaskTimer(MinigameManager.getPlugin(), countdown, 20L, 20L);
 					countdown.setTask(bt);
 				}
 			}
@@ -154,8 +154,6 @@ public final class DefaultRotationManager implements RotationManager {
 			if (mapinfo.length > 0)
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
 		}
-		// Start the fun
-		minigame.onStart();
 	}
 
 	@Override

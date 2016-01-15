@@ -15,6 +15,8 @@ import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.listeners.MinigameListener;
+import me.donkeycore.minigamemanager.listeners.QuitListener;
 import me.donkeycore.minigamemanager.minigames.DefaultMinigame;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 
@@ -41,6 +43,9 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		getCommand("minigamemanager").setExecutor(new CommandMinigame(manager));
 		getCommand("join").setExecutor(new CommandJoin(manager));
 		getCommand("leave").setExecutor(new CommandLeave(manager));
+		getLogger().info("Registering listeners...");
+		Bukkit.getPluginManager().registerEvents(new QuitListener(manager), this);
+		Bukkit.getPluginManager().registerEvents(new MinigameListener(manager), this);
 		getLogger().info("Creating rotation manager...");
 		Class<? extends RotationManager> rmClass = SubstitutionHandler.getInstance().getRotationManager();
 		try {

@@ -12,6 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
+import me.donkeycore.minigamemanager.api.nms.ReflectionAPI;
+
 public class ItemStackBuilder {
 	
 	private ItemStack i;
@@ -99,6 +101,74 @@ public class ItemStackBuilder {
 		ItemMeta im = i.getItemMeta();
 		im.spigot().setUnbreakable(unbreakable);
 		i.setItemMeta(im);
+		return this;
+	}
+	
+	public ItemStackBuilder canDestroy(String... destroyable) throws Exception {
+		ReflectionAPI nms = new ReflectionAPI();
+		Class<?> nbttagcompound = nms.getNMSClass("NBTTagCompound");
+		Class<?> nbttagstring = nms.getNMSClass("NBTTagString");
+		Class<?> nbttaglist = nms.getNMSClass("NBTTagList");
+		Class<?> nbtbase = nms.getNMSClass("NBTBase");
+		
+		Class<?> craftItemStack = nms.getCraftClass("inventory.CraftItemStack");
+		// CraftItemStack.asNMSCopy(i);
+		Object nmsItemStack = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, i);
+		Class<?> clazz = nmsItemStack.getClass();
+		
+		// ItemStack.hasTag();
+		Boolean hasTag = (Boolean) clazz.getMethod("hasTag").invoke(nmsItemStack);
+		if (!hasTag)
+			// ItemStack.setTag(new NBTTagCompound());
+			clazz.getMethod("setTag", nbttagcompound).invoke(nmsItemStack, nbttagcompound.newInstance());
+		// ItemStack.getTag();
+		Object tag = clazz.getMethod("getTag").invoke(nmsItemStack);
+		// NBTTagList list = new NBTTagList();
+		Object list = nbttaglist.newInstance();
+		for(String d : destroyable) {
+			// NBTTagList.add(new NBTTagString(d));
+			nbttaglist.getMethod("add", nbtbase).invoke(list, nbttagstring.getConstructor(String.class).newInstance(d));
+		}
+		// NBTTagCompound.set("CanDestroy", list);
+		tag.getClass().getMethod("set", String.class, nbtbase).invoke(tag, "CanDestroy", list);
+		// ItemStack.setTag(tag);
+		clazz.getMethod("setTag", nbttagcompound).invoke(nmsItemStack, tag);
+		// i = CraftItemStack.asBukkitCopy(nmsItemStack);
+		i = (ItemStack) craftItemStack.getMethod("asBukkitCopy", clazz).invoke(null, nmsItemStack);
+		return this;
+	}
+	
+	public ItemStackBuilder canPlaceOn(String... placeable) throws Exception {
+		ReflectionAPI nms = new ReflectionAPI();
+		Class<?> nbttagcompound = nms.getNMSClass("NBTTagCompound");
+		Class<?> nbttagstring = nms.getNMSClass("NBTTagString");
+		Class<?> nbttaglist = nms.getNMSClass("NBTTagList");
+		Class<?> nbtbase = nms.getNMSClass("NBTBase");
+		
+		Class<?> craftItemStack = nms.getCraftClass("inventory.CraftItemStack");
+		// CraftItemStack.asNMSCopy(i);
+		Object nmsItemStack = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, i);
+		Class<?> clazz = nmsItemStack.getClass();
+		
+		// ItemStack.hasTag();
+		Boolean hasTag = (Boolean) clazz.getMethod("hasTag").invoke(nmsItemStack);
+		if (!hasTag)
+			// ItemStack.setTag(new NBTTagCompound());
+			clazz.getMethod("setTag", nbttagcompound).invoke(nmsItemStack, nbttagcompound.newInstance());
+		// ItemStack.getTag();
+		Object tag = clazz.getMethod("getTag").invoke(nmsItemStack);
+		// NBTTagList list = new NBTTagList();
+		Object list = nbttaglist.newInstance();
+		for(String d : placeable) {
+			// NBTTagList.add(new NBTTagString(d));
+			nbttaglist.getMethod("add", nbtbase).invoke(list, nbttagstring.getConstructor(String.class).newInstance(d));
+		}
+		// NBTTagCompound.set("CanDestroy", list);
+		tag.getClass().getMethod("set", String.class, nbtbase).invoke(tag, "CanPlaceOn", list);
+		// ItemStack.setTag(tag);
+		clazz.getMethod("setTag", nbttagcompound).invoke(nmsItemStack, tag);
+		// i = CraftItemStack.asBukkitCopy(nmsItemStack);
+		i = (ItemStack) craftItemStack.getMethod("asBukkitCopy", clazz).invoke(null, nmsItemStack);
 		return this;
 	}
 	

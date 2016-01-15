@@ -3,6 +3,7 @@ package me.donkeycore.minigamemanager.minigames;
 import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,7 +18,7 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 
 @DefaultMinigame
-@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore")
+@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysFullHunger = true)
 public class Spleef extends Minigame {
 	
 	private final Location[] spawns;
@@ -29,12 +30,19 @@ public class Spleef extends Minigame {
 	
 	@Override
 	public void onStart() {
-		clearInventories();
+		setGamemode(GameMode.ADVENTURE);
+		healAll();
+		clearAll();
 		giveAll(new ItemStackSupplier() {
 			
 			@Override
 			public Pair<ItemStack, Integer> apply(Player player) {
-				ItemStack i = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("♪ Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS).build();
+				ItemStack i = new ItemStack(Material.DIAMOND_SPADE); // Backup item
+				try {
+					i = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("♪ Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS).canDestroy("minecraft:snow").build();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				return Pair.of(i, 0);
 			}
 		});

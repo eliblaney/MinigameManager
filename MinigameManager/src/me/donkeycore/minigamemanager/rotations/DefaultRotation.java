@@ -43,6 +43,8 @@ public final class DefaultRotation implements Rotation {
 			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1))));
 			if (getState() == RotationState.INGAME)
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1))));
+			p.setHealth(p.getMaxHealth());
+			p.setFoodLevel(20);
 		}
 	}
 	
@@ -89,6 +91,7 @@ public final class DefaultRotation implements Rotation {
 		this.minigame = minigame;
 		setState(RotationState.INGAME);
 		inGame.addAll(players);
+		minigame.onStart();
 	}
 	
 	@Override

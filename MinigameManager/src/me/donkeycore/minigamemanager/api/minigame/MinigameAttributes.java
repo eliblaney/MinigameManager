@@ -15,4 +15,8 @@ public @interface MinigameAttributes {
 	
 	String[] authors() default {};
 	
+	boolean alwaysFullHealth() default false;
+	
+	boolean alwaysFullHunger() default false;
+	
 }
