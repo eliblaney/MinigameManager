@@ -40,15 +40,9 @@ public final class DefaultRotation implements Rotation {
 				throw new IllegalArgumentException("Player was already in rotation!");
 			players.add(uuid);
 			p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
-			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN).replace("%rotation%", "" + id)));
+			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1))));
 			if (getState() == RotationState.INGAME)
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + id)));
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (!players.contains(player.getUniqueId())) {
-					p.hidePlayer(player);
-					player.hidePlayer(p);
-				}
-			}
+				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1))));
 		}
 	}
 	

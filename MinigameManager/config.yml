@@ -18,6 +18,8 @@ messages:
   full-rotations: "&cThere are no available rotations! Try again later."
   # When a player tries to join a SPECIFIC rotation, but it is full
   full-rotation: "&cThat rotation is full! Try a different one."
+  # When a player tries to join a rotation already is in one
+  already-in-rotation: "&cYou are already in a rotation!"
   # When a player tries to leave a rotation, but they aren't in one
   not-in-rotation: "&cYou are not currently in a rotation!"
 

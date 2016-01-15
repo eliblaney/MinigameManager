@@ -14,14 +14,17 @@ public class Countdown implements Runnable {
 	private final DefaultRotationManager rm;
 	private final DefaultRotation r;
 	private final Minigame minigame;
+	private final boolean force;
 	private BukkitTask bt;
-	private int secondsLeft = getTotalSecondsLeft();
+	private int secondsLeft = 30;
 	
-	Countdown(MinigameManager manager, DefaultRotationManager rm, DefaultRotation r, Minigame minigame) {
+	Countdown(MinigameManager manager, DefaultRotationManager rm, DefaultRotation r, Minigame minigame, boolean force) {
 		this.manager = manager;
 		this.rm = rm;
 		this.r = r;
 		this.minigame = minigame;
+		this.force = force;
+		this.secondsLeft = getTotalSecondsLeft();
 	}
 	
 	void setTask(BukkitTask bt) {
@@ -38,7 +41,7 @@ public class Countdown implements Runnable {
 	}
 	
 	public void run() {
-		if (r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame)) {
+		if (!force && r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame.getClass())) {
 			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
 			if (bt != null)
 				bt.cancel();
@@ -57,6 +60,8 @@ public class Countdown implements Runnable {
 			// Announce to all players that a game is starting every 10 seconds
 		} else if (secondsLeft % 10 == 0 || secondsLeft <= 5)
 			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName()).replace("%time%", getTimeLeft(secondsLeft--))));
+		else
+			secondsLeft--;
 	}
 	
 	// Get friendly string for amount of time left

@@ -1,5 +1,8 @@
 package me.donkeycore.minigamemanager.commands;
 
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,15 +24,14 @@ public class CommandMinigame implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		//<command> [help|list|info minigame|<start|stop|status> <rotation>|reload]
 		if (cmd.getName().equalsIgnoreCase("minigamemanager")) {
 			if (args.length == 0) {
-				sender.sendMessage("§e=========================");
-				sender.sendMessage("§e>    Minigame§6Manager");
-				sender.sendMessage("§e>     Version §6" + MinigameManager.getPlugin().getDescription().getVersion());
-				sender.sendMessage("§e>     by §6DonkeyCore");
-				sender.sendMessage("§e>    Usage: §6/mm help");
-				sender.sendMessage("§e=========================");
+				sender.sendMessage("§e========================");
+				sender.sendMessage("§e>      Minigame§6Manager");
+				sender.sendMessage("§e>        Version §6" + MinigameManager.getPlugin().getDescription().getVersion());
+				sender.sendMessage("§e>       by §6DonkeyCore");
+				sender.sendMessage("§e>      Usage: §6/mm help");
+				sender.sendMessage("§e========================");
 			} else if (args.length == 1) {
 				if (args[0].equalsIgnoreCase("help") && sender.hasPermission("minigamemanager.admin.help")) {
 					sender.sendMessage("§e===<§6MinigameManager Help§e>===");
@@ -67,8 +69,8 @@ public class CommandMinigame implements CommandExecutor {
 					id = Integer.parseInt(args[1]);
 				} catch (NumberFormatException e) {}
 				RotationManager rm = manager.getRotationManager();
-				boolean valid = id >= 0 && id < rm.getRotations().length;
-				Rotation r = valid ? rm.getRotation(id) : null;
+				boolean valid = id > 0 && id <= rm.getRotations().length;
+				Rotation r = valid ? rm.getRotation(id - 1) : null;
 				if (args[0].equalsIgnoreCase("start") && sender.hasPermission("minigamemanager.admin.start")) {
 					if (!valid)
 						sender.sendMessage("§cThat is not a valid rotation id!");
@@ -86,14 +88,40 @@ public class CommandMinigame implements CommandExecutor {
 						if (r.getState() == RotationState.STOPPED)
 							sender.sendMessage("§cRotation is already stopped");
 						else {
-							
+							r.stop();
+							sender.sendMessage("§aStopped rotation #" + id);
 						}
+					}
+				} else if (args[0].equalsIgnoreCase("force") && sender.hasPermission("minigamemanager.admin.force")) {
+					if (!valid)
+						sender.sendMessage("§cThat is not a valid rotation id!");
+					else {
+						if(r.getState() == RotationState.LOBBY) {
+							rm.force(r);
+							sender.sendMessage("§aForced rotation #" + id + " to start the countdown");
+						} else
+							sender.sendMessage("§cRotation #" + id + " is not currently in the lobby.");
 					}
 				} else if (args[0].equalsIgnoreCase("status") && sender.hasPermission("minigamemanager.admin.status")) {
 					if (!valid)
 						sender.sendMessage("§cThat is not a valid rotation id!");
 					else {
-						
+						sender.sendMessage("§e===<§6Rotation Information§e>===");
+						sender.sendMessage("§e> ID: §6" + id);
+						sender.sendMessage("§e> State: " + r.getState().toColoredString());
+						if(r.getState() == RotationState.INGAME) {
+							sender.sendMessage("§e> Minigame: §6" + r.getCurrentMinigame().getName());
+							sender.sendMessage("§e> Ingame: §6" + r.getInGame().size());
+						}
+						sender.sendMessage("§e> Players (" + r.getPlayers().size() + "):");
+						if (r.getPlayers().size() > 0) {
+							String players = "";
+							for (UUID u : r.getPlayers())
+								players += ", " + Bukkit.getPlayer(u).getName();
+							sender.sendMessage("  §6> " + players.substring(2));
+						} else
+							sender.sendMessage("  §6> §e(none)");
+						sender.sendMessage("§e===<§6Rotation Information§e>===");
 					}
 				} else if (args[0].equalsIgnoreCase("info")) {
 					for (Class<? extends Minigame> mclazz : manager.getMinigames()) {

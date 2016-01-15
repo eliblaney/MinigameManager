@@ -72,4 +72,11 @@ public interface RotationManager {
 	 */
 	void shutdown();
 	
+	/**
+	 * Force the countdown to start, no matter how many players there are
+	 * 
+	 * @param r The rotation to force
+	 */
+	void force(Rotation r);
+	
 }

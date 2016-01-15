@@ -85,13 +85,14 @@ public class MinigameLocations {
 		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
 		if (mcs == null)
 			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
-		ConfigurationSection cs = mcs.getConfigurationSection("spawns");
-		Set<String> keys = cs.getKeys(false);
-		Location[] locations = new Location[keys.size()];
+		ConfigurationSection spawns = mcs.getConfigurationSection("spawns");
+		Set<String> keys = spawns.getKeys(false);
+		Location[] locations = new Location[keys.size() - 1];
 		int i = 0;
 		for (String key : keys) {
 			if (key.equalsIgnoreCase("mapinfo"))
 				continue;
+			ConfigurationSection cs = spawns.getConfigurationSection(key);
 			World world = Bukkit.getWorld(cs.getString("world"));
 			if (world == null)
 				throw new RuntimeException("Invalid world for " + key + " (from " + minigame + " spawns)");

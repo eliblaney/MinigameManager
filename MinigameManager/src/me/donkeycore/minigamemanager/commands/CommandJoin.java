@@ -31,9 +31,13 @@ public class CommandJoin implements CommandExecutor {
 				return false;
 			}
 			Player player = (Player) sender;
+			if(manager.getRotationManager().getRotation(player) != null) {
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.ALREADY_IN_ROTATION)));
+				return true;
+			}
 			int rotation;
 			try {
-				rotation = args.length == 1 ? Integer.parseInt(args[0]) - 1 : Integer.MIN_VALUE;
+				rotation = args.length == 1 ? Integer.parseInt(args[0]) : Integer.MIN_VALUE;
 			} catch (NumberFormatException e) {
 				player.sendMessage("§cThat is not a valid number!");
 				return true;
@@ -52,7 +56,7 @@ public class CommandJoin implements CommandExecutor {
 				else
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.FULL_ROTATIONS)));
 			} else {
-				if (manager.getRotationManager().join(player, rotation))
+				if (manager.getRotationManager().join(player, rotation - 1))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(player));
 				else
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.FULL_ROTATION)));

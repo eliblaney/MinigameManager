@@ -70,13 +70,14 @@ public class MinigameConfig {
 	}
 	
 	public Location[] getMinigameSpawns(String minigame) {
-		ConfigurationSection cs = getConfig().getConfigurationSection("spawns");
-		Set<String> keys = cs.getKeys(false);
+		ConfigurationSection spawns= getConfig().getConfigurationSection("spawns");
+		Set<String> keys = spawns.getKeys(false);
 		Location[] locations = new Location[keys.size()];
 		int i = 0;
 		for (String key : keys) {
 			if(key.equalsIgnoreCase("mapinfo"))
 				continue;
+			ConfigurationSection cs = spawns.getConfigurationSection(key);
 			World world = Bukkit.getWorld(cs.getString("world"));
 			if (world == null)
 				throw new RuntimeException("Invalid world for " + key + " (from " + minigame + " spawns)");

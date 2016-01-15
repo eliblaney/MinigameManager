@@ -27,6 +27,7 @@ public final class DefaultRotationManager implements RotationManager {
 	private final MinigameManager manager;
 	private final List<DefaultRotation> rotations = new ArrayList<>();
 	private boolean running;
+	private boolean force = false;
 	
 	public DefaultRotationManager(MinigameManager manager, int rotations) {
 		this.manager = manager;
@@ -107,6 +108,9 @@ public final class DefaultRotationManager implements RotationManager {
 		// Don't want to do anything if shutting down
 		if (!running)
 			return;
+		// Don't run if already playing
+		if(rotation.getState() != RotationState.LOBBY)
+			return;
 		final DefaultRotationManager rm = this;
 		Bukkit.getScheduler().runTaskAsynchronously(MinigameManager.getPlugin(), new Runnable() {
 			public void run() {
@@ -125,7 +129,8 @@ public final class DefaultRotationManager implements RotationManager {
 					// Announce next minigame
 					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName())));
 					// Async countdown timer
-					Countdown countdown = new Countdown(manager, rm, r, minigame);
+					Countdown countdown = new Countdown(manager, rm, r, minigame, force);
+					force = false;
 					BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(MinigameManager.getPlugin(), countdown, 20L, 20L);
 					countdown.setTask(bt);
 				}
@@ -152,14 +157,24 @@ public final class DefaultRotationManager implements RotationManager {
 		// Start the fun
 		minigame.onStart();
 	}
+
+	@Override
+	public void force(Rotation r) {
+		if(r.getState() != RotationState.LOBBY)
+			return;
+		force = true;
+		chooseMinigame(r);
+	}
 	
 	@Override
 	public void shutdown() {
 		this.running = false;
 		for (DefaultRotation r : rotations) {
 			r.finish();
-			for (UUID u : r.getPlayers())
-				r.leave(u, true);
+			// Avoid ConcurrentModificationExcpetion
+			UUID[] uuids = r.getPlayers().toArray(new UUID[r.getPlayers().size()]);
+			for (UUID uuid : uuids)
+				r.leave(uuid, true);
 		}
 	}
 	
@@ -184,7 +199,7 @@ public final class DefaultRotationManager implements RotationManager {
 		// Cycle through the minigames with their corresponding minimums
 		for (Entry<Class<? extends Minigame>, Integer> e : manager.getMinigamesWithMinimums().entrySet()) {
 			// If the current players are sufficient for the minigame, add it to the valid minigames
-			if (currentPlayers >= e.getValue())
+			if (force || currentPlayers >= e.getValue())
 				validMinigames.add(e.getKey());
 		}
 		return validMinigames;

@@ -55,16 +55,6 @@ public abstract class Minigame {
 	}
 	
 	/**
-	 * Called when the minigame has been registered
-	 */
-	public void onLoad() {}
-	
-	/**
-	 * Called when the minigame is being unregistered
-	 */
-	public void onUnload() {}
-	
-	/**
 	 * Called when the minigame starts and all players have been teleported to
 	 * their starting locations
 	 */
@@ -78,7 +68,7 @@ public abstract class Minigame {
 	/**
 	 * Call this to end the minigame and continue to the next rotation<br>
 	 * <b>Note:</b> If this method is being overriden, make sure there is a call
-	 * to {@link Rotation#finish()}
+	 * to {@link Rotation#finish()} or a call to <pre>super.end()</pre>
 	 */
 	public void end() {
 		r.finish();
