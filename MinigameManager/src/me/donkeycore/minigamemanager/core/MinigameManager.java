@@ -16,8 +16,7 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
 /*
  * TODO:
  * - sign support
- * - team API, chest API (and other minigame APIs) in the
- * me.donkeycore.minigamemanager.api.minigame package
+ * - chest API (and other minigame APIs)
  * - stuff to make minigames EASIER to make
  * - config options:
  * * server-wide (join rotation on join server, leave rotation on quit server)
@@ -29,6 +28,7 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
  * # boolean: use vault currency as gems
  * - scoreboard:
  * * set scoreboard lines using string array
+ * * lobby scoreboard
  * - ELO rating system
  */
 /**

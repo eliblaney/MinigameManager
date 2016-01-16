@@ -1,20 +1,28 @@
 package me.donkeycore.minigamemanager.api.minigame;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.google.common.base.Function;
 
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
+import me.donkeycore.minigamemanager.api.teams.Team;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
@@ -25,6 +33,7 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 public abstract class Minigame {
 	
 	private final Rotation r;
+	protected final Random random = new Random();
 	
 	/**
 	 * Initialize the minigame
@@ -296,6 +305,97 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Generate up to a specified amount of teams from the players in the
+	 * rotation
+	 * 
+	 * @param amount The maximum and ideal number of teams
+	 * @return An array of {@link Team} objects generated with random colors and
+	 *         names that represent the color
+	 */
+	public Team[] generateRandomTeams(int amount) {
+		Player[] players = getPlayers();
+		int length = players.length;
+		if (amount <= 0 || length <= 0)
+			return new Team[0];
+		if(amount == 1) {
+			Team[] teams = new Team[1];
+			for(Player player : players) {
+				ChatColor color = randomChatColor();
+				teams[0] = new Team.Builder().players(player).color(color).name(color.name().toLowerCase().replaceFirst(color.name().substring(0, 1).toLowerCase(), color.name().substring(0, 1).toUpperCase())).build();
+			}
+			return teams;
+		}
+		if (amount > length)
+			amount /= 2;
+		if (amount == length) {
+			Team[] teams = new Team[amount];
+			for (int i = 0; i < amount; i++) {
+				ChatColor color = randomChatColor();
+				teams[i] = new Team.Builder().players(players[i]).color(color).name(color.name().toLowerCase().replaceFirst(color.name().substring(0, 1).toLowerCase(), color.name().substring(0, 1).toUpperCase())).build();
+			}
+			return teams;
+		} else {
+			// get GCF/GCD, stored in x
+			int w = 0;
+			int x = amount;
+			int y = length;
+			int z = 0;
+			do {
+				x = amount;
+				y = length - z;
+				while (y > 0) {
+					w = y;
+					y = x % y;
+					x = w;
+				}
+				z++;
+			} while (y <= 1);
+			Team[] teams = new Team[x];
+			List<Player> playersLeft = new LinkedList<>(Arrays.asList(players));
+			Collections.shuffle(playersLeft);
+			for (int i = 1; i <= x; i++) {
+				ChatColor color = randomChatColor();
+				Team.Builder builder = new Team.Builder();
+				// get an even amount of players per team, except the last one which gets the even amount plus any remainders
+				for (int j = 0; j < (i == x ? ((length / amount) + (length % amount)) : (length / amount)); j++)
+					builder.players(playersLeft.get(j));
+				teams[i] = builder.color(color).name(color.name().toLowerCase().replaceFirst(color.name().substring(0, 1).toLowerCase(), color.name().substring(0, 1).toUpperCase())).build();
+			}
+			return teams;
+		}
+	}
+	
+	public void setScoreboard(final Scoreboard scoreboard) {
+		applyAll(new PlayerConsumer() {
+
+			@Override
+			public void apply(Player player) {
+				player.setScoreboard(scoreboard);
+			}
+			
+		});
+	}
+	
+	/**
+	 * Generate a random chat color
+	 * 
+	 * @return A random {@link ChatColor}
+	 */
+	public ChatColor randomChatColor() {
+		ChatColor[] c = ChatColor.values();
+		return c[random.nextInt(c.length)];
+	}
+	
+	/**
+	 * Generate a color with random RGB values
+	 * 
+	 * @return A random {@link Color}
+	 */
+	public Color randomColor() {
+		return Color.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+	}
+	
+	/**
 	 * Supplies a location for every player given
 	 */
 	public static interface LocationSupplier extends Function<Player, Location> {}
@@ -311,6 +411,11 @@ public abstract class Minigame {
 	 */
 	public static interface PlayerConsumer {
 		
+		/**
+		 * Perform an operation on a player
+		 * 
+		 * @param player The {@link Player} to perform an operation on
+		 */
 		public void apply(Player player);
 		
 	}

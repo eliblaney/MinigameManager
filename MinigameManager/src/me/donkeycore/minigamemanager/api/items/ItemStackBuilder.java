@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.api.minigame;
+package me.donkeycore.minigamemanager.api.items;
 
 import java.util.Arrays;
 

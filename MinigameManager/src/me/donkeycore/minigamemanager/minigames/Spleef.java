@@ -1,7 +1,5 @@
 package me.donkeycore.minigamemanager.minigames;
 
-import java.util.Random;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -11,17 +9,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import me.donkeycore.minigamemanager.api.minigame.ItemStackBuilder;
+import me.donkeycore.minigamemanager.api.items.ItemStackBuilder;
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
+import me.donkeycore.minigamemanager.api.teams.Team;
 
 @DefaultMinigame
 @MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysFullHunger = true)
 public class Spleef extends Minigame {
 	
 	private final Location[] spawns;
+	Team[] teams;
 	
 	public Spleef(Rotation r) {
 		super(r);
@@ -50,7 +50,7 @@ public class Spleef extends Minigame {
 	
 	@Override
 	public Location getStartingLocation() {
-		return spawns[new Random().nextInt(spawns.length)];
+		return spawns[random.nextInt(spawns.length)];
 	}
 	
 }

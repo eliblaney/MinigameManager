@@ -57,6 +57,7 @@ public final class DefaultRotation implements Rotation {
 			players.remove(uuid);
 			Player p = Bukkit.getPlayer(uuid);
 			if (p != null) {
+				p.setScoreboard(null);
 				p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("spawn"));
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
@@ -108,6 +109,8 @@ public final class DefaultRotation implements Rotation {
 		if (minigame != null)
 			minigame.onEnd();
 		minigame = null;
+		for(UUID u : inGame)
+			Bukkit.getPlayer(u).setScoreboard(null);
 		inGame.clear();
 		teleportAll(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
 	}
