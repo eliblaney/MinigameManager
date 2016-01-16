@@ -126,12 +126,20 @@ public abstract class Minigame {
 	 * Teleport all players to a location
 	 * 
 	 * @param supplier A {@link LocationSupplier} that, when given a player,
-	 *            returns the
-	 *            location to teleport that player.
+	 *            returns the location to teleport that player.
 	 */
 	public void teleportAll(LocationSupplier supplier) {
 		for (Player player : getPlayers())
-			getRotation().teleportAll(supplier.apply(player));
+			player.teleport(supplier.apply(player));
+	}
+	
+	/**
+	 * Teleport all players to a location
+	 * 
+	 * @param location A {@link Location} to teleport to
+	 */
+	public void teleportAll(Location location) {
+		getRotation().teleportAll(location);
 	}
 	
 	/**
@@ -186,6 +194,46 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Give all the players an item. Equivalent to
+	 * 
+	 * <pre>
+	 * giveAll(itemstack, slot, null);
+	 * </pre>
+	 * 
+	 * @param itemstack An {@link ItemStack} to give to each player
+	 * 			
+	 * @see #giveAll(ItemStackSupplier, PlayerConsumer)
+	 */
+	public void giveAll(ItemStack itemstack, int slot) {
+		giveAll(itemstack, slot, null);
+	}
+	
+	/**
+	 * Give all the players an item
+	 * 
+	 * @param itemstack An {@link ItemStack} to give to each player
+	 * @param backup An instance of {@link PlayerConsumer} that says what to do
+	 *            in case the player can't receive the item (null to just
+	 *            ignore)
+	 */
+	public void giveAll(ItemStack itemstack, int slot, PlayerConsumer backup) {
+		for (Player player : getPlayers()) {
+			PlayerInventory inv = player.getInventory();
+			if (slot == -1) {
+				HashMap<Integer, ItemStack> error = inv.addItem(itemstack);
+				if (error != null && !error.isEmpty())
+					backup.apply(player);
+			} else {
+				ItemStack i = inv.getItem(slot);
+				if (i == null)
+					inv.setItem(slot, itemstack);
+				else
+					backup.apply(player);
+			}
+		}
+	}
+	
+	/**
 	 * Apply some operation to all players in the minigame
 	 * 
 	 * @param operation The operation to apply to all players
@@ -224,6 +272,16 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Send a message to every in-game player
+	 * 
+	 * @param message The message to send to each player
+	 */
+	public void announce(String message) {
+		for (Player player : getPlayers())
+			player.sendMessage(message);
+	}
+	
+	/**
 	 * Set all players' gamemodes
 	 * 
 	 * @param mode the {@link GameMode} to change all players to
@@ -243,7 +301,7 @@ public abstract class Minigame {
 	public static interface LocationSupplier extends Function<Player, Location> {}
 	
 	/**
-	 * Supplise an itemstack and a slot to place the itemstack for every player
+	 * Supplies an itemstack and a slot to place the itemstack for every player
 	 * given
 	 */
 	public static interface ItemStackSupplier extends Function<Player, Pair<ItemStack, Integer>> {}
