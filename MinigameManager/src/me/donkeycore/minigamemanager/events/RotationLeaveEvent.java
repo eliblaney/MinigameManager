@@ -1,16 +1,18 @@
 package me.donkeycore.minigamemanager.events;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class RotationLeaveEvent extends Event {
+import me.donkeycore.minigamemanager.api.rotation.Rotation;
+
+public class RotationLeaveEvent extends RotationEvent {
 	
 	private static final HandlerList handlers = new HandlerList();
 	
 	private final Player player;
 	
-	public RotationLeaveEvent(Player player) {
+	public RotationLeaveEvent(Rotation rotation, Player player) {
+		super(rotation);
 		this.player = player;
 	}
 	

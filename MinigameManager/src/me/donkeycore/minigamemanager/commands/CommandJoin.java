@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 import me.donkeycore.minigamemanager.events.RotationJoinEvent;
@@ -50,14 +51,15 @@ public class CommandJoin implements CommandExecutor {
 				player.sendMessage(error);
 				return true;
 			}
+			RotationManager rm = manager.getRotationManager();
 			if (rotation == Integer.MIN_VALUE) {
-				if (manager.getRotationManager().join(player))
-					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(player));
+				if (rm.join(player))
+					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.FULL_ROTATIONS)));
 			} else {
-				if (manager.getRotationManager().join(player, rotation - 1))
-					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(player));
+				if (rm.join(player, rotation - 1))
+					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.FULL_ROTATION)));
 			}

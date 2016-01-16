@@ -1,23 +1,22 @@
 package me.donkeycore.minigamemanager.events;
 
-import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 
-public class RotationJoinEvent extends RotationEvent {
+public abstract class RotationEvent extends Event {
 	
 	private static final HandlerList handlers = new HandlerList();
 	
-	private final Player player;
+	private final Rotation rotation;
 	
-	public RotationJoinEvent(Rotation rotation, Player player) {
-		super(rotation);
-		this.player = player;
+	public RotationEvent(Rotation rotation) {
+		this.rotation = rotation;
 	}
 	
-	public Player getPlayer() {
-		return player;
+	public Rotation getRotation() {
+		return rotation;
 	}
 	
 	@Override

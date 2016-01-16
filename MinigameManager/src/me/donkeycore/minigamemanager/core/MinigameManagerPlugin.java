@@ -47,7 +47,8 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new QuitListener(manager), this);
 		Bukkit.getPluginManager().registerEvents(new MinigameListener(manager), this);
 		getLogger().info("Creating rotation manager...");
-		Class<? extends RotationManager> rmClass = SubstitutionHandler.getInstance().getRotationManager();
+		SubstitutionHandler.lock();
+		Class<? extends RotationManager> rmClass = SubstitutionHandler.getRotationManager();
 		try {
 			manager.rotationManager = rmClass.getConstructor(MinigameManager.class, int.class).newInstance(manager, manager.config.getNumberOfRotations());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -59,7 +60,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			public void run() {
 				for (Rotation rotation : manager.rotationManager.getRotations())
-					manager.rotationManager.chooseMinigame(rotation);
+					manager.rotationManager.start(rotation);
 			}
 		});
 		loadDefaultMinigames();

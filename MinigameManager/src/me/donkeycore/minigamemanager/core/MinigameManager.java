@@ -9,7 +9,6 @@ import org.apache.commons.lang.Validate;
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
-import me.donkeycore.minigamemanager.api.rotation.SubstitutionHandler;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
 
@@ -29,6 +28,7 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
  * - scoreboard:
  * * set scoreboard lines using string array
  * * lobby scoreboard
+ * - commands to edit locations
  * - ELO rating system
  */
 /**
@@ -45,10 +45,6 @@ public final class MinigameManager {
 	RotationManager rotationManager;
 	private static MinigameManagerPlugin plugin;
 	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
-	
-	static {
-		SubstitutionHandler.getInstance();
-	}
 	
 	MinigameManager(MinigameManagerPlugin plugin) {
 		MinigameManager.plugin = plugin;

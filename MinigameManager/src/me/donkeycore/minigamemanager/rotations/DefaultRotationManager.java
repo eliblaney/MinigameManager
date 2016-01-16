@@ -2,8 +2,10 @@ package me.donkeycore.minigamemanager.rotations;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -26,14 +28,14 @@ public final class DefaultRotationManager implements RotationManager {
 	
 	private final MinigameManager manager;
 	private final List<DefaultRotation> rotations = new ArrayList<>();
-	private boolean running;
+	private final Map<UUID, DefaultRotation> players = new HashMap<>();
+	private boolean running = true;
 	private boolean force = false;
 	
 	public DefaultRotationManager(MinigameManager manager, int rotations) {
 		this.manager = manager;
 		for (int i = 0; i < rotations; i++)
 			this.rotations.add(new DefaultRotation(this, i));
-		this.running = true;
 	}
 	
 	@Override
@@ -44,8 +46,9 @@ public final class DefaultRotationManager implements RotationManager {
 			if (r.getPlayers().size() >= maxPlayers)
 				continue;
 			r.join(player.getUniqueId());
+			players.put(player.getUniqueId(), r);
 			if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
-				chooseMinigame(r);
+				start(r);
 			return true;
 		}
 		return false;
@@ -60,8 +63,9 @@ public final class DefaultRotationManager implements RotationManager {
 		if (r.getPlayers().size() >= maxPlayers)
 			return false;
 		r.join(player.getUniqueId());
+		players.put(player.getUniqueId(), r);
 		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
-			chooseMinigame(r);
+			start(r);
 		return true;
 	}
 	
@@ -72,6 +76,7 @@ public final class DefaultRotationManager implements RotationManager {
 		for (DefaultRotation r : rotations) {
 			if (r.hasPlayer(uuid)) {
 				r.leave(uuid, kicked);
+				players.remove(uuid);
 				return true;
 			}
 		}
@@ -92,16 +97,16 @@ public final class DefaultRotationManager implements RotationManager {
 	@Override
 	public Rotation getRotation(Player player) {
 		Validate.notNull(player, "Player cannot be null!");
-		UUID uuid = player.getUniqueId();
-		for (Rotation r : rotations) {
-			if (r.hasPlayer(uuid))
-				return r;
-		}
-		return null;
+		return getRotation(player.getUniqueId());
+	}
+	
+	public Rotation getRotation(UUID player) {
+		Validate.notNull(player, "Player UUID cannot be null!");
+		return players.get(player);
 	}
 	
 	@Override
-	public void chooseMinigame(Rotation rotation) {
+	public void start(Rotation rotation) {
 		Validate.notNull(rotation, "The rotation cannot be null!");
 		Validate.isTrue(rotation instanceof DefaultRotation, "Rotation type " + rotation.getClass().getSimpleName() + " is invalid for " + getClass().getSimpleName());
 		final DefaultRotation r = (DefaultRotation) rotation;
@@ -161,7 +166,7 @@ public final class DefaultRotationManager implements RotationManager {
 		if(r.getState() != RotationState.LOBBY)
 			return;
 		force = true;
-		chooseMinigame(r);
+		start(r);
 	}
 	
 	@Override

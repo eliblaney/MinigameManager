@@ -40,7 +40,7 @@ public interface RotationManager {
 	 * 
 	 * @param rotation The rotation to execute the process for
 	 */
-	void chooseMinigame(Rotation rotation);
+	void start(Rotation rotation);
 	
 	/**
 	 * Get all of the currently active rotations

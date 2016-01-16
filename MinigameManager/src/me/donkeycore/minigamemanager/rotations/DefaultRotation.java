@@ -120,7 +120,7 @@ public final class DefaultRotation implements Rotation {
 		if (getState() != RotationState.STOPPED)
 			throw new IllegalStateException("Cannot resume if not stopped!");
 		setState(RotationState.LOBBY);
-		rm.chooseMinigame(this);
+		rm.start(this);
 	}
 	
 	@Override
