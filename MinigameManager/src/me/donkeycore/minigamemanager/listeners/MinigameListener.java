@@ -24,18 +24,13 @@ public class MinigameListener implements Listener {
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		HumanEntity entity = event.getEntity();
-		if(entity instanceof Player) {
+		if (entity instanceof Player) {
 			Player player = (Player) entity;
 			Rotation rotation = manager.getRotationManager().getRotation(player);
-			if(rotation != null) {
-				RotationState state = rotation.getState();
-				if(state != RotationState.INGAME)
+			if (rotation != null && rotation.getState() == RotationState.INGAME) {
+				MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
+				if (attr.alwaysFullHunger())
 					event.setCancelled(true);
-				else {
-					MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
-					if(attr.alwaysFullHunger())
-						event.setCancelled(true);
-				}
 			}
 		}
 	}
@@ -43,18 +38,13 @@ public class MinigameListener implements Listener {
 	@EventHandler
 	public void onHealthChange(EntityDamageEvent event) {
 		Entity entity = event.getEntity();
-		if(entity instanceof Player) {
+		if (entity instanceof Player) {
 			Player player = (Player) entity;
 			Rotation rotation = manager.getRotationManager().getRotation(player);
-			if(rotation != null) {
-				RotationState state = rotation.getState();
-				if(state != RotationState.INGAME)
+			if (rotation != null && rotation.getState() == RotationState.INGAME) {
+				MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
+				if (attr.alwaysFullHealth())
 					event.setCancelled(true);
-				else {
-					MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
-					if(attr.alwaysFullHealth())
-						event.setCancelled(true);
-				}
 			}
 		}
 	}

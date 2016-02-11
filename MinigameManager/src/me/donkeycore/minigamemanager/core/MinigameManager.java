@@ -22,6 +22,8 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
  * - beta test at some point
  * - future: create entire minigame from config or lua/python
  * - gems:
+ * * rename-able
+ * * minigames can customize amounts after each game per player
  * * config:
  * # format ($x, x gems)
  * # boolean: use vault currency as gems
@@ -30,6 +32,8 @@ import me.donkeycore.minigamemanager.config.MinigameSettings;
  * * lobby scoreboard
  * - commands to edit locations
  * - ELO rating system
+ * - multiserver support
+ * - multilanguage support
  */
 /**
  * Main MinigameManager plugin class with API methods
@@ -47,10 +51,10 @@ public final class MinigameManager {
 	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
 	
 	MinigameManager(MinigameManagerPlugin plugin) {
-		MinigameManager.plugin = plugin;
 		if (instance != null)
 			throw new IllegalStateException("MinigameManager has already been initialized!");
-		instance = this;
+		MinigameManager.plugin = plugin;
+		MinigameManager.instance = this;
 	}
 	
 	/**

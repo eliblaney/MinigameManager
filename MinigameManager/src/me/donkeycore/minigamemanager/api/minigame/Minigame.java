@@ -19,8 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Scoreboard;
 
-import com.google.common.base.Function;
-
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.teams.Team;
 import me.donkeycore.minigamemanager.core.MinigameManager;
@@ -33,6 +31,7 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 public abstract class Minigame {
 	
 	private final Rotation r;
+	private final Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	protected final Random random = new Random();
 	
 	/**
@@ -72,8 +71,10 @@ public abstract class Minigame {
 	
 	/**
 	 * Called when the minigame ends
+	 * 
+	 * @param error The error code (0 = no error)
 	 */
-	public void onEnd() {}
+	public void onEnd(int error) {}
 	
 	/**
 	 * Call this to end the minigame and continue to the next rotation<br>
@@ -83,9 +84,18 @@ public abstract class Minigame {
 	 * <pre>
 	 * super.end()
 	 * </pre>
+	 * 
+	 * @param error The error code (0 = no error)
 	 */
-	public void end() {
-		r.finish();
+	public void end(int error) {
+		r.finish(error);
+	}
+	
+	/**
+	 * End the minigame with nothing wrong. Equivalent to {@code}end(0){@code}
+	 */
+	public final void end() {
+		end(0);
 	}
 	
 	/**
@@ -128,6 +138,20 @@ public abstract class Minigame {
 		int i = 0;
 		for (UUID u : uuids)
 			players[i++] = Bukkit.getPlayer(u);
+		return players;
+	}
+	
+	/**
+	 * Get the names of players that are currently playing
+	 * 
+	 * @return A array of player names that are playing
+	 */
+	public String[] getPlayerNames() {
+		List<UUID> uuids = getRotation().getInGame();
+		String[] players = new String[uuids.size()];
+		int i = 0;
+		for(UUID u : uuids)
+			players[i++] = Bukkit.getPlayer(u).getName();
 		return players;
 	}
 	
@@ -365,6 +389,13 @@ public abstract class Minigame {
 		}
 	}
 	
+	/**
+	 * Set the scoreboard for all the players.<br>
+	 * Equivalent to a PlayerConsumer iterating through all players and setting their scoreboards.<br>
+	 * To do this for a single player, just use {@code}player.setScoreboard(scoreboard);{@code}
+	 * 
+	 * @param scoreboard The scoreboard to set for all players
+	 */
 	public void setScoreboard(final Scoreboard scoreboard) {
 		applyAll(new PlayerConsumer() {
 
@@ -396,6 +427,15 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Clear the scoreboard for a player
+	 * 
+	 * @param player The player to clear the scoreboard of
+	 */
+	public void clearScoreboard(Player player) {
+		player.setScoreboard(blankScoreboard);
+	}
+	
+	/**
 	 * Supplies a location for every player given
 	 */
 	public static interface LocationSupplier extends Function<Player, Location> {}
@@ -417,6 +457,44 @@ public abstract class Minigame {
 		 * @param player The {@link Player} to perform an operation on
 		 */
 		public void apply(Player player);
+		
+	}
+	
+	/**
+	 * Represents a function; very useful for Java 8 plugins
+	 *
+	 * @param <T> Type to be passed in
+	 * @param <R> Type to be returned
+	 */
+	public static interface Function<T, R> {
+		
+		/**
+		 * Apply T and get some value back
+		 * 
+		 * @param t The object to apply
+		 * 
+		 * @return Some instance of R
+		 */
+		public R apply(T t);
+		
+	}
+	
+	/**
+	 * Represents a function that accepts multiple parameter types
+	 *
+	 * @param <T> Type to be passed in
+	 * @param <R> Type to be returned
+	 */
+	public static interface BulkFunction<T, R> {
+		
+		/**
+		 * Apply an array of T and get some values back
+		 * 
+		 * @param ts The objects to apply
+		 * 
+		 * @return An array of instances of R
+		 */
+		public R[] apply(T[] ts);
 		
 	}
 	

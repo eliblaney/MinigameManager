@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
@@ -88,7 +89,7 @@ public class CommandMinigame implements CommandExecutor {
 						if (r.getState() == RotationState.STOPPED)
 							sender.sendMessage("§cRotation is already stopped");
 						else {
-							r.stop();
+							r.stop(MinigameErrors.INTERRUPT);
 							sender.sendMessage("§aStopped rotation #" + id);
 						}
 					}

@@ -49,8 +49,10 @@ public interface Rotation {
 	 * <b>Note:</b> This method should not be called by minigames; they should
 	 * use {@link Minigame#end} instead so that alternate implementations can be
 	 * regarded
+	 * 
+	 * @param error The error code (0 = no error)
 	 */
-	void finish();
+	void finish(int error);
 	
 	/**
 	 * Announce a message to everybody in the rotation
@@ -88,7 +90,9 @@ public interface Rotation {
 	
 	/**
 	 * Stop the rotation, return players to the lobby, but do NOT start a new minigame
+	 * 
+	 * @param error The error code (0 = no error)
 	 */
-	void stop();
+	void stop(int error);
 	
 }

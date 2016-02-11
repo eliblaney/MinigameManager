@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
@@ -173,7 +174,7 @@ public final class DefaultRotationManager implements RotationManager {
 	public void shutdown() {
 		this.running = false;
 		for (DefaultRotation r : rotations) {
-			r.finish();
+			r.finish(MinigameErrors.INTERRUPT);
 			// Avoid ConcurrentModificationExcpetion
 			UUID[] uuids = r.getPlayers().toArray(new UUID[r.getPlayers().size()]);
 			for (UUID uuid : uuids)

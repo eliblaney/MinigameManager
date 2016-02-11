@@ -27,6 +27,7 @@ public final class DefaultRotation implements Rotation {
 	private final int id;
 	private Minigame minigame = null;
 	private RotationState state = RotationState.LOBBY;
+	private final org.bukkit.scoreboard.Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	
 	public DefaultRotation(RotationManager rm, int id) {
 		this.rm = rm;
@@ -55,9 +56,11 @@ public final class DefaultRotation implements Rotation {
 	protected void leave(UUID uuid, boolean kicked) {
 		if (players.contains(uuid)) {
 			players.remove(uuid);
+			if(inGame.contains(uuid))
+				inGame.remove(uuid);
 			Player p = Bukkit.getPlayer(uuid);
 			if (p != null) {
-				p.setScoreboard(null);
+				p.setScoreboard(blankScoreboard);
 				p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("spawn"));
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
@@ -96,21 +99,21 @@ public final class DefaultRotation implements Rotation {
 	}
 	
 	@Override
-	public void finish() {
-		stop();
+	public void finish(int error) {
+		stop(error);
 		resume();
 	}
 	
 	@Override
-	public void stop() {
+	public void stop(int error) {
 		if (getState() == RotationState.STOPPED)
 			throw new IllegalStateException("Cannot stop if already stopped!");
 		setState(RotationState.STOPPED);
 		if (minigame != null)
-			minigame.onEnd();
+			minigame.onEnd(error);
 		minigame = null;
 		for(UUID u : inGame)
-			Bukkit.getPlayer(u).setScoreboard(null);
+			Bukkit.getPlayer(u).setScoreboard(blankScoreboard);
 		inGame.clear();
 		teleportAll(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
 	}

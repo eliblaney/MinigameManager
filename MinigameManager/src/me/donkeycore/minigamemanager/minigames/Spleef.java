@@ -8,12 +8,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Scoreboard;
 
 import me.donkeycore.minigamemanager.api.items.ItemStackBuilder;
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
+import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.api.teams.Team;
 
 @DefaultMinigame
@@ -46,6 +48,19 @@ public class Spleef extends Minigame {
 				return Pair.of(i, 0);
 			}
 		});
+		BulkFunction<String, String> nameColorer = new BulkFunction<String, String>() {
+			
+			@Override
+			public String[] apply(String[] names) {
+				// apply a green color to all names
+				for(int i = 0; i < names.length; i++)
+					names[i] = "\u00a7a" + names[i];
+				return names;
+			}
+		};
+		// create a scoreboard that lists everybody's names
+		Scoreboard s = new ScoreboardBuilder("blah", "\u00a7b\u00a7lAlive").setLines(nameColorer.apply(getPlayerNames())).build();
+		setScoreboard(s);
 	}
 	
 	@Override
