@@ -1,6 +1,7 @@
 package me.donkeycore.minigamemanager.minigames;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,18 +49,8 @@ public class Spleef extends Minigame {
 				return Pair.of(i, 0);
 			}
 		});
-		BulkFunction<String, String> nameColorer = new BulkFunction<String, String>() {
-			
-			@Override
-			public String[] apply(String[] names) {
-				// apply a green color to all names
-				for(int i = 0; i < names.length; i++)
-					names[i] = "\u00a7a" + names[i];
-				return names;
-			}
-		};
 		// create a scoreboard that lists everybody's names
-		Scoreboard s = new ScoreboardBuilder("blah", "\u00a7b\u00a7lAlive").setLines(nameColorer.apply(getPlayerNames())).build();
+		Scoreboard s = new ScoreboardBuilder("blah", "\u00a7b\u00a7lAlive").setLines(getPlayerNamesWithColor(ChatColor.GREEN)).build();
 		setScoreboard(s);
 	}
 	

@@ -42,17 +42,40 @@ public final class DefaultRotationManager implements RotationManager {
 	@Override
 	public boolean join(Player player) {
 		Validate.notNull(player);
+		int id = findAvailableRotation();
+		if(id < 0)
+			return false;
+		DefaultRotation r = rotations.get(id);
+		r.join(player.getUniqueId());
+		players.put(player.getUniqueId(), r);
+		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
+			start(r);
+		return true;
+	}
+	
+	// find lobbies to join
+	private int findAvailableRotation() {
 		int maxPlayers = manager.getMinigameConfig().getMaximumPlayers();
-		for (DefaultRotation r : rotations) {
+		for (int i = 0; i < rotations.size(); i++) {
+			DefaultRotation r = rotations.get(i);
+			// skip if reached max players
 			if (r.getPlayers().size() >= maxPlayers)
 				continue;
-			r.join(player.getUniqueId());
-			players.put(player.getUniqueId(), r);
-			if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
-				start(r);
-			return true;
+			// prefer ready lobbies rather than already started ones
+			if (r.getState() != RotationState.INGAME)
+				continue;
+			return i;
 		}
-		return false;
+		// lower standards and try again
+		for (int i = 0; i < rotations.size(); i++) {
+			DefaultRotation r = rotations.get(i);
+			// still can't join lobby if bigger than max size
+			if (r.getPlayers().size() >= maxPlayers)
+				continue;
+			return i;
+		}
+		// :(
+		return -1;
 	}
 	
 	@Override
@@ -115,7 +138,7 @@ public final class DefaultRotationManager implements RotationManager {
 		if (!running)
 			return;
 		// Don't run if already playing
-		if(rotation.getState() != RotationState.LOBBY)
+		if (rotation.getState() != RotationState.LOBBY)
 			return;
 		final DefaultRotationManager rm = this;
 		Bukkit.getScheduler().runTask(MinigameManager.getPlugin(), new Runnable() {
@@ -144,11 +167,16 @@ public final class DefaultRotationManager implements RotationManager {
 		});
 	}
 	
-	protected void start(DefaultRotation r, Minigame minigame) {
+	void start(DefaultRotation r, Minigame minigame) {
 		Validate.notNull(r, "Rotation cannot be null!");
 		Validate.notNull(minigame, "Minigame cannot be null!");
-		// Set the rotation minigame and copy current players to another list
-		r.beginMinigame(minigame);
+		// Set the rotation minigame and copy current players to another list OR end the process if failed
+		if (!r.beginMinigame(minigame)) {
+			r.announce(manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
+			r.setState(RotationState.LOBBY);
+			r.teleportAll(manager.getMinigameLocations().getRotationLocation("lobby"));
+			start(r);
+		}
 		// Teleport everybody to possibly random spawns and optionally send them a mapinfo message 
 		for (UUID u : r.getPlayers()) {
 			Player player = Bukkit.getPlayer(u);
@@ -161,10 +189,10 @@ public final class DefaultRotationManager implements RotationManager {
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
 		}
 	}
-
+	
 	@Override
 	public void force(Rotation r) {
-		if(r.getState() != RotationState.LOBBY)
+		if (r.getState() != RotationState.LOBBY)
 			return;
 		force = true;
 		start(r);

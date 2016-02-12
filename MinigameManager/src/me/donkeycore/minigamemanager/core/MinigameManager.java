@@ -77,6 +77,16 @@ public final class MinigameManager {
 	}
 	
 	/**
+	 * Check if the current version of MinigameManager is a release. Should
+	 * always be true for public distribution, and false for testing.
+	 * 
+	 * @return Whether the current version is a release or a testing version
+	 */
+	public static boolean isRelease() {
+		return false;
+	}
+	
+	/**
 	 * Get the rotation manager for working with rotations
 	 * 
 	 * @return An instance of {@link RotationManager}

@@ -133,12 +133,22 @@ public abstract class Minigame {
 	 * @return An array of {@link Player} instances that are playing
 	 */
 	public Player[] getPlayers() {
-		List<UUID> uuids = getRotation().getInGame();
-		Player[] players = new Player[uuids.size()];
+		UUID[] uuids = getPlayerUUIDs();
+		Player[] players = new Player[uuids.length];
 		int i = 0;
 		for (UUID u : uuids)
 			players[i++] = Bukkit.getPlayer(u);
 		return players;
+	}
+	
+	/**
+	 * Get the UUIDs of players that are currently playing
+	 * 
+	 * @return An array of UUIDs that represent currently playing players
+	 */
+	public UUID[] getPlayerUUIDs() {
+		List<UUID> uuids = getRotation().getInGame();
+		return uuids.toArray(new UUID[uuids.size()]);
 	}
 	
 	/**
@@ -150,9 +160,25 @@ public abstract class Minigame {
 		List<UUID> uuids = getRotation().getInGame();
 		String[] players = new String[uuids.size()];
 		int i = 0;
-		for(UUID u : uuids)
+		for (UUID u : uuids)
 			players[i++] = Bukkit.getPlayer(u).getName();
 		return players;
+	}
+	
+	/**
+	 * Get the names of players that are currently playing colored with a
+	 * certain chatcolor
+	 * 
+	 * @param color The ChatColor to color the names
+	 * 			
+	 * @return An array of strings of the player names, prefixed with
+	 *         \u00a7 and the color
+	 */
+	public String[] getPlayerNamesWithColor(final ChatColor color) {
+		String[] names = getPlayerNames();
+		for (int i = 0; i < names.length; i++)
+			names[i] = color + names[i];
+		return names;
 	}
 	
 	/**
@@ -341,9 +367,9 @@ public abstract class Minigame {
 		int length = players.length;
 		if (amount <= 0 || length <= 0)
 			return new Team[0];
-		if(amount == 1) {
+		if (amount == 1) {
 			Team[] teams = new Team[1];
-			for(Player player : players) {
+			for (Player player : players) {
 				ChatColor color = randomChatColor();
 				teams[0] = new Team.Builder().players(player).color(color).name(color.name().toLowerCase().replaceFirst(color.name().substring(0, 1).toLowerCase(), color.name().substring(0, 1).toUpperCase())).build();
 			}
@@ -391,14 +417,16 @@ public abstract class Minigame {
 	
 	/**
 	 * Set the scoreboard for all the players.<br>
-	 * Equivalent to a PlayerConsumer iterating through all players and setting their scoreboards.<br>
-	 * To do this for a single player, just use {@code}player.setScoreboard(scoreboard);{@code}
+	 * Equivalent to a PlayerConsumer iterating through all players and setting
+	 * their scoreboards.<br>
+	 * To do this for a single player, just use
+	 * {@code}player.setScoreboard(scoreboard);{@code}
 	 * 
 	 * @param scoreboard The scoreboard to set for all players
 	 */
 	public void setScoreboard(final Scoreboard scoreboard) {
 		applyAll(new PlayerConsumer() {
-
+			
 			@Override
 			public void apply(Player player) {
 				player.setScoreboard(scoreboard);
@@ -472,7 +500,7 @@ public abstract class Minigame {
 		 * Apply T and get some value back
 		 * 
 		 * @param t The object to apply
-		 * 
+		 * 			
 		 * @return Some instance of R
 		 */
 		public R apply(T t);
@@ -491,7 +519,7 @@ public abstract class Minigame {
 		 * Apply an array of T and get some values back
 		 * 
 		 * @param ts The objects to apply
-		 * 
+		 * 			
 		 * @return An array of instances of R
 		 */
 		public R[] apply(T[] ts);
