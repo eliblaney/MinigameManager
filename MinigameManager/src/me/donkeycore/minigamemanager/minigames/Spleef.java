@@ -1,5 +1,7 @@
 package me.donkeycore.minigamemanager.minigames;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -7,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
@@ -14,17 +18,17 @@ import org.bukkit.scoreboard.Scoreboard;
 import me.donkeycore.minigamemanager.api.items.ItemStackBuilder;
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
 import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
-import me.donkeycore.minigamemanager.api.teams.Team;
+import me.donkeycore.minigamemanager.core.MinigameManager;
 
 @DefaultMinigame
 @MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysFullHunger = true)
 public class Spleef extends Minigame {
 	
 	private final Location[] spawns;
-	Team[] teams;
 	
 	public Spleef(Rotation r) {
 		super(r);
@@ -49,8 +53,39 @@ public class Spleef extends Minigame {
 				return Pair.of(i, 0);
 			}
 		});
+		alive.addAll(Arrays.asList(getPlayerUUIDs()));
 		// create a scoreboard that lists everybody's names
-		Scoreboard s = new ScoreboardBuilder("blah", "\u00a7b\u00a7lAlive").setLines(getPlayerNamesWithColor(ChatColor.GREEN)).build();
+		updateScoreboard();
+		listenEvent(PlayerMoveEvent.class, new EventListener() {
+			
+			@Override
+			public void onEvent(Event event) {
+				PlayerMoveEvent e = (PlayerMoveEvent) event;
+				Location l = e.getTo();
+				Location from = e.getFrom();
+				if (l.getBlockX() != from.getBlockX() || l.getBlockY() != from.getBlockY() || l.getBlockZ() != from.getBlockZ()) {
+					if (l.getBlock().getType() == Material.LAVA || l.getBlock().getType() == Material.STATIONARY_LAVA)
+						kill(e.getPlayer());
+				}
+			}
+		});
+	}
+	
+	private void kill(Player player) {
+		setAlive(player, false);
+		updateScoreboard();
+		if (getAliveAmount() == 1 && MinigameManager.isRelease()) {
+			announce("\u00a7a\u00a7l" + getAliveNames()[0] + " \u00a7e\u00a7lwins!");
+			end();
+		} else if (getAliveAmount() < 2 && !MinigameManager.isRelease()) {
+			announce("\u00a7aFinished!");
+			end();
+		} else if (getAliveAmount() < 1)
+			end(MinigameErrors.NOT_ENOUGH_PLAYERS);
+	}
+	
+	private void updateScoreboard() {
+		Scoreboard s = new ScoreboardBuilder("blah", "\u00a7b\u00a7lAlive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
 		setScoreboard(s);
 	}
 	

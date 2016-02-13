@@ -15,6 +15,7 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Scoreboard;
@@ -33,6 +34,7 @@ public abstract class Minigame {
 	private final Rotation r;
 	private final Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	protected final Random random = new Random();
+	protected final List<UUID> alive;
 	
 	/**
 	 * Initialize the minigame
@@ -41,6 +43,7 @@ public abstract class Minigame {
 	 */
 	public Minigame(Rotation r) {
 		this.r = r;
+		this.alive = new LinkedList<>(Arrays.asList(getPlayerUUIDs()));
 	}
 	
 	/**
@@ -152,6 +155,15 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Get the number of players that are currently playing
+	 * 
+	 * @return The number of currently playing players
+	 */
+	public int getPlayerAmount() {
+		return getRotation().getInGame().size();
+	}
+	
+	/**
 	 * Get the names of players that are currently playing
 	 * 
 	 * @return A array of player names that are playing
@@ -176,6 +188,81 @@ public abstract class Minigame {
 	 */
 	public String[] getPlayerNamesWithColor(final ChatColor color) {
 		String[] names = getPlayerNames();
+		for (int i = 0; i < names.length; i++)
+			names[i] = color + names[i];
+		return names;
+	}
+	
+	public boolean setAlive(Player player, boolean alive) {
+		player.setGameMode(GameMode.SPECTATOR);
+		UUID u = player.getUniqueId();
+		if(this.alive.contains(u) && alive)
+			return false;
+		if(this.alive.contains(u) && !alive)
+			return false;
+		if(alive)
+			this.alive.add(u);
+		else
+			this.alive.remove(u);
+		return true;
+	}
+	
+	/**
+	 * Get the players that are currently alive
+	 * 
+	 * @return An array of {@link Player} instances that are alive
+	 */
+	public Player[] getAlive() {
+		UUID[] uuids = getAliveUUIDs();
+		Player[] players = new Player[uuids.length];
+		int i = 0;
+		for (UUID u : uuids)
+			players[i++] = Bukkit.getPlayer(u);
+		return players;
+	}
+	
+	/**
+	 * Get the UUIDs of players that are currently alive
+	 * 
+	 * @return An array of UUIDs that represent currently alive players
+	 */
+	public UUID[] getAliveUUIDs() {
+		return alive.toArray(new UUID[alive.size()]);
+	}
+	
+	/**
+	 * Get the number of players that are currently alive
+	 * 
+	 * @return The number of currently alive players
+	 */
+	public int getAliveAmount() {
+		return alive.size();
+	}
+	
+	/**
+	 * Get the names of players that are currently alive
+	 * 
+	 * @return A array of player names that are alive
+	 */
+	public String[] getAliveNames() {
+		String[] players = new String[alive.size()];
+		int i = 0;
+		for (UUID u : alive)
+			players[i++] = Bukkit.getPlayer(u).getName();
+		return players;
+	}
+	
+	/**
+	 * Get the names of players that are currently alive colored with a
+	 * certain chatcolor
+	 * 
+	 * @param color The ChatColor to color the names
+	 * 			
+	 * @return An array of strings of the player names, prefixed with
+	 *         \u00a7 and the color
+	 */
+	public String[] getAliveNamesWithColor(final ChatColor color) {
+		String[] names = getAliveNames();
 		for (int i = 0; i < names.length; i++)
 			names[i] = color + names[i];
 		return names;
@@ -454,6 +541,31 @@ public abstract class Minigame {
 		return Color.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((r == null) ? 0 : r.hashCode());
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Minigame other = (Minigame) obj;
+		if (r == null) {
+			if (other.r != null)
+				return false;
+		} else if (!r.equals(other.r))
+			return false;
+		return true;
+	}
+	
 	/**
 	 * Clear the scoreboard for a player
 	 * 
@@ -461,6 +573,16 @@ public abstract class Minigame {
 	 */
 	public void clearScoreboard(Player player) {
 		player.setScoreboard(blankScoreboard);
+	}
+	
+	/**
+	 * Create a listener for an event
+	 * 
+	 * @param event The event to listen for
+	 * @param listener What to do when the event happens
+	 */
+	public void listenEvent(Class<? extends Event> event, EventListener listener) {
+		MinigameManager.getMinigameManager().addListener(this, event, listener);
 	}
 	
 	/**
@@ -485,6 +607,20 @@ public abstract class Minigame {
 		 * @param player The {@link Player} to perform an operation on
 		 */
 		public void apply(Player player);
+		
+	}
+	
+	/**
+	 * Listens to events sent by MinigameListener
+	 */
+	public static interface EventListener {
+		
+		/**
+		 * Accept an event and perform some operation
+		 * 
+		 * @param event The event to act based upon
+		 */
+		public void onEvent(Event event);
 		
 	}
 	

@@ -73,8 +73,12 @@ public final class DefaultRotation implements Rotation {
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
 			// sad, sad times
-			if (inGame.size() < 2)
-				minigame.end(MinigameErrors.NOT_ENOUGH_PLAYERS);
+			if (inGame.size() < 2) {
+				if(minigame != null)
+					minigame.end(MinigameErrors.NOT_ENOUGH_PLAYERS);
+				else
+					finish(MinigameErrors.NOT_ENOUGH_PLAYERS);
+			}
 		} else
 			throw new IllegalArgumentException("Player was not in rotation!");
 	}
@@ -104,7 +108,7 @@ public final class DefaultRotation implements Rotation {
 	protected boolean beginMinigame(Minigame minigame) {
 		Validate.notNull(minigame);
 		// players must always be at least 1 for testing, and at least 2 for releases
-		if (getInGame().size() < 1 || (getInGame().size() < 2 && MinigameManager.isRelease()))
+		if (players.size() < 1 || (players.size() < 2 && MinigameManager.isRelease()))
 			return false;
 		this.minigame = minigame;
 		// set state, add all players to ingame list, set default gamemode, and start the fun!
@@ -132,11 +136,15 @@ public final class DefaultRotation implements Rotation {
 		// stop any minigames if they're going
 		if (minigame != null) {
 			minigame.onEnd(error);
+			MinigameManager.getMinigameManager().clearListeners(minigame);
 			minigame = null;
 		}
 		// clear scoreboards, clear ingame list, and teleport everybody to the lobby
-		for (UUID u : inGame)
-			Bukkit.getPlayer(u).setScoreboard(blankScoreboard);
+		for (UUID u : inGame) {
+			Player player = Bukkit.getPlayer(u);
+			player.setScoreboard(blankScoreboard);
+			player.setGameMode(GameMode.ADVENTURE);
+		}
 		inGame.clear();
 		teleportAll(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
 	}
@@ -182,6 +190,50 @@ public final class DefaultRotation implements Rotation {
 	@Override
 	public Minigame getCurrentMinigame() {
 		return minigame;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((inGame == null) ? 0 : inGame.hashCode());
+		result = prime * result + ((minigame == null) ? 0 : minigame.hashCode());
+		result = prime * result + ((players == null) ? 0 : players.hashCode());
+		result = prime * result + ((rm == null) ? 0 : rm.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DefaultRotation other = (DefaultRotation) obj;
+		if (id != other.id)
+			return false;
+		if (inGame == null) {
+			if (other.inGame != null)
+				return false;
+		} else if (!inGame.equals(other.inGame))
+			return false;
+		if (minigame == null) {
+			if (other.minigame != null)
+				return false;
+		} else if (!minigame.equals(other.minigame))
+			return false;
+		if (players == null) {
+			if (other.players != null)
+				return false;
+		} else if (!players.equals(other.players))
+			return false;
+		if (state != other.state)
+			return false;
+		return true;
 	}
 	
 }

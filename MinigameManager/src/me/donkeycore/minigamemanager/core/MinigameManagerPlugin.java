@@ -1,9 +1,12 @@
 package me.donkeycore.minigamemanager.core;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
@@ -23,6 +26,8 @@ import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 public class MinigameManagerPlugin extends JavaPlugin {
 	
 	private MinigameManager manager;
+	MinigameListener listener;
+	private boolean serverStartup = false;
 	
 	/**
 	 * <b>Bukkit implementation method</b><br>
@@ -34,6 +39,35 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		manager = new MinigameManager(this);
 		PluginDescriptionFile description = getDescription();
 		getLogger().info("Enabling " + description.getName() + " v" + description.getVersion() + "...");
+		// not as malicious as this sounds - custom plugin manager is just used to handle events more easily
+		getLogger().info("Injecting custom plugin manager...");
+		// get server instance and class
+		Server server = Bukkit.getServer();
+		Class<?> clazz = server.getClass();
+		try {
+			// attempt to get the pluginManager field and edit it
+			Field pluginManager = clazz.getDeclaredField("pluginManager");
+			pluginManager.setAccessible(true);
+			// the current plugin manager will be used to do the actual processing
+			PluginManager pm = (PluginManager) pluginManager.get(server);
+			// there shouldn't already be a MinigamePluginManagerWrapper instance
+			if(serverStartup = !pm.getClass().getName().equals(MinigamePluginManagerWrapper.class.getName()))
+				// inject the wrapper so that the plugin can send all events to minigames
+				pluginManager.set(server, new MinigamePluginManagerWrapper(pm));
+			else {
+				getLogger().info("Previous MinigamePluginManagerWrapper found, finding root...");
+				while(pm.getClass().getName().equals(MinigamePluginManagerWrapper.class.getName())) {
+					Field f = pm.getClass().getDeclaredField("pm");
+					f.setAccessible(true);
+					pm = (PluginManager) f.get(pm);
+				}
+				getLogger().info("Found root of type " + pm.getClass().getSimpleName());
+				pluginManager.set(server, new MinigamePluginManagerWrapper(pm));
+			}
+		} catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
+			e.printStackTrace();
+			getLogger().severe("Failed to inject plugin manager! EVENTS WILL NOT WORK PROPERLY!");
+		}
 		getLogger().info("Initializing config... (Part 1: General)");
 		saveDefaultConfig();
 		manager.config = new MinigameSettings();
@@ -45,11 +79,14 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		getCommand("leave").setExecutor(new CommandLeave(manager));
 		getLogger().info("Registering listeners...");
 		Bukkit.getPluginManager().registerEvents(new QuitListener(manager), this);
-		Bukkit.getPluginManager().registerEvents(new MinigameListener(manager), this);
+		Bukkit.getPluginManager().registerEvents(listener = new MinigameListener(manager), this);
 		getLogger().info("Creating rotation manager...");
+		// lock to prevent further editing
 		SubstitutionHandler.lock();
+		// this is the rotation manager to be used
 		Class<? extends RotationManager> rmClass = SubstitutionHandler.getRotationManager();
 		try {
+			// instantiate it and set it as the main rotation manager 
 			manager.rotationManager = rmClass.getConstructor(MinigameManager.class, int.class).newInstance(manager, manager.config.getNumberOfRotations());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -63,6 +100,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 					manager.rotationManager.start(rotation);
 			}
 		});
+		// load all of the default minigames if enabled
 		loadDefaultMinigames();
 		getLogger().info(description.getName() + " v" + description.getVersion() + " by DonkeyCore has been enabled!");
 	}
@@ -80,6 +118,16 @@ public class MinigameManagerPlugin extends JavaPlugin {
 	}
 	
 	/**
+	 * Helpful method to determine whether the server is starting up or the plugins are simply being reloaded<br>
+	 * Determined by the plugin being able to successfully inject the custom plugin manager
+	 * 
+	 * @return Whether the server is starting up
+	 */
+	public boolean isServerStartup() {
+		return serverStartup;
+	}
+	
+	/**
 	 * Insert the default minigames into the rotation. Automatically called on
 	 * enable and '/mm reload'
 	 */
@@ -90,11 +138,13 @@ public class MinigameManagerPlugin extends JavaPlugin {
 			for (String minigameStr : manager.config.getDefaultMinigames()) {
 				Class<?> clazz = null;
 				try {
+					// all default minigames MUST be in the me.donkeycore.minigamemanager.minigames package
 					clazz = Class.forName("me.donkeycore.minigamemanager.minigames." + minigameStr);
 				} catch (ClassNotFoundException e) {
 					getLogger().warning("Uh oh! " + minigameStr + " is not a default minigame. Skipping!");
 					continue;
 				}
+				// all minigames must be a subclass of Minigame
 				if (clazz.getSuperclass() != Minigame.class) {
 					getLogger().warning(minigameStr + " is not a minigame. Skipping!");
 					continue;

@@ -1,16 +1,22 @@
 package me.donkeycore.minigamemanager.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.event.Event;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.Minigame.EventListener;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.listeners.MinigameListener;
 
 /*
  * TODO:
@@ -49,6 +55,7 @@ public final class MinigameManager {
 	RotationManager rotationManager;
 	private static MinigameManagerPlugin plugin;
 	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
+	List<ListenerEntry> listeners = new ArrayList<>();
 	
 	MinigameManager(MinigameManagerPlugin plugin) {
 		if (instance != null)
@@ -115,6 +122,16 @@ public final class MinigameManager {
 	}
 	
 	/**
+	 * Get the listener for minigames
+	 * 
+	 * @return An instance of MinigameListener being used to send data to
+	 *         minigames
+	 */
+	public MinigameListener getListener() {
+		return getPlugin().listener;
+	}
+	
+	/**
 	 * Register a minigame with MinigameManager and insert it into the rotations
 	 * <br>
 	 * <b>Note:</b> The class <i>must</i> have a {@link MinigameAttributes}
@@ -147,6 +164,34 @@ public final class MinigameManager {
 	}
 	
 	/**
+	 * Add listeners for a minigame for a certain event
+	 * 
+	 * @param minigame The minigame that hosts this listener
+	 * @param event The event to listen for
+	 * @param listener What to do when the event happens
+	 */
+	public void addListener(Minigame minigame, Class<? extends Event> event, EventListener listener) {
+		Validate.notNull(minigame, "Minigame may not be null!");
+		Validate.notNull(event, "Event may not be null!");
+		Validate.notNull(listener, "Listener may not be null!");
+		listeners.add(new ListenerEntry(minigame, event, listener));
+	}
+	
+	/**
+	 * Clear all listeners for a certain minigame
+	 * 
+	 * @param minigame The minigame to clear listeners forO
+	 */
+	public void clearListeners(Minigame minigame) {
+		Iterator<ListenerEntry> it = listeners.iterator();
+		while (it.hasNext()) {
+			ListenerEntry e = it.next();
+			if (e.minigame.equals(minigame))
+				it.remove();
+		}
+	}
+	
+	/**
 	 * Get a set of minigame classes that have been registered
 	 * 
 	 * @return A {@link Set} of minigames that have been registered
@@ -166,6 +211,20 @@ public final class MinigameManager {
 		Map<Class<? extends Minigame>, Integer> m = new HashMap<>();
 		m.putAll(minigames);
 		return m;
+	}
+	
+	public static class ListenerEntry {
+		
+		public final Minigame minigame;
+		public final Class<? extends Event> event;
+		public final EventListener listener;
+		
+		public ListenerEntry(Minigame minigame, Class<? extends Event> event, EventListener listener) {
+			this.minigame = minigame;
+			this.event = event;
+			this.listener = listener;
+		}
+		
 	}
 	
 }

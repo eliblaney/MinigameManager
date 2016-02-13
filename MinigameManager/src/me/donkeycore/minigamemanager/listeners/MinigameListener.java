@@ -31,7 +31,8 @@ public class MinigameListener implements Listener {
 				MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
 				if (attr.alwaysFullHunger())
 					event.setCancelled(true);
-			}
+			} else if(rotation != null && rotation.getState() == RotationState.LOBBY)
+				event.setCancelled(true);
 		}
 	}
 	
@@ -45,7 +46,8 @@ public class MinigameListener implements Listener {
 				MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
 				if (attr.alwaysFullHealth())
 					event.setCancelled(true);
-			}
+			} else if(rotation != null && rotation.getState() == RotationState.LOBBY)
+				event.setCancelled(true);
 		}
 	}
 	
