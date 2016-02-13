@@ -67,6 +67,15 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Get the id of the rotation containing this minigame
+	 * 
+	 * @return The id of the rotation
+	 */
+	public int getId() {
+		return r.getId();
+	}
+	
+	/**
 	 * Called when the minigame starts and all players have been teleported to
 	 * their starting locations
 	 */

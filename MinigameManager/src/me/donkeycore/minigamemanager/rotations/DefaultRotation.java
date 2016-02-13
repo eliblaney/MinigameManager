@@ -105,6 +105,11 @@ public final class DefaultRotation implements Rotation {
 		return inGame;
 	}
 	
+	@Override
+	public int getId() {
+		return id;
+	}
+	
 	protected boolean beginMinigame(Minigame minigame) {
 		Validate.notNull(minigame);
 		// players must always be at least 1 for testing, and at least 2 for releases

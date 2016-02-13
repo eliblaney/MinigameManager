@@ -95,4 +95,11 @@ public interface Rotation {
 	 */
 	void stop(int error);
 	
+	/**
+	 * Get the id number that represents this rotation
+	 * 
+	 * @return The id of the rotation
+	 */
+	int getId();
+	
 }

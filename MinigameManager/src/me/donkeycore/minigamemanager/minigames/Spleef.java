@@ -85,7 +85,7 @@ public class Spleef extends Minigame {
 	}
 	
 	private void updateScoreboard() {
-		Scoreboard s = new ScoreboardBuilder("blah", "\u00a7b\u00a7lAlive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
+		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", "\u00a7b\u00a7lAlive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
 		setScoreboard(s);
 	}
 	

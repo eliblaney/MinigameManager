@@ -1,6 +1,7 @@
 package me.donkeycore.minigamemanager.core;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Server;
@@ -45,7 +46,9 @@ public final class MinigamePluginManagerWrapper implements PluginManager {
 	
 	@Override
 	public void callEvent(Event event) throws IllegalStateException {
-		for(ListenerEntry e : MinigameManager.getMinigameManager().listeners) {
+		Iterator<ListenerEntry> it = MinigameManager.getMinigameManager().listeners.iterator();
+		while(it.hasNext()) {
+			ListenerEntry e = it.next();
 			if(e.event.getName().equals(event.getClass().getName()))
 				e.listener.onEvent(event);
 		}
