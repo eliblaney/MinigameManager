@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -205,11 +204,11 @@ public abstract class Minigame {
 	public boolean setAlive(Player player, boolean alive) {
 		player.setGameMode(GameMode.SPECTATOR);
 		UUID u = player.getUniqueId();
-		if(this.alive.contains(u) && alive)
+		if (this.alive.contains(u) && alive)
 			return false;
-		if(!this.alive.contains(u) && !alive)
+		if (!this.alive.contains(u) && !alive)
 			return false;
-		if(alive)
+		if (alive)
 			this.alive.add(u);
 		else
 			this.alive.remove(u);
@@ -330,9 +329,9 @@ public abstract class Minigame {
 	 */
 	public void giveAll(ItemStackSupplier supplier, PlayerConsumer backup) {
 		for (Player player : getPlayers()) {
-			Pair<ItemStack, Integer> pair = supplier.apply(player);
-			ItemStack itemstack = pair.getKey();
-			int slot = pair.getValue();
+			Tuple<ItemStack, Integer> tuple = supplier.apply(player);
+			ItemStack itemstack = tuple.getLeft();
+			int slot = tuple.getRight();
 			PlayerInventory inv = player.getInventory();
 			if (slot == -1) {
 				HashMap<Integer, ItemStack> error = inv.addItem(itemstack);
@@ -532,6 +531,16 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Set scoreboards that can change per player
+	 * 
+	 * @param scoreboards The function to supply scoreboards
+	 */
+	public void setScoreboard(Function<Player, Scoreboard> scoreboards) {
+		for(Player player : getAlive())
+			player.setScoreboard(scoreboards.apply(player));
+	}
+	
+	/**
 	 * Generate a random chat color
 	 * 
 	 * @return A random {@link ChatColor}
@@ -603,7 +612,31 @@ public abstract class Minigame {
 	 * Supplies an itemstack and a slot to place the itemstack for every player
 	 * given
 	 */
-	public static interface ItemStackSupplier extends Function<Player, Pair<ItemStack, Integer>> {}
+	public static interface ItemStackSupplier extends Function<Player, Tuple<ItemStack, Integer>> {}
+	
+	public static class Tuple<L, R> {
+		
+		private final L l;
+		private final R r;
+		
+		public Tuple(L l, R r) {
+			this.l = l;
+			this.r = r;
+		}
+		
+		public L getLeft() {
+			return l;
+		}
+		
+		public R getRight() {
+			return r;
+		}
+		
+		public static <L, R> Tuple<L, R> of(L l, R r) {
+			return new Tuple<L, R>(l, r);
+		}
+		
+	}
 	
 	/**
 	 * Performs some operation for every player given

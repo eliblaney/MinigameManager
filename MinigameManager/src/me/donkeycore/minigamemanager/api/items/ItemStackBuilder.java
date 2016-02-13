@@ -1,5 +1,6 @@
 package me.donkeycore.minigamemanager.api.items;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import org.apache.commons.lang.Validate;
@@ -104,7 +105,7 @@ public class ItemStackBuilder {
 		return this;
 	}
 	
-	public ItemStackBuilder canDestroy(String... destroyable) throws Exception {
+	public ItemStackBuilder canDestroy(String... destroyable) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException {
 		ReflectionAPI nms = new ReflectionAPI();
 		Class<?> nbttagcompound = nms.getNMSClass("NBTTagCompound");
 		Class<?> nbttagstring = nms.getNMSClass("NBTTagString");
@@ -138,7 +139,7 @@ public class ItemStackBuilder {
 		return this;
 	}
 	
-	public ItemStackBuilder canPlaceOn(String... placeable) throws Exception {
+	public ItemStackBuilder canPlaceOn(String... placeable) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException {
 		ReflectionAPI nms = new ReflectionAPI();
 		Class<?> nbttagcompound = nms.getNMSClass("NBTTagCompound");
 		Class<?> nbttagstring = nms.getNMSClass("NBTTagString");

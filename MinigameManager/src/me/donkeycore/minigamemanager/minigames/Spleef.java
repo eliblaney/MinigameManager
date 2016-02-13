@@ -1,8 +1,5 @@
 package me.donkeycore.minigamemanager.minigames;
 
-import java.util.Arrays;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -37,25 +34,31 @@ public class Spleef extends Minigame {
 	
 	@Override
 	public void onStart() {
+		// set everybody's gamemode to adventure
 		setGamemode(GameMode.ADVENTURE);
+		// heal everybody to full health and hunger
 		healAll();
+		// clear everybody's inventories
 		clearAll();
+		// give everybody a very efficient diamond shovel
 		giveAll(new ItemStackSupplier() {
 			
 			@Override
-			public Pair<ItemStack, Integer> apply(Player player) {
+			public Tuple<ItemStack, Integer> apply(Player player) {
 				ItemStack i = new ItemStack(Material.DIAMOND_SPADE); // Backup item
 				try {
 					i = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("♪ Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS).canDestroy("minecraft:snow").build();
 				} catch (Exception e) {
+					// only thrown if canDestroy(...) failed to add NBT data
 					e.printStackTrace();
 				}
-				return Pair.of(i, 0);
+				// return itemstack to be put in the first slot of the hotbar
+				return Tuple.of(i, 0);
 			}
 		});
-		alive.addAll(Arrays.asList(getPlayerUUIDs()));
 		// create a scoreboard that lists everybody's names
 		updateScoreboard();
+		// listen to when the player moves
 		listenEvent(PlayerMoveEvent.class, new EventListener() {
 			
 			@Override
@@ -63,6 +66,7 @@ public class Spleef extends Minigame {
 				PlayerMoveEvent e = (PlayerMoveEvent) event;
 				Location l = e.getTo();
 				Location from = e.getFrom();
+				// if the player moves a whole block, check for lava, and if so, remove them from the game
 				if (l.getBlockX() != from.getBlockX() || l.getBlockY() != from.getBlockY() || l.getBlockZ() != from.getBlockZ()) {
 					if (l.getBlock().getType() == Material.LAVA || l.getBlock().getType() == Material.STATIONARY_LAVA)
 						kill(e.getPlayer());
@@ -72,25 +76,34 @@ public class Spleef extends Minigame {
 	}
 	
 	private void kill(Player player) {
+		// announce their death and mark them as dead
+		announce("\u00a7c" + player.getName() + " \u00a7rdied from \u00a76burning in lava\u00a7r.");
 		setAlive(player, false);
+		// update the scoreboard without the player in the list
 		updateScoreboard();
+		// We have a winner!
 		if (getAliveAmount() == 1) {
-			announce("\u00a7a\u00a7l" + getAliveNames()[0] + " \u00a7e\u00a7lwins!");
+			announce("\u00a7a" + getAliveNames()[0] + " \u00a7rwins!");
 			end();
+		// We're just testing with a single person, everything seemed to work fine
 		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
 			announce("\u00a7aFinished!");
 			end();
+		// Just in case, end the game if there aren't any people left (though this case should never happen)
 		} else if (getAliveAmount() < 1)
 			end(MinigameErrors.NOT_ENOUGH_PLAYERS);
 	}
 	
 	private void updateScoreboard() {
+		// build a scoreboard with a display name of "Alive" in aqua/bold, listing the alive player names in green
 		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", "\u00a7b\u00a7lAlive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
+		// update the scoreboard for everybody
 		setScoreboard(s);
 	}
 	
 	@Override
 	public Location getStartingLocation() {
+		// random spawn
 		return spawns[random.nextInt(spawns.length)];
 	}
 	
