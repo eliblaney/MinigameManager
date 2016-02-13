@@ -198,7 +198,7 @@ public abstract class Minigame {
 		UUID u = player.getUniqueId();
 		if(this.alive.contains(u) && alive)
 			return false;
-		if(this.alive.contains(u) && !alive)
+		if(!this.alive.contains(u) && !alive)
 			return false;
 		if(alive)
 			this.alive.add(u);

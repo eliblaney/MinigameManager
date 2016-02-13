@@ -74,10 +74,10 @@ public class Spleef extends Minigame {
 	private void kill(Player player) {
 		setAlive(player, false);
 		updateScoreboard();
-		if (getAliveAmount() == 1 && MinigameManager.isRelease()) {
+		if (getAliveAmount() == 1) {
 			announce("\u00a7a\u00a7l" + getAliveNames()[0] + " \u00a7e\u00a7lwins!");
 			end();
-		} else if (getAliveAmount() < 2 && !MinigameManager.isRelease()) {
+		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
 			announce("\u00a7aFinished!");
 			end();
 		} else if (getAliveAmount() < 1)

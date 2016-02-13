@@ -139,9 +139,10 @@ public final class DefaultRotation implements Rotation {
 			MinigameManager.getMinigameManager().clearListeners(minigame);
 			minigame = null;
 		}
-		// clear scoreboards, clear ingame list, and teleport everybody to the lobby
+		// clear/reset everything, and teleport everybody to the lobby
 		for (UUID u : inGame) {
 			Player player = Bukkit.getPlayer(u);
+			player.getInventory().clear();
 			player.setScoreboard(blankScoreboard);
 			player.setGameMode(GameMode.ADVENTURE);
 		}
