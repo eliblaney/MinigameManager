@@ -13,6 +13,11 @@ import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * Listens for food level changes or health changes in minigames or lobbies and cancels them
+ * 
+ * @author DonkeyCore
+ */
 public class MinigameListener implements Listener {
 	
 	private final MinigameManager manager;
@@ -29,7 +34,7 @@ public class MinigameListener implements Listener {
 			Rotation rotation = manager.getRotationManager().getRotation(player);
 			if (rotation != null && rotation.getState() == RotationState.INGAME) {
 				MinigameAttributes attr = rotation.getCurrentMinigame().getAttributes();
-				if (attr.alwaysFullHunger())
+				if (attr.alwaysSaturated())
 					event.setCancelled(true);
 			} else if(rotation != null && rotation.getState() == RotationState.LOBBY)
 				event.setCancelled(true);

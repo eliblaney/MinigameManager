@@ -5,6 +5,11 @@ import org.bukkit.event.HandlerList;
 
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 
+/**
+ * Called when somebody joins a rotation
+ * 
+ * @author DonkeyCore
+ */
 public class RotationJoinEvent extends RotationEvent {
 	
 	private static final HandlerList handlers = new HandlerList();

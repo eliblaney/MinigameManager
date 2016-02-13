@@ -1,5 +1,10 @@
 package me.donkeycore.minigamemanager.api.rotation;
 
+/**
+ * The state of a rotation
+ * 
+ * @author DonkeyCore
+ */
 public enum RotationState {
 	
 	LOBBY, COUNTDOWN, INGAME, STOPPED;
@@ -17,6 +22,14 @@ public enum RotationState {
 		return str.trim();
 	}
 	
+	/**
+	 * Get the name of the property with color added to it. Used for status messages.<br>
+	 * <b>LOBBY, COUNTDOWN: </b>GOLD<br>
+	 * <b>INGAME: </b>GREEN
+	 * <b>STOPPED: </b>RED
+	 * 
+	 * @return The colored name of the property
+	 */
 	public String toColoredString() {
 		switch (this) {
 			default:

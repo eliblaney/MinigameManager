@@ -4,7 +4,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
-
+/**
+ * Called when somebody leaves a rotation
+ * 
+ * @author DonkeyCore
+ */
 public class RotationLeaveEvent extends RotationEvent {
 	
 	private static final HandlerList handlers = new HandlerList();

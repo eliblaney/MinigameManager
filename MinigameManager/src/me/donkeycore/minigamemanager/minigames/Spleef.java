@@ -21,14 +21,24 @@ import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * A default minigame where players attempt to destroy snow blocks under other
+ * players to make them fall into lava (last person alive wins)
+ * 
+ * @author DonkeyCore
+ */
 @DefaultMinigame
-@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysFullHunger = true)
+@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true)
 public class Spleef extends Minigame {
 	
+	/**
+	 * Array of spawn locations that players can appear at
+	 */
 	private final Location[] spawns;
 	
 	public Spleef(Rotation r) {
 		super(r);
+		// get the spawn locations for this default minigame
 		spawns = getMinigameManager().getMinigameLocations().getMinigameSpawns(getName());
 	}
 	
@@ -85,11 +95,11 @@ public class Spleef extends Minigame {
 		if (getAliveAmount() == 1) {
 			announce("\u00a7a" + getAliveNames()[0] + " \u00a7rwins!");
 			end();
-		// We're just testing with a single person, everything seemed to work fine
+			// We're just testing with a single person, everything seemed to work fine
 		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
 			announce("\u00a7aFinished!");
 			end();
-		// Just in case, end the game if there aren't any people left (though this case should never happen)
+			// Just in case, end the game if there aren't any people left (though this case should never happen)
 		} else if (getAliveAmount() < 1)
 			end(MinigameErrors.NOT_ENOUGH_PLAYERS);
 	}

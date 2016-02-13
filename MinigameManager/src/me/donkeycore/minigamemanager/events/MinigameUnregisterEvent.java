@@ -4,6 +4,11 @@ import org.bukkit.event.HandlerList;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 
+/**
+ * Called when a minigame is unregistered
+ * 
+ * @author DonkeyCore
+ */
 public class MinigameUnregisterEvent extends MinigameEvent {
 	
 	private static final HandlerList handlers = new HandlerList();

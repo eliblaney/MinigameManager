@@ -1,5 +1,10 @@
 package me.donkeycore.minigamemanager.api.minigame;
 
+/**
+ * Types of minigames, used for info messages
+ * 
+ * @author DonkeyCore
+ */
 public enum MinigameType {
 	
 	LAST_MAN_STANDING, TEAMS, TOWER_DEFENSE, OTHER;

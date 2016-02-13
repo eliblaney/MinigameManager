@@ -15,6 +15,11 @@ import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * "/minigamemanager" command - Handles administrator manipulation
+ * 
+ * @author DonkeyCore
+ */
 public class CommandMinigame implements CommandExecutor {
 	
 	private final MinigameManager manager;

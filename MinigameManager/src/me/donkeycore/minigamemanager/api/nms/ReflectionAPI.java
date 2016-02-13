@@ -2,15 +2,36 @@ package me.donkeycore.minigamemanager.api.nms;
 
 import org.bukkit.Bukkit;
 
+/**
+ * Get classes of CraftBukkit and NMS from their names
+ * 
+ * @author DonkeyCore
+ */
 public class ReflectionAPI {
 	
-	public final String version;
+	/**
+	 * The version of CraftBukkit/NMS
+	 */
+	public static final String version;
 	
-	public ReflectionAPI() {
-		this.version = Bukkit.getServer().getClass().getPackage().getName().replace(".",  ",").split(",")[3];
+	static {
+		// set the version of CraftBukkit/NMS
+		version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 	}
 	
-	public Class<?> getCraftClass(String name) {
+	/**
+	 * Private constructor to prevent instances
+	 */
+	private ReflectionAPI() {}
+	
+	/**
+	 * Get a CraftBukkit class from its name
+	 * 
+	 * @param name The class's name
+	 * 			
+	 * @return The CraftBukkit class, or null if not found
+	 */
+	public static Class<?> getCraftClass(String name) {
 		try {
 			return Class.forName("org.bukkit.craftbukkit." + version + "." + name);
 		} catch (ClassNotFoundException e) {
@@ -18,7 +39,14 @@ public class ReflectionAPI {
 		}
 	}
 	
-	public Class<?> getNMSClass(String name) {
+	/**
+	 * Get a net.minecraft.server (NMS) class from its name
+	 * 
+	 * @param name The class's name
+	 * 			
+	 * @return The NMS class, or null if not found
+	 */
+	public static Class<?> getNMSClass(String name) {
 		try {
 			return Class.forName("net.minecraft.server." + version + "." + name);
 		} catch (ClassNotFoundException e) {

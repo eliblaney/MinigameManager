@@ -6,6 +6,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * Handles players quitting so that rotations are safe 
+ * 
+ * @author DonkeyCore
+ */
 public class QuitListener implements Listener {
 	
 	private final MinigameManager manager;

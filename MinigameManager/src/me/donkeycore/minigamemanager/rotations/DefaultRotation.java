@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
@@ -19,23 +20,59 @@ import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * The default rotation object to be used to represent a rotation where players
+ * cycle through minigames
+ * 
+ * @author DonkeyCore
+ */
 public final class DefaultRotation implements Rotation {
 	
-	// All players in the rotation, both playing and not
+	/**
+	 * All players in the rotation, both playing and not
+	 */
 	private final List<UUID> players = new ArrayList<>();
-	// Separate array for those in-game to separate newly joining from currently playing
+	/**
+	 * Separate array for those in-game to separate newly joining from currently playing
+	 */
 	private final List<UUID> inGame = new ArrayList<>();
+	/**
+	 * The parent rotation manager
+	 */
 	private final RotationManager rm;
+	/**
+	 * The id of this rotation
+	 */
 	private final int id;
+	/**
+	 * The current minigame
+	 */
 	private Minigame minigame = null;
+	/**
+	 * The current rotation state
+	 */
 	private RotationState state = RotationState.LOBBY;
-	private final org.bukkit.scoreboard.Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+	/**
+	 * Blank scoreboard for use when leaving a minigame to clear any active scoreboards
+	 */
+	private final Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	
+	/**
+	 * Create a new rotation
+	 * 
+	 * @param rm The parent rotation manager
+	 * @param id The id of this rotation
+	 */
 	public DefaultRotation(RotationManager rm, int id) {
 		this.rm = rm;
 		this.id = id;
 	}
 	
+	/**
+	 * Have a player join the rotation
+	 * 
+	 * @param uuid The UUID of the player to join
+	 */
 	protected void join(UUID uuid) {
 		Player p = Bukkit.getPlayer(uuid);
 		if (p != null) {
@@ -55,10 +92,21 @@ public final class DefaultRotation implements Rotation {
 		}
 	}
 	
+	/**
+	 * Have a player leave the rotation
+	 * 
+	 * @param uuid The UUID of the player to leave
+	 */
 	protected void leave(UUID uuid) {
 		leave(uuid, false);
 	}
 	
+	/**
+	 * Have a player leave the rotation
+	 * 
+	 * @param uuid The UUID of the player to leave
+	 * @param kicked Whether they were kicked out of the rotation
+	 */
 	protected void leave(UUID uuid, boolean kicked) {
 		// only let them leave if they're already in there
 		if (players.contains(uuid)) {
@@ -74,7 +122,7 @@ public final class DefaultRotation implements Rotation {
 			}
 			// sad, sad times
 			if (inGame.size() < 2) {
-				if(minigame != null)
+				if (minigame != null)
 					minigame.end(MinigameErrors.NOT_ENOUGH_PLAYERS);
 				else
 					finish(MinigameErrors.NOT_ENOUGH_PLAYERS);
@@ -110,6 +158,13 @@ public final class DefaultRotation implements Rotation {
 		return id;
 	}
 	
+	/**
+	 * Begin the minigame
+	 * 
+	 * @param minigame The minigame to start
+	 * 
+	 * @return Whether the process was successful
+	 */
 	protected boolean beginMinigame(Minigame minigame) {
 		Validate.notNull(minigame);
 		// players must always be at least 1 for testing, and at least 2 for releases
@@ -121,7 +176,6 @@ public final class DefaultRotation implements Rotation {
 		inGame.addAll(players);
 		for (UUID player : getInGame())
 			Bukkit.getPlayer(player).setGameMode(GameMode.ADVENTURE);
-		minigame.onStart();
 		return true;
 	}
 	
@@ -189,6 +243,11 @@ public final class DefaultRotation implements Rotation {
 		return state;
 	}
 	
+	/**
+	 * Set the state of this rotation
+	 * 
+	 * @param state The new state
+	 */
 	protected void setState(RotationState state) {
 		this.state = state;
 	}
@@ -197,7 +256,7 @@ public final class DefaultRotation implements Rotation {
 	public Minigame getCurrentMinigame() {
 		return minigame;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -210,7 +269,7 @@ public final class DefaultRotation implements Rotation {
 		result = prime * result + ((state == null) ? 0 : state.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

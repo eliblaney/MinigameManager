@@ -16,18 +16,55 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Configuration file for minigames
+ * 
+ * @author DonkeyCore
+ */
 public class MinigameConfig {
 	
+	/**
+	 * The JavaPlugin owning the config
+	 */
 	private final JavaPlugin plugin;
+	/**
+	 * The FileConfiguration instance that can be manipulated
+	 */
 	private FileConfiguration config;
+	/**
+	 * The file that the config is saved to
+	 */
 	private File configFile;
+	/**
+	 * The name of the config file
+	 */
 	private String fileName;
 	
+	/**
+	 * Create a new instance of MinigameConfig for an existing FileConfiguration
+	 * 
+	 * @param plugin The plugin that should own this config
+	 * @param config The FileConfiguration to be used
+	 * @param configFile The file to be saved as
+	 */
 	public MinigameConfig(JavaPlugin plugin, FileConfiguration config, File configFile) {
 		this.plugin = plugin;
 		this.config = config;
 		this.configFile = configFile;
 		this.fileName = configFile.getName();
+	}
+	
+	/**
+	 * Create a new instance of MinigameConfig
+	 * 
+	 * @param plugin The plugin that should own this config
+	 * @param configFile The file to be saved as
+	 */
+	public MinigameConfig(JavaPlugin plugin, File configFile) {
+		this.plugin = plugin;
+		this.configFile = configFile;
+		this.fileName = configFile.getName();
+		reloadConfig();
 	}
 	
 	/**
@@ -90,12 +127,12 @@ public class MinigameConfig {
 	 * @return An array of {@link Location} objects for each spawn location
 	 */
 	public Location[] getMinigameSpawns(String minigame) {
-		ConfigurationSection spawns= getConfig().getConfigurationSection("spawns");
+		ConfigurationSection spawns = getConfig().getConfigurationSection("spawns");
 		Set<String> keys = spawns.getKeys(false);
 		Location[] locations = new Location[keys.size() - 1];
 		int i = 0;
 		for (String key : keys) {
-			if(key.equalsIgnoreCase("mapinfo"))
+			if (key.equalsIgnoreCase("mapinfo"))
 				continue;
 			ConfigurationSection cs = spawns.getConfigurationSection(key);
 			World world = Bukkit.getWorld(cs.getString("world"));
@@ -115,8 +152,10 @@ public class MinigameConfig {
 	 * Get the map info information for the arena
 	 * 
 	 * @param minigame The minigame string to use
-	 * @param key The name of the arena in which the mapinfo information can be found
-	 * @return An array of length 2 with the name of the arena in the first index and the author(s) in the second
+	 * @param key The name of the arena in which the mapinfo information can be
+	 *            found
+	 * @return An array of length 2 with the name of the arena in the first
+	 *         index and the author(s) in the second
 	 */
 	public String[] getMapInfo(String minigame, String key) {
 		ConfigurationSection kcs = getConfig().getConfigurationSection(key);

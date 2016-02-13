@@ -12,6 +12,11 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 import me.donkeycore.minigamemanager.events.RotationJoinEvent;
 import net.md_5.bungee.api.ChatColor;
 
+/**
+ * "/join" command - Joins a rotation
+ * 
+ * @author DonkeyCore
+ */
 public class CommandJoin implements CommandExecutor {
 	
 	private final MinigameManager manager;

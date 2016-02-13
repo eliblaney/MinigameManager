@@ -8,6 +8,11 @@ import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * Countdown for rotations
+ * 
+ * @author DonkeyCore
+ */
 public class Countdown implements Runnable {
 	
 	private final MinigameManager manager;

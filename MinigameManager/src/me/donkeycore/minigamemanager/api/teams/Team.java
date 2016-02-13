@@ -17,9 +17,21 @@ import me.donkeycore.minigamemanager.api.minigame.Minigame.LocationSupplier;
  */
 public class Team {
 	
+	/**
+	 * The scoreboard version of the team
+	 */
 	private org.bukkit.scoreboard.Team team = null;
+	/**
+	 * The list of players on the team
+	 */
 	private List<UUID> players = new LinkedList<>();
+	/**
+	 * The name of the team
+	 */
 	private String name;
+	/**
+	 * The prefix color of the team
+	 */
 	private ChatColor color = ChatColor.WHITE;
 	
 	/**
@@ -32,6 +44,9 @@ public class Team {
 			this.players.add(player.getUniqueId());
 	}
 	
+	/**
+	 * Empty constructor that is used for the builder
+	 */
 	private Team() {}
 	
 	/**
@@ -52,7 +67,7 @@ public class Team {
 	 */
 	public org.bukkit.scoreboard.Team createScoreboardTeam(Scoreboard scoreboard, String name) {
 		setScoreboardTeam(scoreboard.registerNewTeam(name));
-		for(Player player : getPlayers())
+		for (Player player : getPlayers())
 			team.addEntry(player.getName());
 		team.setDisplayName(getDisplayName());
 		team.setPrefix(color.toString());
@@ -87,12 +102,13 @@ public class Team {
 	}
 	
 	/**
-	 * Get the team's display name, including color
+	 * Get the team's name, with the addition of color and the replacement of
+	 * underscores with spaces
 	 * 
-	 * @return The team's name with color added to it
+	 * @return The team's name with color and spaces added to it
 	 */
 	public String getDisplayName() {
-		return color + name;
+		return color + name.replace('_', ' ');
 	}
 	
 	/**
@@ -233,7 +249,7 @@ public class Team {
 		players.clear();
 		name = null;
 		color = null;
-		if(team != null)
+		if (team != null)
 			team.unregister();
 		team = null;
 	}
@@ -243,38 +259,112 @@ public class Team {
 	 */
 	public static class Builder {
 		
+		/**
+		 * The scoreboard version of the team
+		 */
 		private org.bukkit.scoreboard.Team team;
+		/**
+		 * Create a new team automatically if the scoreboard is nonnull
+		 */
+		private Scoreboard scoreboard;
+		/**
+		 * The list of players on the team
+		 */
 		private List<UUID> players = new LinkedList<>();
+		/**
+		 * The name of the team
+		 */
 		private String name;
+		/**
+		 * The prefix color of the team
+		 */
 		private ChatColor color;
 		
+		/**
+		 * Set the scoreboard version of the team. Mutually exclusive with the
+		 * other team method.
+		 * 
+		 * @param team The scoreboard version of the team
+		 * 			
+		 * @return The builder instance
+		 */
 		public Builder team(org.bukkit.scoreboard.Team team) {
+			if (this.scoreboard != null)
+				throw new IllegalStateException("Cannot set a team if a team is queued to exist");
 			this.team = team;
 			return this;
 		}
 		
+		/**
+		 * Whether to create a scoreboard version of the team. Mutually
+		 * exclusive with the other team method.
+		 * 
+		 * @param scoreboard The scoreboard to use. Set to null to disable creating a team.
+		 * 			
+		 * @return The builder instance
+		 */
+		public Builder team(Scoreboard scoreboard) {
+			if (this.team != null && scoreboard != null)
+				throw new IllegalStateException("Cannot create a team if there is an existing one");
+			this.scoreboard = scoreboard;
+			return this;
+		}
+		
+		/**
+		 * Add players on the team. Can be called multiple times.
+		 * 
+		 * @param players The players to add to the team
+		 * 			
+		 * @return The builder instance
+		 */
 		public Builder players(Player... players) {
 			for (Player player : players)
 				this.players.add(player.getUniqueId());
 			return this;
 		}
 		
+		/**
+		 * Add players on the team. Can be called multiple times.
+		 * 
+		 * @param uuids The players to add to the team
+		 * 			
+		 * @return The builder instance
+		 */
 		public Builder players(UUID... uuids) {
 			for (UUID uuid : uuids)
 				this.players.add(uuid);
 			return this;
 		}
 		
+		/**
+		 * Set the name of the team
+		 * 
+		 * @param name The new name of the team
+		 * 			
+		 * @return The builder instance
+		 */
 		public Builder name(String name) {
 			this.name = name;
 			return this;
 		}
 		
+		/**
+		 * Set the prefix color of the team
+		 * 
+		 * @param color The new color
+		 * 			
+		 * @return The builder instance
+		 */
 		public Builder color(ChatColor color) {
 			this.color = color;
 			return this;
 		}
 		
+		/**
+		 * Create the team
+		 * 
+		 * @return The newly created Team instance
+		 */
 		public Team build() {
 			Team team = new Team();
 			if (this.team != null)
@@ -285,6 +375,8 @@ public class Team {
 				team.name = this.name;
 			if (this.color != null)
 				team.color = this.color;
+			if (this.scoreboard != null)
+				team.createScoreboardTeam(this.scoreboard, this.name);
 			return team;
 		}
 		

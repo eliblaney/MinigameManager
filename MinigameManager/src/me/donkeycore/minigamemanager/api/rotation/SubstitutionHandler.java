@@ -10,15 +10,30 @@ import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
  */
 public final class SubstitutionHandler {
 	
+	/**
+	 * The rotation manager to use if no others are provided
+	 */
 	private static final Class<? extends RotationManager> defaultRotationManager = DefaultRotationManager.class;
+	/**
+	 * The current rotation manager to use
+	 */
 	private static Class<? extends RotationManager> rotationManager = defaultRotationManager;
+	/**
+	 * Whether substitutions are not allowed to be used anymore
+	 */
 	private static boolean lock = false;
 	
 	{
+		// no instances allowed
 		if (SubstitutionHandler.class == getClass())
 			throw new IllegalAccessException("SubstitutionHandler cannot have an instance");
 	}
 	
+	/**
+	 * No instances allowed
+	 * 
+	 * @throws IllegalAccessException Instances are not allowed
+	 */
 	private SubstitutionHandler() throws IllegalAccessException {
 		throw new IllegalAccessException("SubstitutionHandler cannot have an instance");
 	}
@@ -70,6 +85,9 @@ public final class SubstitutionHandler {
 		SubstitutionHandler.rotationManager = rotationManager;
 	}
 	
+	/**
+	 * Lock the class so that no more substitutions are allowed
+	 */
 	public static final void lock() {
 		if (lock)
 			throw new IllegalStateException("Already locked!");
@@ -82,6 +100,7 @@ public final class SubstitutionHandler {
 	 * 
 	 * @param a An instance of SubstitutionHandler, so you have to solve that problem first! ;)
 	 * @param secretNumber A secret number that is tough to figure out... Maybe the method name could be a hint?
+	 * 
 	 * @return Whether you win or not!
 	 */
 	\u0040\u0053\u0075\u0070\u0070\u0072\u0065\u0073\u0073\u0057\u0061\u0072\u006e\u0069\u006e\u0067\u0073\u0028\u0022\u0075\u006e\u0075\u0073\u0065\u0064\u0022\u0029

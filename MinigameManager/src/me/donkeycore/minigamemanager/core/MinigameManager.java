@@ -23,6 +23,7 @@ import me.donkeycore.minigamemanager.listeners.MinigameListener;
  * - sign support
  * - chest API (and other minigame APIs)
  * - stuff to make minigames EASIER to make
+ * - multiple map support (random selection?)
  * - config options:
  * * server-wide (join rotation on join server, leave rotation on quit server)
  * - beta test at some point
@@ -49,14 +50,44 @@ import me.donkeycore.minigamemanager.listeners.MinigameListener;
  */
 public final class MinigameManager {
 	
+	/**
+	 * The instance of MinigameManager
+	 */
 	static MinigameManager instance = null;
-	MinigameSettings config;
-	MinigameLocations locations;
+	/**
+	 * The rotation manager to be used
+	 */
 	RotationManager rotationManager;
-	private static MinigameManagerPlugin plugin;
-	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
+	/**
+	 * The config for MinigameManager
+	 */
+	MinigameSettings config;
+	/**
+	 * The locations for lobbies, spawn, and minigame spawns
+	 */
+	MinigameLocations locations;
+	/**
+	 * The listener for health/hunger changes for minigames/lobbies
+	 */
+	MinigameListener listener;
+	/**
+	 * The list of minigames requesting events
+	 */
 	List<ListenerEntry> listeners = new ArrayList<>();
+	/**
+	 * The plugin owning MinigameManager
+	 */
+	private static MinigameManagerPlugin plugin;
+	/**
+	 * The list of minigames as well as their minimum player requirement
+	 */
+	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
 	
+	/**
+	 * Create a new instance of MinigameManager
+	 * 
+	 * @param plugin The plugin instance to use
+	 */
 	MinigameManager(MinigameManagerPlugin plugin) {
 		if (instance != null)
 			throw new IllegalStateException("MinigameManager has already been initialized!");
@@ -128,7 +159,7 @@ public final class MinigameManager {
 	 *         minigames
 	 */
 	public MinigameListener getListener() {
-		return getPlugin().listener;
+		return listener;
 	}
 	
 	/**
@@ -213,6 +244,11 @@ public final class MinigameManager {
 		return m;
 	}
 	
+	/**
+	 * Represents a minigame that is listening to an event
+	 * 
+ 	 * @author DonkeyCore
+	 */
 	public static class ListenerEntry {
 		
 		public final Minigame minigame;

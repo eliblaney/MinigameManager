@@ -6,7 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to indicate if a minigame is a default minigame. Not recommended to use.
+ * Used to indicate if a minigame is a default minigame. Do not use.
+ * 
+ * @author DonkeyCore
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

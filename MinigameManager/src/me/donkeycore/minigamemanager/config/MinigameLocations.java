@@ -17,16 +17,33 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * Class for finding locations of spawns, lobbies, and default minigames
+ * 
+ * @author DonkeyCore
+ */
 public class MinigameLocations {
 	
+	/**
+	 * The FileConfiguration instance that can be manipulated
+	 */
 	private FileConfiguration config;
+	/**
+	 * The file that the config is saved to
+	 */
 	private File configFile;
 	
+	/**
+	 * Create a new instance of MinigameLocations
+	 */
 	public MinigameLocations() {
 		saveDefaultConfig();
 		reloadConfig();
 	}
 	
+	/**
+	 * Reload the locations.yml configuration file
+	 */
 	public void reloadConfig() {
 		if (configFile == null)
 			configFile = new File(MinigameManager.getPlugin().getDataFolder(), "locations.yml");
@@ -43,12 +60,20 @@ public class MinigameLocations {
 		}
 	}
 	
+	/**
+	 * Get the instance of FileConfiguration that handles the config
+	 * 
+	 * @return An instance of FileConfiguration representing the config
+	 */
 	public FileConfiguration getConfig() {
 		if (config == null)
 			reloadConfig();
 		return config;
 	}
 	
+	/**
+	 * Save any changes to the config to disk
+	 */
 	public void saveConfig() {
 		if (config == null || configFile == null)
 			return;
@@ -59,6 +84,9 @@ public class MinigameLocations {
 		}
 	}
 	
+	/**
+	 * Save the default config if the config file does not exist
+	 */
 	public void saveDefaultConfig() {
 		if (configFile == null)
 			configFile = new File(MinigameManager.getPlugin().getDataFolder(), "locations.yml");
@@ -66,6 +94,13 @@ public class MinigameLocations {
 			MinigameManager.getPlugin().saveResource("locations.yml", false);
 	}
 	
+	/**
+	 * Get the specified rotation location
+	 * 
+	 * @param key The type of location to retrieve
+	 * 			
+	 * @return A location for the specified key
+	 */
 	public Location getRotationLocation(String key) {
 		ConfigurationSection cs = getConfig().getConfigurationSection("rotations").getConfigurationSection(key);
 		if (cs == null)
@@ -81,6 +116,14 @@ public class MinigameLocations {
 		return new Location(world, x, y, z, yaw, pitch);
 	}
 	
+	/**
+	 * Get an array of Locations representing spawn locations for a default
+	 * minigame
+	 * 
+	 * @param minigame The minigame to look for (must be a default minigame!)
+	 * 			
+	 * @return An array of Location elements representing spawns
+	 */
 	public Location[] getMinigameSpawns(String minigame) {
 		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
 		if (mcs == null)
@@ -106,6 +149,14 @@ public class MinigameLocations {
 		return locations;
 	}
 	
+	/**
+	 * Get the map info for a default minigame's specified map
+	 * 
+	 * @param minigame The minigame to look for (must be default!)
+	 * @param key The map that the mapinfo will be found for (normally "spawns")
+	 * 			
+	 * @return A string array of length 2 with the name in the first index and the author in the second
+	 */
 	public String[] getMapInfo(String minigame, String key) {
 		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
 		if (mcs == null)

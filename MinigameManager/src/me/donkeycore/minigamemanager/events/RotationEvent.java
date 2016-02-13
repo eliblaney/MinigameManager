@@ -5,6 +5,11 @@ import org.bukkit.event.HandlerList;
 
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 
+/**
+ * An event for rotations
+ * 
+ * @author DonkeyCore
+ */
 public abstract class RotationEvent extends Event {
 	
 	private static final HandlerList handlers = new HandlerList();

@@ -26,6 +26,8 @@ import me.donkeycore.minigamemanager.core.MinigameManager.ListenerEntry;
  * Custom implementation of PluginManager that redirects everything to a
  * SimplePluginManager with the exception of events, so that those can be
  * handled properly
+ * 
+ * @author DonkeyCore
  */
 public final class MinigamePluginManagerWrapper implements PluginManager {
 	

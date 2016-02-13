@@ -12,6 +12,11 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 import me.donkeycore.minigamemanager.events.RotationLeaveEvent;
 import net.md_5.bungee.api.ChatColor;
 
+/**
+ * "/leave" command - Leaves a rotation
+ * 
+ * @author DonkeyCore
+ */
 public class CommandLeave implements CommandExecutor {
 	
 	private final MinigameManager manager;

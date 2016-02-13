@@ -25,14 +25,40 @@ import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
+/**
+ * The default rotation manager to handle all rotations
+ * 
+ * @author DonkeyCore
+ */
 public final class DefaultRotationManager implements RotationManager {
 	
+	/**
+	 * The parent MinigameManager instance
+	 */
 	private final MinigameManager manager;
+	/**
+	 * The list of rotations belonging to this rotation manager
+	 */
 	private final List<DefaultRotation> rotations = new ArrayList<>();
+	/**
+	 * The list of players playing, and their respective rotation
+	 */
 	private final Map<UUID, DefaultRotation> players = new HashMap<>();
+	/**
+	 * Whether rotations should continue to run
+	 */
 	private boolean running = true;
+	/**
+	 * Whether to force the countdown to start
+	 */
 	private boolean force = false;
 	
+	/**
+	 * Create a new default rotation manager
+	 * 
+	 * @param manager An instance of MinigameManager that owns this rotation manager
+	 * @param rotations The number of rotations to create
+	 */
 	public DefaultRotationManager(MinigameManager manager, int rotations) {
 		this.manager = manager;
 		for (int i = 0; i < rotations; i++)
@@ -167,6 +193,12 @@ public final class DefaultRotationManager implements RotationManager {
 		});
 	}
 	
+	/**
+	 * Start the next minigame
+	 * 
+	 * @param r The rotation to be affected
+	 * @param minigame The minigame to start
+	 */
 	void start(DefaultRotation r, Minigame minigame) {
 		Validate.notNull(r, "Rotation cannot be null!");
 		Validate.notNull(minigame, "Minigame cannot be null!");
@@ -188,6 +220,7 @@ public final class DefaultRotationManager implements RotationManager {
 			if (mapinfo.length > 0)
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
 		}
+		minigame.onStart();
 	}
 	
 	@Override

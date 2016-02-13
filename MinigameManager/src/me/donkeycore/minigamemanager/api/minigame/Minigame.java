@@ -30,9 +30,21 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
  */
 public abstract class Minigame {
 	
+	/**
+	 * The parent rotation of this minigame
+	 */
 	private final Rotation r;
+	/**
+	 * A blank scoreboard for clearing
+	 */
 	private final Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+	/**
+	 * Helpful random object
+	 */
 	protected final Random random = new Random();
+	/**
+	 * List of players who are alive
+	 */
 	protected final List<UUID> alive;
 	
 	/**
@@ -76,7 +88,8 @@ public abstract class Minigame {
 	
 	/**
 	 * Called when the minigame starts and all players have been teleported to
-	 * their starting locations
+	 * their starting locations. This is called after all players are teleported
+	 * to their spawns
 	 */
 	public abstract void onStart();
 	
@@ -90,7 +103,7 @@ public abstract class Minigame {
 	/**
 	 * Call this to end the minigame and continue to the next rotation<br>
 	 * <b>Note:</b> If this method is being overriden, make sure there is a call
-	 * to {@link Rotation#finish()} or a call to
+	 * to {@link Rotation#finish(int)} or a call to
 	 * 
 	 * <pre>
 	 * super.end()
@@ -202,16 +215,18 @@ public abstract class Minigame {
 	}
 	
 	public boolean setAlive(Player player, boolean alive) {
-		player.setGameMode(GameMode.SPECTATOR);
 		UUID u = player.getUniqueId();
 		if (this.alive.contains(u) && alive)
 			return false;
 		if (!this.alive.contains(u) && !alive)
 			return false;
-		if (alive)
+		if (alive) {
+			player.setGameMode(GameMode.ADVENTURE);
 			this.alive.add(u);
-		else
+		} else {
+			player.setGameMode(GameMode.SPECTATOR);
 			this.alive.remove(u);
+		}
 		return true;
 	}
 	
@@ -355,6 +370,7 @@ public abstract class Minigame {
 	 * </pre>
 	 * 
 	 * @param itemstack An {@link ItemStack} to give to each player
+	 * @param slot The slot number to put the item in
 	 * 			
 	 * @see #giveAll(ItemStackSupplier, PlayerConsumer)
 	 */
@@ -366,6 +382,7 @@ public abstract class Minigame {
 	 * Give all the players an item
 	 * 
 	 * @param itemstack An {@link ItemStack} to give to each player
+	 * @param slot The slot number to put the item in
 	 * @param backup An instance of {@link PlayerConsumer} that says what to do
 	 *            in case the player can't receive the item (null to just
 	 *            ignore)
@@ -536,7 +553,7 @@ public abstract class Minigame {
 	 * @param scoreboards The function to supply scoreboards
 	 */
 	public void setScoreboard(Function<Player, Scoreboard> scoreboards) {
-		for(Player player : getAlive())
+		for (Player player : getAlive())
 			player.setScoreboard(scoreboards.apply(player));
 	}
 	
