@@ -43,11 +43,11 @@ public class OneInTheQuiver extends Minigame {
 	/**
 	 * Unbreakable bow
 	 */
-	private final ItemStack bow = ItemStackBuilder.fromMaterial(Material.BOW).unbreakable(true).lore("Don't miss!").flags(ItemFlag.HIDE_UNBREAKABLE).build();
+	private final ItemStack bow = ItemStackBuilder.fromMaterial(Material.BOW).unbreakable(true).lore("Don't miss!").shiny().flags(ItemFlag.HIDE_UNBREAKABLE).build();
 	/**
 	 * Unbreakable iron axe
 	 */
-	private final ItemStack axe = ItemStackBuilder.fromMaterial(Material.IRON_AXE).unbreakable(true).lore("Well, at least I have this...").flags(ItemFlag.HIDE_UNBREAKABLE).build();
+	private final ItemStack axe = ItemStackBuilder.fromMaterial(Material.IRON_AXE).unbreakable(true).lore("Well, at least I have this...").shiny().flags(ItemFlag.HIDE_UNBREAKABLE).build();
 	/**
 	 * Main timer set for 5 minutes
 	 */
@@ -58,8 +58,12 @@ public class OneInTheQuiver extends Minigame {
 	private int time = 5 * 60;
 	
 	public OneInTheQuiver(Rotation r) {
-		super(r, "map1", getMinigameManager().getMinigameLocations().getMapInfo("One_In_The_Quiver", "map1")[0], getMinigameManager().getMinigameLocations().getMapInfo("One_In_The_Quiver", "map1")[1]);
+		super(r, "map1", getMapinfo("map1")[0], getMapinfo("map1")[1]);
 		kills = new HashMap<String, Integer>();
+	}
+	
+	private static String[] getMapinfo(String map) {
+		return getMinigameManager().getMinigameLocations().getMapInfo(((MinigameAttributes) OneInTheQuiver.class.getAnnotation(MinigameAttributes.class)).name(), map);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import static me.donkeycore.minigamemanager.api.nms.ReflectionAPI.getNMSClass;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
@@ -131,6 +132,21 @@ public class ItemStackBuilder {
 	 */
 	public ItemStackBuilder unsafeEnchantment(Enchantment ench, int level) {
 		i.addUnsafeEnchantment(ench, level);
+		return this;
+	}
+	
+	/**
+	 * Add the 'Shiny I' enchantment<br>
+	 * If you make a call to {@link #lore(String...)} and want Shiny I, call this method AFTER you call {@link #lore(String...)}
+	 * 
+	 * @return The builder instance
+	 */
+	public ItemStackBuilder shiny() {
+		unsafeEnchantment(Enchantment.LUCK, 0);
+		List<String> lore = i.getItemMeta().getLore();
+		lore.add(0, "\u00a77Shiny I");
+		lore(lore.toArray(new String[lore.size()]));
+		flags(ItemFlag.HIDE_ENCHANTS);
 		return this;
 	}
 	

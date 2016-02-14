@@ -21,9 +21,7 @@ import me.donkeycore.minigamemanager.listeners.MinigameListener;
 /*
  * TODO:
  * - sign support
- * - chest API (and other minigame APIs)
  * - stuff to make minigames EASIER to make
- * - multiple map support (random selection?)
  * - config options:
  * * server-wide (join rotation on join server, leave rotation on quit server)
  * - beta test at some point
