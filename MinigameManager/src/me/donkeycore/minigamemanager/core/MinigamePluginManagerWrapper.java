@@ -1,7 +1,8 @@
 package me.donkeycore.minigamemanager.core;
 
 import java.io.File;
-import java.util.Iterator;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.bukkit.Server;
@@ -48,11 +49,17 @@ public final class MinigamePluginManagerWrapper implements PluginManager {
 	
 	@Override
 	public void callEvent(Event event) throws IllegalStateException {
-		Iterator<ListenerEntry> it = MinigameManager.getMinigameManager().listeners.iterator();
-		while(it.hasNext()) {
-			ListenerEntry e = it.next();
-			if(e.event.getName().equals(event.getClass().getName()))
-				e.listener.onEvent(event);
+		ListenerEntry[] entries = MinigameManager.getMinigameManager().listeners.toArray(new ListenerEntry[MinigameManager.getMinigameManager().listeners.size()]);
+		for(ListenerEntry e : entries) {
+			try {
+				if (e.event.isInstance(event)) {
+					Method onEvent = e.listener.getClass().getDeclaredMethod("onEvent", e.event);
+					onEvent.setAccessible(true);
+					onEvent.invoke(e.listener, e.event.cast(event));
+				}
+			} catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | ClassCastException ex) {
+				ex.printStackTrace();
+			}
 		}
 		pm.callEvent(event);
 	}

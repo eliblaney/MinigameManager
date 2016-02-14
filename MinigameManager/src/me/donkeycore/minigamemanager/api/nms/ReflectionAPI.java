@@ -25,6 +25,15 @@ public class ReflectionAPI {
 	private ReflectionAPI() {}
 	
 	/**
+	 * Get the version of the server
+	 * 
+	 * @return The version
+	 */
+	public static String getVersion() {
+		return version;
+	}
+	
+	/**
 	 * Get a CraftBukkit class from its name
 	 * 
 	 * @param name The class's name

@@ -1,12 +1,12 @@
 package me.donkeycore.minigamemanager.minigames;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -28,8 +28,21 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
  * @author DonkeyCore
  */
 @DefaultMinigame
-@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true)
+@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true, canDropItems = false, canPickUpItems = false)
 public class Spleef extends Minigame {
+	
+	private ItemStack shovel;
+	
+	{
+		ItemStackBuilder builder = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("♪ Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS);
+		try {
+			builder.canDestroy("minecraft:snow");
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException e) {
+			// only thrown if canDestroy(...) failed to add NBT data
+			e.printStackTrace();
+		}
+		shovel = builder.build();
+	}
 	
 	/**
 	 * Array of spawn locations that players can appear at
@@ -44,42 +57,31 @@ public class Spleef extends Minigame {
 	
 	@Override
 	public void onStart() {
-		// set everybody's gamemode to adventure
-		setGamemode(GameMode.ADVENTURE);
-		// heal everybody to full health and hunger
-		healAll();
-		// clear everybody's inventories
-		clearAll();
 		// give everybody a very efficient diamond shovel
 		giveAll(new ItemStackSupplier() {
 			
 			@Override
 			public Tuple<ItemStack, Integer> apply(Player player) {
-				ItemStack i = new ItemStack(Material.DIAMOND_SPADE); // Backup item
-				try {
-					i = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("♪ Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS).canDestroy("minecraft:snow").build();
-				} catch (Exception e) {
-					// only thrown if canDestroy(...) failed to add NBT data
-					e.printStackTrace();
-				}
 				// return itemstack to be put in the first slot of the hotbar
-				return Tuple.of(i, 0);
+				return Tuple.of(shovel, 0);
 			}
 		});
 		// create a scoreboard that lists everybody's names
 		updateScoreboard();
 		// listen to when the player moves
-		listenEvent(PlayerMoveEvent.class, new EventListener() {
+		listenEvent(new EventListener<PlayerMoveEvent>() {
 			
 			@Override
-			public void onEvent(Event event) {
-				PlayerMoveEvent e = (PlayerMoveEvent) event;
-				Location l = e.getTo();
-				Location from = e.getFrom();
+			public void onEvent(PlayerMoveEvent event) {
+				// filter only those who are playing and are alive
+				if (!isAlive(event.getPlayer()))
+					return;
+				Location l = event.getTo();
+				Location from = event.getFrom();
 				// if the player moves a whole block, check for lava, and if so, remove them from the game
 				if (l.getBlockX() != from.getBlockX() || l.getBlockY() != from.getBlockY() || l.getBlockZ() != from.getBlockZ()) {
 					if (l.getBlock().getType() == Material.LAVA || l.getBlock().getType() == Material.STATIONARY_LAVA)
-						kill(e.getPlayer());
+						kill(event.getPlayer());
 				}
 			}
 		});
@@ -93,7 +95,7 @@ public class Spleef extends Minigame {
 		updateScoreboard();
 		// We have a winner!
 		if (getAliveAmount() == 1) {
-			announce("\u00a7a" + getAliveNames()[0] + " \u00a7rwins!");
+			titleAll("\u00a7a" + getAliveNames()[0] + " \u00a7rwins!", null, 5, 20, 5);
 			end();
 			// We're just testing with a single person, everything seemed to work fine
 		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
@@ -112,7 +114,7 @@ public class Spleef extends Minigame {
 	}
 	
 	@Override
-	public Location getStartingLocation() {
+	public Location getStartingLocation(Player player) {
 		// random spawn
 		return spawns[random.nextInt(spawns.length)];
 	}

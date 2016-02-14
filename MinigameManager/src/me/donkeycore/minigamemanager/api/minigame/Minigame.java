@@ -1,5 +1,10 @@
 package me.donkeycore.minigamemanager.api.minigame;
 
+import static me.donkeycore.minigamemanager.api.nms.ReflectionAPI.getNMSClass;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,8 +22,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.Scoreboard;
 
+import me.donkeycore.minigamemanager.api.nms.ReflectionAPI;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.teams.Team;
 import me.donkeycore.minigamemanager.core.MinigameManager;
@@ -54,7 +61,7 @@ public abstract class Minigame {
 	 */
 	public Minigame(Rotation r) {
 		this.r = r;
-		this.alive = new LinkedList<>(Arrays.asList(getPlayerUUIDs()));
+		this.alive = new LinkedList<>();
 	}
 	
 	/**
@@ -145,11 +152,64 @@ public abstract class Minigame {
 	}
 	
 	/**
-	 * Get the spawn location for the beginning of the minigame
+	 * Get the spawn location for the beginning of the minigame for a player
 	 * 
+	 * @param player The player being teleported
+	 * 			
 	 * @return The spawn location, can be random
 	 */
-	public abstract Location getStartingLocation();
+	public abstract Location getStartingLocation(Player player);
+	
+	/**
+	 * Determine whether the specified player is playing in the minigame
+	 * 
+	 * @param player The player to check
+	 * 			
+	 * @return Whether the player is playing in this minigame
+	 */
+	public boolean isPlaying(Player player) {
+		return r.getInGame().contains(player.getUniqueId());
+	}
+	
+	/**
+	 * Determine whether the specified player is playing in the minigame
+	 * 
+	 * @param player The player to check
+	 * 			
+	 * @return Whether the player is playing in this minigame
+	 */
+	public boolean isPlaying(UUID player) {
+		return r.getInGame().contains(player);
+	}
+	
+	/**
+	 * Get a player from their name
+	 * 
+	 * @param name The name of the player
+	 * @return The player object
+	 */
+	public Player getPlayer(String name) {
+		for (Player player : getPlayers()) {
+			if (player.getName().equals(name))
+				return player;
+		}
+		return null;
+	}
+	
+	/**
+	 * Get a player from their UUID
+	 * 
+	 * @param uuid The UUID of the player
+	 * 			
+	 * @return The player object
+	 */
+	public Player getPlayer(UUID uuid) {
+		for (Player player : getPlayers()) {
+			if (player.getUniqueId().equals(uuid))
+				return player;
+		}
+		return null;
+	}
 	
 	/**
 	 * Get the players that are currently playing
@@ -228,6 +288,28 @@ public abstract class Minigame {
 			this.alive.remove(u);
 		}
 		return true;
+	}
+	
+	/**
+	 * Determine whether the specified player is alive
+	 * 
+	 * @param player THe player to check
+	 * 			
+	 * @return Whether the player is marked as alive
+	 */
+	public boolean isAlive(Player player) {
+		return isPlaying(player) && alive.contains(player.getUniqueId());
+	}
+	
+	/**
+	 * Determine whether the specified player is alive
+	 * 
+	 * @param player THe player to check
+	 * 			
+	 * @return Whether the player is marked as alive
+	 */
+	public boolean isAlive(UUID player) {
+		return isPlaying(player) && alive.contains(player);
 	}
 	
 	/**
@@ -402,6 +484,22 @@ public abstract class Minigame {
 					backup.apply(player);
 			}
 		}
+	}
+	
+	/**
+	 * Apply a potion effect to all players
+	 * 
+	 * @param effect The potion effect to apply
+	 */
+	public void potionAll(final PotionEffect effect) {
+		applyAll(new PlayerConsumer() {
+			
+			@Override
+			public void apply(Player player) {
+				player.addPotionEffect(effect);
+			}
+			
+		});
 	}
 	
 	/**
@@ -611,13 +709,152 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Display an action bar message to a player
+	 * 
+	 * @param player The player to display the message to
+	 * @param message The message to send
+	 * 			
+	 * @return Whether the function finished successfully
+	 */
+	public boolean sendActionBarMessage(Player player, String message) {
+		try {
+			Object chatSerializer;
+			if (ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R2") || ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R3"))
+				chatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class).invoke(null, "{'text': '" + message + "'}");
+			else
+				chatSerializer = getNMSClass("ChatSerializer").getMethod("a", String.class).invoke(null, "{'text': '" + message + "'}");
+			Object playChat = getNMSClass("PacketPlayOutChat").getConstructor(getNMSClass("IChatBaseComponent"), Byte.TYPE).newInstance(chatSerializer, (byte) 2);
+			Object handle = player.getClass().getMethod("getHandle", (Class<?>[]) new Class[0]).invoke(player, new Object[0]);
+			Object connection = handle.getClass().getField("playerConnection").get(handle);
+			connection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(connection, playChat);
+			return true;
+		} catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchMethodException | NoSuchFieldException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Display a title with an optional subtitle to a player
+	 * 
+	 * @param player The player to display the message to
+	 * @param title The title to send
+	 * @param subtitle The subtitle to send
+	 * @param fadeIn The amount of time in ticks it takes to fade in
+	 * @param stay The amount of time in ticks the message stays
+	 * @param fadeOut The amount of time in ticks it takes to fade out
+	 * 			
+	 * @return Whether the function finished successfully
+	 */
+	public boolean sendTitleMessage(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+		try {
+			Method chatSerializerA;
+			Class<?> enumTitleAction;
+			if (ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R2") || ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R3")) {
+				chatSerializerA = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class);
+				enumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
+			} else {
+				chatSerializerA = getNMSClass("ChatSerializer").getMethod("a", String.class);
+				enumTitleAction = getNMSClass("EnumTitleAction");
+			}
+			Object chatSerializerTitle = chatSerializerA.invoke(null, "{'text': '" + title + "'}");
+			Object chatSerializerSubtitle = chatSerializerA.invoke(null, "{'text': '" + subtitle + "'}");
+			Object enumTitle = enumTitleAction.getField("TITLE").get(null);
+			Object enumSubtitle = enumTitleAction.getField("SUBTITLE").get(null);
+			Object playTitle = getNMSClass("PacketPlayOutTitle").getConstructor(getNMSClass("PacketPlayOutTitle$EnumTitleAction"), getNMSClass("IChatBaseComponent")).newInstance(enumTitle, chatSerializerTitle);
+			Object playSubtitle = getNMSClass("PacketPlayOutTitle").getConstructor(getNMSClass("PacketPlayOutTitle$EnumTitleAction"), getNMSClass("IChatBaseComponent")).newInstance(enumSubtitle, chatSerializerSubtitle);
+			Object playTime = getNMSClass("PacketPlayOutTitle").getConstructor(Integer.TYPE, Integer.TYPE, Integer.TYPE).newInstance(fadeIn, stay, fadeOut);
+			Object entityPlayer = player.getClass().getMethod("getHandle", (Class<?>[]) new Class[0]).invoke(player, new Object[0]);
+			Object connection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+			Method sendPacket = connection.getClass().getMethod("sendPacket", getNMSClass("Packet"));
+			sendPacket.invoke(connection, playTitle);
+			if (subtitle != null && !"".equals(subtitle))
+				sendPacket.invoke(connection, playSubtitle);
+			sendPacket.invoke(connection, playTime);
+			return true;
+		} catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchMethodException | NoSuchFieldException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Display an action bar message to all players
+	 * 
+	 * @param message The message to send
+	 */
+	public void actionAll(final String message) {
+		applyAll(new PlayerConsumer() {
+			
+			@Override
+			public void apply(Player player) {
+				sendActionBarMessage(player, message);
+			}
+		});
+	}
+	
+	/**
+	 * Display a title with an optional subtitle to all players
+	 * 
+	 * @param title The title to send
+	 * @param subtitle The subtitle to send
+	 * @param fadeIn The amount of time in ticks it takes to fade in
+	 * @param stay The amount of time in ticks the message stays
+	 * @param fadeOut The amount of time in ticks it takes to fade out
+	 */
+	public void titleAll(final String title, final String subtitle, final int fadeIn, final int stay, final int fadeOut) {
+		applyAll(new PlayerConsumer() {
+			
+			@Override
+			public void apply(Player player) {
+				sendTitleMessage(player, title, subtitle, fadeIn, stay, fadeOut);
+			}
+		});
+	}
+	
+	/**
 	 * Create a listener for an event
 	 * 
 	 * @param event The event to listen for
 	 * @param listener What to do when the event happens
 	 */
-	public void listenEvent(Class<? extends Event> event, EventListener listener) {
-		MinigameManager.getMinigameManager().addListener(this, event, listener);
+	@SuppressWarnings("unchecked")
+	public <E extends Event> void listenEvent(EventListener<E> listener) {
+		MinigameManager.getMinigameManager().addListener(this, (Class<E>) ((ParameterizedType) (listener.getClass().getGenericInterfaces()[0])).getActualTypeArguments()[0], listener);
+	}
+	
+	/**
+	 * Get a friendly display of a time
+	 * 
+	 * @param seconds The number of seconds
+	 * 			
+	 * @return A user-friendly string
+	 */
+	public String getTime(int seconds) {
+		if (seconds < 60) {
+			if (seconds == 1)
+				return "1 second";
+			else
+				return seconds + " seconds";
+		} else {
+			int minutes = seconds / 60;
+			int remainder = seconds % 60;
+			if (remainder == 0) {
+				if (minutes == 1)
+					return "1 minute";
+				else
+					return minutes + " minutes";
+			} else {
+				if (minutes != 1 && remainder != 1)
+					return minutes + " minutes and " + remainder + " seconds";
+				else if (minutes != 1)
+					return minutes + " minutes and 1 second";
+				else if (remainder != 1)
+					return "1 minute and " + remainder + " seconds";
+				else
+					return "1 minute and 1 second";
+			}
+		}
 	}
 	
 	/**
@@ -631,26 +868,147 @@ public abstract class Minigame {
 	 */
 	public static interface ItemStackSupplier extends Function<Player, Tuple<ItemStack, Integer>> {}
 	
-	public static class Tuple<L, R> {
+	/**
+	 * Represents two values in one object
+	 * 
+	 * @author DonkeyCore
+	 *
+	 * @param <L> Type on the left
+	 * @param <R> Type on the right
+	 */
+	public static abstract class Tuple<L, R> {
 		
+		/**
+		 * Get the object on the left
+		 * 
+		 * @return The object on the left
+		 */
+		public abstract L getLeft();
+		
+		/**
+		 * Get the object on the right
+		 * 
+		 * @return The object on the right
+		 */
+		public abstract R getRight();
+		
+		/**
+		 * Create a tuple
+		 * 
+		 * @param l The object on the left
+		 * @param r The object on the right
+		 * 
+		 * @return A new immutable tuple
+		 */
+		public static <L, R> Tuple<L, R> of(L l, R r) {
+			return new ImmutableTuple<L, R>(l, r);
+		}
+		
+	}
+	
+	/**
+	 * Tuple that cannot be changed
+	 * 
+	 * @author DonkeyCore
+	 *
+	 * @param <L> Type on the left
+	 * @param <R> Type on the right
+	 */
+	public static class ImmutableTuple<L, R> extends Tuple<L, R> {
+		
+		/**
+		 * The object on the right
+		 */
 		private final L l;
+		/**
+		 * The object on the left
+		 */
 		private final R r;
 		
-		public Tuple(L l, R r) {
+		/**
+		 * Create a new immutable tuple with the given values
+		 * 
+		 * @param l The object on the left
+		 * @param r The object on the right
+		 */
+		public ImmutableTuple(L l, R r) {
 			this.l = l;
 			this.r = r;
 		}
 		
+		@Override
 		public L getLeft() {
 			return l;
 		}
 		
+		@Override
 		public R getRight() {
 			return r;
 		}
 		
-		public static <L, R> Tuple<L, R> of(L l, R r) {
-			return new Tuple<L, R>(l, r);
+	}
+	
+	/**
+	 * Tuple that can be changed
+	 * 
+	 * @author DonkeyCore
+	 *
+	 * @param <L> Type on the left
+	 * @param <R> Type on the right
+	 */
+	public static class MutableTuple<L, R> extends Tuple<L, R> {
+		
+		/**
+		 * The object on the left
+		 */
+		private L l;
+		/**
+		 * The object on the right
+		 */
+		private R r;
+		
+		/**
+		 * Create a new mutable tuple with the given values
+		 * 
+		 * @param l The object on the left
+		 * @param r The object on the right
+		 */
+		public MutableTuple(L l, R r) {
+			this.l = l;
+			this.r = r;
+		}
+		
+		/**
+		 * Create a new mutable tuple with no starting values
+		 */
+		public MutableTuple() {}
+		
+		@Override
+		public L getLeft() {
+			return l;
+		}
+		
+		@Override
+		public R getRight() {
+			return r;
+		}
+		
+		/**
+		 * Set a new value for the object on the left
+		 * 
+		 * @param l The new left object
+		 */
+		public void setLeft(L l) {
+			this.l = l;
+		}
+		
+		/**
+		 * Set a new value for the object on the right
+		 * 
+		 * @param r The new right object
+		 */
+		public void setRight(R r) {
+			this.r = r;
 		}
 		
 	}
@@ -672,14 +1030,14 @@ public abstract class Minigame {
 	/**
 	 * Listens to events sent by MinigameListener
 	 */
-	public static interface EventListener {
+	public static interface EventListener<E extends Event> {
 		
 		/**
 		 * Accept an event and perform some operation
 		 * 
 		 * @param event The event to act based upon
 		 */
-		public void onEvent(Event event);
+		public void onEvent(E event);
 		
 	}
 	

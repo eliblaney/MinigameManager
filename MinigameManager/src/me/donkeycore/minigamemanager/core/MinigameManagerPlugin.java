@@ -43,6 +43,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 	 * <b>Bukkit implementation method</b><br>
 	 * Do not call this
 	 */
+	@Override
 	public void onEnable() {
 		if (manager != null)
 			throw new IllegalStateException("MinigameManager has already been enabled!");
@@ -119,6 +120,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 	 * <b>Bukkit implementation method</b><br>
 	 * Do not call this
 	 */
+	@Override
 	public void onDisable() {
 		if (manager == null)
 			throw new IllegalStateException("MinigameManager has not been enabled!");
@@ -149,9 +151,9 @@ public class MinigameManagerPlugin extends JavaPlugin {
 				Class<?> clazz = null;
 				try {
 					// all default minigames MUST be in the me.donkeycore.minigamemanager.minigames package
-					clazz = Class.forName("me.donkeycore.minigamemanager.minigames." + minigameStr);
+					clazz = Class.forName("me.donkeycore.minigamemanager.minigames." + minigameStr.replace("_", ""));
 				} catch (ClassNotFoundException e) {
-					getLogger().warning("Uh oh! " + minigameStr + " is not a default minigame. Skipping!");
+					getLogger().warning("Uh oh! " + minigameStr.replace("_", " ") + " is not a default minigame. Skipping!");
 					continue;
 				}
 				// all minigames must be a subclass of Minigame

@@ -42,3 +42,27 @@ default-minigames:
         z: 20
         yaw: 0
         pitch: 0
+  One_In_The_Quiver:
+    # Spleef spawn locations
+    spawns:
+      # Optional section for displaying the name and author of the map. Can be omitted if no info is present, but both must be set if one is set
+      mapinfo:
+        # Generic arena name and author for example
+        name: OITQ Arena
+        author: the Server Admins
+      # These can be named anything to help keep yourself organized
+      not_center:
+        # The world, x, y, z, yaw, and pitch to be spawned at. Typically, world is identical for all of these.
+        world: world
+        x: 10
+        y: 90
+        z: 10
+        yaw: 0
+        pitch: 0
+      a_bit_farther:
+        world: world
+        x: 20
+        y: 90
+        z: 20
+        yaw: 0
+        pitch: 0

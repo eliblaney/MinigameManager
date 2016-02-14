@@ -52,11 +52,16 @@ public final class DefaultRotationManager implements RotationManager {
 	 * Whether to force the countdown to start
 	 */
 	private boolean force = false;
+	/**
+	 * The next minigame to be played if told
+	 */
+	private Class<? extends Minigame> next;
 	
 	/**
 	 * Create a new default rotation manager
 	 * 
-	 * @param manager An instance of MinigameManager that owns this rotation manager
+	 * @param manager An instance of MinigameManager that owns this rotation
+	 *            manager
 	 * @param rotations The number of rotations to create
 	 */
 	public DefaultRotationManager(MinigameManager manager, int rotations) {
@@ -69,7 +74,7 @@ public final class DefaultRotationManager implements RotationManager {
 	public boolean join(Player player) {
 		Validate.notNull(player);
 		int id = findAvailableRotation();
-		if(id < 0)
+		if (id < 0)
 			return false;
 		DefaultRotation r = rotations.get(id);
 		r.join(player.getUniqueId());
@@ -170,11 +175,19 @@ public final class DefaultRotationManager implements RotationManager {
 		Bukkit.getScheduler().runTask(MinigameManager.getPlugin(), new Runnable() {
 			public void run() {
 				Minigame minigame = null;
-				int tries = 10;
-				// Try 10 times to get a random minigame before giving up
-				do
-					minigame = getRandomMinigame(r);
-				while (--tries > 0 && minigame == null);
+				if (next != null) {
+					try {
+						// Attempt to create a new instance of the minigame
+						minigame = next.getConstructor(Rotation.class).newInstance(r);
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {}
+					next = null;
+				} else {
+					int tries = 10;
+					// Try 10 times to get a random minigame before giving up
+					do
+						minigame = getRandomMinigame(r, r.getLastMinigame());
+					while (--tries > 0 && minigame == null);
+				}
 				if (minigame == null) {
 					// Message players
 					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
@@ -182,7 +195,7 @@ public final class DefaultRotationManager implements RotationManager {
 				} else {
 					r.setState(RotationState.COUNTDOWN);
 					// Announce next minigame
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName())));
+					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
 					// Async countdown timer
 					Countdown countdown = new Countdown(manager, rm, r, minigame, force);
 					force = false;
@@ -215,7 +228,7 @@ public final class DefaultRotationManager implements RotationManager {
 			if (player == null)
 				r.leave(u);
 			else
-				player.teleport(minigame.getStartingLocation());
+				player.teleport(minigame.getStartingLocation(player));
 			String[] mapinfo = manager.getMinigameLocations().getMapInfo(minigame.getName(), "spawns");
 			if (mapinfo.length > 0)
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
@@ -243,13 +256,32 @@ public final class DefaultRotationManager implements RotationManager {
 		}
 	}
 	
+	@Override
+	public void setNext(Class<? extends Minigame> clazz) {
+		this.next = clazz;
+	}
+	
 	@SuppressWarnings("unchecked")
-	private Minigame getRandomMinigame(Rotation r) {
+	private Minigame getRandomMinigame(Rotation r, Class<? extends Minigame> last) {
 		Set<Class<? extends Minigame>> m = getMinigamesWithMinimum(r.getPlayers().size());
+		// no minigames!
 		if (m.size() < 1)
 			return null;
-		// Get random minigame
-		Class<? extends Minigame> clazz = (Class<? extends Minigame>) m.toArray()[new Random().nextInt(m.size())];
+		// remove the last minigame if possible to avoid repeated minigames
+		if (last != null) {
+			for (Class<? extends Minigame> c : m.toArray(new Class[m.size()])) {
+				if (last.getName().equals(c.getName()))
+					m.remove(c);
+			}
+		}
+		Class<? extends Minigame> clazz;
+		System.out.println(m.size());
+		if (m.size() < 1)
+			// there's only 1 minigame, and that was just played... guess we're going to play it again
+			clazz = last;
+		else
+			// Get random minigame
+			clazz = (Class<? extends Minigame>) m.toArray()[new Random().nextInt(m.size())];
 		try {
 			// Attempt to create a new instance of the minigame
 			return clazz.getConstructor(Rotation.class).newInstance(r);
@@ -269,7 +301,7 @@ public final class DefaultRotationManager implements RotationManager {
 		}
 		return validMinigames;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -277,7 +309,7 @@ public final class DefaultRotationManager implements RotationManager {
 		result = prime * result + ((players == null) ? 0 : players.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

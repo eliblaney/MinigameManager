@@ -201,7 +201,7 @@ public final class MinigameManager {
 	 * @param event The event to listen for
 	 * @param listener What to do when the event happens
 	 */
-	public void addListener(Minigame minigame, Class<? extends Event> event, EventListener listener) {
+	public void addListener(Minigame minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
 		Validate.notNull(minigame, "Minigame may not be null!");
 		Validate.notNull(event, "Event may not be null!");
 		Validate.notNull(listener, "Listener may not be null!");
@@ -253,9 +253,9 @@ public final class MinigameManager {
 		
 		public final Minigame minigame;
 		public final Class<? extends Event> event;
-		public final EventListener listener;
+		public final EventListener<? extends Event> listener;
 		
-		public ListenerEntry(Minigame minigame, Class<? extends Event> event, EventListener listener) {
+		public ListenerEntry(Minigame minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
 			this.minigame = minigame;
 			this.event = event;
 			this.listener = listener;

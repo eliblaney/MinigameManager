@@ -64,7 +64,7 @@ public class Countdown implements Runnable {
 			rm.start(r, minigame);
 			// Announce to all players that a game is starting every 10 seconds
 		} else if (secondsLeft % 10 == 0 || secondsLeft <= 5)
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName()).replace("%time%", getTimeLeft(secondsLeft--))));
+			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName().replace("_", " ")).replace("%time%", getTimeLeft(secondsLeft--))));
 		else
 			secondsLeft--;
 	}

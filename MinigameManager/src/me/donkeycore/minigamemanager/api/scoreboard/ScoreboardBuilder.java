@@ -1,5 +1,8 @@
 package me.donkeycore.minigamemanager.api.scoreboard;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -54,7 +57,22 @@ public class ScoreboardBuilder {
 	}
 	
 	/**
-	 * Set the lines of the scoreboard to what is specified
+	 * Set the lines of the scoreboard to what is specified in order
+	 * 
+	 * @param lines The new lines of the scoreboard
+	 * 
+	 * @return The builder instance
+	 */
+	public ScoreboardBuilder setOrderedLines(String... lines) {
+		clear();
+		int n = lines.length;
+		for (String str : lines)
+			o.getScore(str).setScore(--n);
+		return this;
+	}
+	
+	/**
+	 * Set the lines of the scoreboard to what is specified in any order
 	 * 
 	 * @param lines The new lines of the scoreboard
 	 * 
@@ -62,9 +80,22 @@ public class ScoreboardBuilder {
 	 */
 	public ScoreboardBuilder setLines(String... lines) {
 		clear();
-		int n = lines.length;
 		for (String str : lines)
-			o.getScore(str).setScore(--n);
+			o.getScore(str).setScore(0);
+		return this;
+	}
+	
+	/**
+	 * Set the lines of the scoreboard to what is specified with scores
+	 * 
+	 * @param lines The new lines of the scoreboard
+	 * 
+	 * @return The builder instance
+	 */
+	public ScoreboardBuilder setLines(Map<String, Integer> scores) {
+		clear();
+		for (Entry<String, Integer> e : scores.entrySet())
+			o.getScore(e.getKey()).setScore(e.getValue());
 		return this;
 	}
 	

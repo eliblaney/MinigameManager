@@ -38,15 +38,29 @@ public @interface MinigameAttributes {
 	/**
 	 * Whether players should always have full health during the minigame
 	 * 
-	 * @return Whether players should always have full health
+	 * @return Whether players should always have full health (default false)
 	 */
 	boolean alwaysFullHealth() default false;
 	
 	/**
 	 * Whether players should always be saturated during the minigame
 	 * 
-	 * @return Whether players should always be saturated
+	 * @return Whether players should always be saturated (default false)
 	 */
 	boolean alwaysSaturated() default false;
+	
+	/**
+	 * Whether players should be able to drop items on the ground
+	 * 
+	 * @return Whether players can drop items (default true)
+	 */
+	boolean canDropItems() default true;
+	
+	/**
+	 * Whether players should be able to pick up items from the ground
+	 * 
+	 * @return Whether players can pick up items (default true)
+	 */
+	boolean canPickUpItems() default true;
 	
 }

@@ -2,6 +2,8 @@ package me.donkeycore.minigamemanager.api.rotation;
 
 import org.bukkit.entity.Player;
 
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+
 /**
  * The main rotation manager; controls all rotations
  * 
@@ -78,5 +80,12 @@ public interface RotationManager {
 	 * @param r The rotation to force
 	 */
 	void force(Rotation r);
+	
+	/**
+	 * Set the next minigame to be played
+	 * 
+	 * @param mclazz The class of the next minigame
+	 */
+	void setNext(Class<? extends Minigame> mclazz);
 	
 }

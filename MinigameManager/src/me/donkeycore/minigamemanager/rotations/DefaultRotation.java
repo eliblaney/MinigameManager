@@ -49,6 +49,10 @@ public final class DefaultRotation implements Rotation {
 	 */
 	private Minigame minigame = null;
 	/**
+	 * The last minigame played
+	 */
+	private Class<? extends Minigame> lastMinigame = null;
+	/**
 	 * The current rotation state
 	 */
 	private RotationState state = RotationState.LOBBY;
@@ -82,6 +86,7 @@ public final class DefaultRotation implements Rotation {
 			// add them and teleport to lobby with a welcoming message
 			players.add(uuid);
 			p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("lobby"));
+			p.getInventory().clear();
 			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1))));
 			// send a sorry message if the rotation is in-game
 			if (getState() == RotationState.INGAME)
@@ -116,6 +121,7 @@ public final class DefaultRotation implements Rotation {
 			// clear the scoreboard, teleport to spawn, and send a message
 			Player p = Bukkit.getPlayer(uuid);
 			if (p != null) {
+				p.getInventory().clear();
 				p.setScoreboard(blankScoreboard);
 				p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("spawn"));
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
@@ -174,8 +180,14 @@ public final class DefaultRotation implements Rotation {
 		// set state, add all players to ingame list, set default gamemode, and start the fun!
 		setState(RotationState.INGAME);
 		inGame.addAll(players);
-		for (UUID player : getInGame())
-			Bukkit.getPlayer(player).setGameMode(GameMode.ADVENTURE);
+		for (UUID u : getInGame()) {
+			Player player = Bukkit.getPlayer(u);
+			player.setGameMode(GameMode.ADVENTURE);
+			player.setHealth(player.getMaxHealth());
+			player.setFoodLevel(20);
+			player.getInventory().clear();
+			minigame.setAlive(player, true);
+		}
 		return true;
 	}
 	
@@ -196,6 +208,7 @@ public final class DefaultRotation implements Rotation {
 		if (minigame != null) {
 			minigame.onEnd(error);
 			MinigameManager.getMinigameManager().clearListeners(minigame);
+			lastMinigame = minigame.getClass();
 			minigame = null;
 		}
 		// clear/reset everything, and teleport everybody to the lobby
@@ -255,6 +268,10 @@ public final class DefaultRotation implements Rotation {
 	@Override
 	public Minigame getCurrentMinigame() {
 		return minigame;
+	}
+
+	public Class<? extends Minigame> getLastMinigame() {
+		return lastMinigame;
 	}
 	
 	@Override
