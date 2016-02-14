@@ -121,20 +121,22 @@ public class MinigameLocations {
 	 * minigame
 	 * 
 	 * @param minigame The minigame to look for (must be a default minigame!)
+	 * @param map The map name that the spawns are located in
 	 * 			
 	 * @return An array of Location elements representing spawns
 	 */
-	public Location[] getMinigameSpawns(String minigame) {
+	public Location[] getMinigameSpawns(String minigame, String map) {
 		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
 		if (mcs == null)
 			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
-		ConfigurationSection spawns = mcs.getConfigurationSection("spawns");
+		ConfigurationSection mapcs = mcs.getConfigurationSection(map);
+		if(mapcs == null)
+			throw new IllegalArgumentException(map + " is not a valid map");
+		ConfigurationSection spawns = mapcs.getConfigurationSection("spawns");
 		Set<String> keys = spawns.getKeys(false);
-		Location[] locations = new Location[keys.size() - 1];
+		Location[] locations = new Location[keys.size()];
 		int i = 0;
 		for (String key : keys) {
-			if (key.equalsIgnoreCase("mapinfo"))
-				continue;
 			ConfigurationSection cs = spawns.getConfigurationSection(key);
 			World world = Bukkit.getWorld(cs.getString("world"));
 			if (world == null)
@@ -153,17 +155,17 @@ public class MinigameLocations {
 	 * Get the map info for a default minigame's specified map
 	 * 
 	 * @param minigame The minigame to look for (must be default!)
-	 * @param key The map that the mapinfo will be found for (normally "spawns")
+	 * @param map The map corresponding with the mapinfo
 	 * 			
 	 * @return A string array of length 2 with the name in the first index and the author in the second
 	 */
-	public String[] getMapInfo(String minigame, String key) {
+	public String[] getMapInfo(String minigame, String map) {
 		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
 		if (mcs == null)
 			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
-		ConfigurationSection kcs = mcs.getConfigurationSection(key);
+		ConfigurationSection kcs = mcs.getConfigurationSection(map);
 		if (kcs == null)
-			throw new IllegalArgumentException(key + " is not a valid key (minigame: " + minigame + ")");
+			throw new IllegalArgumentException(map + " is not a valid map (minigame: " + minigame + ")");
 		ConfigurationSection cs = kcs.getConfigurationSection("mapinfo");
 		if (cs == null)
 			return new String[0];

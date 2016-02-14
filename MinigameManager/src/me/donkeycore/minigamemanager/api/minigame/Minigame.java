@@ -28,7 +28,9 @@ import org.bukkit.scoreboard.Scoreboard;
 import me.donkeycore.minigamemanager.api.nms.ReflectionAPI;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.teams.Team;
+import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
+import me.donkeycore.minigamemanager.minigames.DefaultMinigame;
 
 /**
  * The main minigame API class; all minigames should extend this class
@@ -37,6 +39,10 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
  */
 public abstract class Minigame {
 	
+	/**
+	 * Array of spawn locations that players can appear at
+	 */
+	protected Location[] spawns;
 	/**
 	 * The parent rotation of this minigame
 	 */
@@ -53,15 +59,59 @@ public abstract class Minigame {
 	 * List of players who are alive
 	 */
 	protected final List<UUID> alive;
+	/**
+	 * Mapinfo variables
+	 */
+	private final String mapName, mapAuthors;
+	
+	/**
+	 * Initialize the minigame WITHOUT mapinfo
+	 * 
+	 * @param r The rotation that the minigame is in
+	 * @param map The map that the players will be playing in
+	 */
+	public Minigame(Rotation r, String map) {
+		this(r, map, null, null);
+	}
 	
 	/**
 	 * Initialize the minigame
 	 * 
 	 * @param r The rotation that the minigame is in
+	 * @param map The map that the players will be playing in
+	 * @param mapName The name of the map to show in mapinfo
+	 * @param mapAuthors The authors of the map
 	 */
-	public Minigame(Rotation r) {
+	public Minigame(Rotation r, String map, String mapName, String mapAuthors) {
 		this.r = r;
 		this.alive = new LinkedList<>();
+		/*
+		 * get the spawns for default minigames
+		 * 
+		 * if the minigame isn't default, the dev has to specify the spawns or
+		 * get it from a config
+		 */
+		if (isDefault())
+			this.spawns = getMinigameManager().getMinigameLocations().getMinigameSpawns(getName(), map);
+		this.mapName = mapName;
+		this.mapAuthors = mapAuthors;
+	}
+	
+	/**
+	 * Determine if this minigame is a default minigame
+	 * 
+	 * @return Whether the minigame is a default minigame
+	 */
+	public boolean isDefault() {
+		return getClass().getAnnotation(DefaultMinigame.class) != null;
+	}
+	
+	/**
+	 * Send all players the mapinfo
+	 */
+	public final void mapinfo() {
+		if (mapName != null && mapAuthors != null)
+			announce(ChatColor.translateAlternateColorCodes('&', getMinigameManager().getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapName).replace("%author%", mapAuthors));
 	}
 	
 	/**
@@ -872,7 +922,7 @@ public abstract class Minigame {
 	 * Represents two values in one object
 	 * 
 	 * @author DonkeyCore
-	 *
+	 * 		
 	 * @param <L> Type on the left
 	 * @param <R> Type on the right
 	 */
@@ -897,7 +947,7 @@ public abstract class Minigame {
 		 * 
 		 * @param l The object on the left
 		 * @param r The object on the right
-		 * 
+		 * 			
 		 * @return A new immutable tuple
 		 */
 		public static <L, R> Tuple<L, R> of(L l, R r) {
@@ -910,7 +960,7 @@ public abstract class Minigame {
 	 * Tuple that cannot be changed
 	 * 
 	 * @author DonkeyCore
-	 *
+	 * 		
 	 * @param <L> Type on the left
 	 * @param <R> Type on the right
 	 */
@@ -952,7 +1002,7 @@ public abstract class Minigame {
 	 * Tuple that can be changed
 	 * 
 	 * @author DonkeyCore
-	 *
+	 * 		
 	 * @param <L> Type on the left
 	 * @param <R> Type on the right
 	 */

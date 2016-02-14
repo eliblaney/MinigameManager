@@ -123,11 +123,12 @@ public class MinigameConfig {
 	/**
 	 * Get the locations for the minigame spawns, as specified by the config
 	 * 
-	 * @param minigame The minigame string to use
+	 * @param map The map name that spawns are located in
+	 * 
 	 * @return An array of {@link Location} objects for each spawn location
 	 */
-	public Location[] getMinigameSpawns(String minigame) {
-		ConfigurationSection spawns = getConfig().getConfigurationSection("spawns");
+	public Location[] getMinigameSpawns(String map) {
+		ConfigurationSection spawns = getConfig().getConfigurationSection(map).getConfigurationSection("spawns");
 		Set<String> keys = spawns.getKeys(false);
 		Location[] locations = new Location[keys.size() - 1];
 		int i = 0;
@@ -137,7 +138,7 @@ public class MinigameConfig {
 			ConfigurationSection cs = spawns.getConfigurationSection(key);
 			World world = Bukkit.getWorld(cs.getString("world"));
 			if (world == null)
-				throw new RuntimeException("Invalid world for " + key + " (from " + minigame + " spawns)");
+				throw new RuntimeException("Invalid world for " + key);
 			double x = cs.getDouble("x");
 			double y = cs.getDouble("y");
 			double z = cs.getDouble("z");
@@ -151,16 +152,15 @@ public class MinigameConfig {
 	/**
 	 * Get the map info information for the arena
 	 * 
-	 * @param minigame The minigame string to use
-	 * @param key The name of the arena in which the mapinfo information can be
-	 *            found
+	 * @param map The map corresponding with the mapinfo
+	 * 
 	 * @return An array of length 2 with the name of the arena in the first
 	 *         index and the author(s) in the second
 	 */
-	public String[] getMapInfo(String minigame, String key) {
-		ConfigurationSection kcs = getConfig().getConfigurationSection(key);
+	public String[] getMapInfo(String map) {
+		ConfigurationSection kcs = getConfig().getConfigurationSection(map);
 		if (kcs == null)
-			throw new IllegalArgumentException(key + " is not a valid key (minigame: " + minigame + ")");
+			throw new IllegalArgumentException(map + " is not a valid map");
 		ConfigurationSection cs = kcs.getConfigurationSection("mapinfo");
 		if (cs == null)
 			return new String[0];

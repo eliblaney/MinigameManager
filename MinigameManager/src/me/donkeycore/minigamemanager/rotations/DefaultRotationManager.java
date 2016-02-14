@@ -189,7 +189,7 @@ public final class DefaultRotationManager implements RotationManager {
 					while (--tries > 0 && minigame == null);
 				}
 				if (minigame == null) {
-					// Message players
+					// No minigame found most likely because not enough players
 					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
 					// Wait for more players to join
 				} else {
@@ -229,9 +229,7 @@ public final class DefaultRotationManager implements RotationManager {
 				r.leave(u);
 			else
 				player.teleport(minigame.getStartingLocation(player));
-			String[] mapinfo = manager.getMinigameLocations().getMapInfo(minigame.getName(), "spawns");
-			if (mapinfo.length > 0)
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapinfo[0]).replace("%author%", mapinfo[1]));
+			minigame.mapinfo();
 		}
 		minigame.onStart();
 	}
@@ -275,7 +273,6 @@ public final class DefaultRotationManager implements RotationManager {
 			}
 		}
 		Class<? extends Minigame> clazz;
-		System.out.println(m.size());
 		if (m.size() < 1)
 			// there's only 1 minigame, and that was just played... guess we're going to play it again
 			clazz = last;
@@ -286,6 +283,7 @@ public final class DefaultRotationManager implements RotationManager {
 			// Attempt to create a new instance of the minigame
 			return clazz.getConstructor(Rotation.class).newInstance(r);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
 			return null;
 		}
 		

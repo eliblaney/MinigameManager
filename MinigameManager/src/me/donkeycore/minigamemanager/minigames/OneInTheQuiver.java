@@ -37,10 +37,6 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 public class OneInTheQuiver extends Minigame {
 	
 	/**
-	 * Array of spawn locations that players can appear at
-	 */
-	private final Location[] spawns;
-	/**
 	 * Everybody's display names with their respective kills
 	 */
 	private final Map<String, Integer> kills;
@@ -62,9 +58,7 @@ public class OneInTheQuiver extends Minigame {
 	private int time = 5 * 60;
 	
 	public OneInTheQuiver(Rotation r) {
-		super(r);
-		// get the spawn locations for this default minigame
-		spawns = getMinigameManager().getMinigameLocations().getMinigameSpawns(getName());
+		super(r, "map1", getMinigameManager().getMinigameLocations().getMapInfo("One_In_The_Quiver", "map1")[0], getMinigameManager().getMinigameLocations().getMapInfo("One_In_The_Quiver", "map1")[1]);
 		kills = new HashMap<String, Integer>();
 	}
 	
@@ -109,7 +103,7 @@ public class OneInTheQuiver extends Minigame {
 					if (proj instanceof Arrow && projShooter instanceof Player) {
 						Player killer = (Player) projShooter;
 						if (entity.getUniqueId().equals(killer.getUniqueId()))
-							announce("\u00a7c" + entity.getName() + " \u00a7rcommitted \u00a7csuicide\u00a7r.");
+							announce("\u00a76" + entity.getName() + " \u00a7ccommitted suicide.");
 						else {
 							announce("\u00a7c" + entity.getName() + " \u00a7rwas killed by \u00a7c" + killer.getName() + "\u00a7r.");
 							killer.getInventory().addItem(new ItemStack(Material.ARROW));
@@ -138,7 +132,7 @@ public class OneInTheQuiver extends Minigame {
 			public void onEvent(PlayerDeathEvent event) {
 				Player player = event.getEntity();
 				if (isAlive(player)) {
-					announce("\u00a76" + player.getName() + " " + event.getDeathMessage().replace(player.getName(), "").trim());
+					announce("\u00a76" + player.getName() + " \u00a7c" + event.getDeathMessage().replace(player.getName(), "").trim());
 					event.getDrops().clear();
 					event.setDeathMessage(null);
 					event.setNewTotalExp(0);

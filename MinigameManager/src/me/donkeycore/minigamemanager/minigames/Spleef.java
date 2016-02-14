@@ -44,15 +44,8 @@ public class Spleef extends Minigame {
 		shovel = builder.build();
 	}
 	
-	/**
-	 * Array of spawn locations that players can appear at
-	 */
-	private final Location[] spawns;
-	
 	public Spleef(Rotation r) {
-		super(r);
-		// get the spawn locations for this default minigame
-		spawns = getMinigameManager().getMinigameLocations().getMinigameSpawns(getName());
+		super(r, "map1", getMinigameManager().getMinigameLocations().getMapInfo("Spleef", "map1")[0], getMinigameManager().getMinigameLocations().getMapInfo("Spleef", "map1")[1]);
 	}
 	
 	@Override

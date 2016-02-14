@@ -116,7 +116,7 @@ public class CommandMinigame implements CommandExecutor {
 						sender.sendMessage("\u00a7e> ID: \u00a76" + id);
 						sender.sendMessage("\u00a7e> State: " + r.getState().toColoredString());
 						if (r.getState() == RotationState.INGAME) {
-							sender.sendMessage("\u00a7e> Minigame: \u00a76" + r.getCurrentMinigame().getName());
+							sender.sendMessage("\u00a7e> Minigame: \u00a76" + r.getCurrentMinigame().getName().replace("_", ""));
 							sender.sendMessage("\u00a7e> Ingame: \u00a76" + r.getInGame().size());
 						}
 						sender.sendMessage("\u00a7e> Players (" + r.getPlayers().size() + "):");
@@ -134,7 +134,7 @@ public class CommandMinigame implements CommandExecutor {
 						MinigameAttributes attr = mclazz.getAnnotation(MinigameAttributes.class);
 						if (attr == null)
 							continue;
-						if (args[1].equalsIgnoreCase(attr.name())) {
+						if (args[1].replace(" ", "").replace("_", "").replace("-", "").equalsIgnoreCase(attr.name().replace(" ", "").replace("_", "").replace("-", ""))) {
 							sender.sendMessage("\u00a7e===<\u00a76Minigame Information\u00a7e>===");
 							sender.sendMessage("\u00a7e> Name: \u00a76" + attr.name().replace("_", " "));
 							String[] _authors = attr.authors();
@@ -171,15 +171,17 @@ public class CommandMinigame implements CommandExecutor {
 						return true;
 					}
 					if(r.getState() != RotationState.STOPPED && r.getState() != RotationState.INGAME) {
-						sender.sendMessage("\u00a7c");
+						sender.sendMessage("\u00a7cRotation state must either be stopped or already ingame to set the next minigame");
+						return true;
 					}
 					for (Class<? extends Minigame> mclazz : manager.getMinigames()) {
 						MinigameAttributes attr = mclazz.getAnnotation(MinigameAttributes.class);
 						if (attr == null)
 							continue;
-						if (args[2].equalsIgnoreCase(attr.name())) {
+						if (args[2].replace(" ", "").replace("_", "").replace("-", "").equalsIgnoreCase(attr.name().replace(" ", "").replace("_", "").replace("-", ""))) {
 							rm.setNext(mclazz);
 							sender.sendMessage("\u00a7aNext minigame for rotation #" + id + " has been set to: " + attr.name());
+							return true;
 						}
 					}
 					sender.sendMessage("\u00a7cCould not find minigame with name: \u00a74" + args[2]);
