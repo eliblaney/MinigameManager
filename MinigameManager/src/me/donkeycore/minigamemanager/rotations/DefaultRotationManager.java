@@ -24,6 +24,8 @@ import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
+import me.donkeycore.minigamemanager.events.rotation.RotationJoinEvent;
+import me.donkeycore.minigamemanager.events.rotation.RotationLeaveEvent;
 
 /**
  * The default rotation manager to handle all rotations
@@ -79,6 +81,7 @@ public final class DefaultRotationManager implements RotationManager {
 		DefaultRotation r = rotations.get(id);
 		r.join(player.getUniqueId());
 		players.put(player.getUniqueId(), r);
+		Bukkit.getPluginManager().callEvent(new RotationJoinEvent(r, player));
 		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
 			start(r);
 		return true;
@@ -119,6 +122,7 @@ public final class DefaultRotationManager implements RotationManager {
 			return false;
 		r.join(player.getUniqueId());
 		players.put(player.getUniqueId(), r);
+		Bukkit.getPluginManager().callEvent(new RotationJoinEvent(r, player));
 		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
 			start(r);
 		return true;
@@ -132,6 +136,7 @@ public final class DefaultRotationManager implements RotationManager {
 			if (r.hasPlayer(uuid)) {
 				r.leave(uuid, kicked);
 				players.remove(uuid);
+				Bukkit.getPluginManager().callEvent(new RotationLeaveEvent(r, player));
 				return true;
 			}
 		}

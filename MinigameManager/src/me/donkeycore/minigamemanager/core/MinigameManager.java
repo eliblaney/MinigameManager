@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
@@ -16,11 +17,12 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.events.minigame.MinigameRegisterEvent;
+import me.donkeycore.minigamemanager.events.minigame.MinigameUnregisterEvent;
 import me.donkeycore.minigamemanager.listeners.MinigameListener;
 
 /*
  * TODO:
- * - sign support
  * - stuff to make minigames EASIER to make
  * - config options:
  * * server-wide (join rotation on join server, leave rotation on quit server)
@@ -174,6 +176,7 @@ public final class MinigameManager {
 		Validate.isTrue(minimumPlayers > 0, "Minimum players must be above 0");
 		Validate.notNull(minigame.getAnnotation(MinigameAttributes.class), "Minigame must have a @MinigameAttributes annotation");
 		this.minigames.put(minigame, minimumPlayers);
+		Bukkit.getPluginManager().callEvent(new MinigameRegisterEvent(minigame, minimumPlayers));
 		plugin.getLogger().info("Registered: " + minigame.getSimpleName());
 	}
 	
@@ -187,8 +190,10 @@ public final class MinigameManager {
 	public boolean unregisterMinigame(Class<? extends Minigame> minigame) {
 		Validate.notNull(minigame);
 		boolean b = this.minigames.remove(minigame) != null;
-		if (b)
+		if (b) {
+			Bukkit.getPluginManager().callEvent(new MinigameUnregisterEvent(minigame));
 			plugin.getLogger().info("Unregistered: " + minigame.getSimpleName());
+		}
 		return b;
 	}
 	
