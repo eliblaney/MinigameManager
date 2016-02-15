@@ -52,8 +52,8 @@ public class CommandMinigame implements CommandExecutor {
 					sender.sendMessage(ChatColor.YELLOW + "> " + ChatColor.GOLD + "===<" + ChatColor.GOLD + "MinigameManager Help" + ChatColor.YELLOW + ">===");
 				} else if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("minigamemanager.admin.reload")) {
 					MinigameManager.getPlugin().reloadConfig();
-					MinigameManager.getMinigameManager().getMinigameConfig().reloadConfig();
-					MinigameManager.getMinigameManager().getMinigameLocations().reloadConfig();
+					MinigameManager.getMinigameManager().getMinigameSettings().reloadConfig();
+					MinigameManager.getMinigameManager().getDefaultMinigameLocations().reloadConfig();
 					MinigameManager.getPlugin().loadDefaultMinigames();
 					sender.sendMessage(ChatColor.GREEN + "The configs have been reloaded!");
 				} else if (args[0].equalsIgnoreCase("list") && sender.hasPermission("minigamemanager.admin.list")) {

@@ -3,6 +3,7 @@ version: 0.0.1
 description: "Minigame API and rotation handler"
 main: me.donkeycore.minigamemanager.core.MinigameManagerPlugin
 author: DonkeyCore
+softdepend: [Vault]
 commands:
   join:
     description: "Join the minigame rotation"

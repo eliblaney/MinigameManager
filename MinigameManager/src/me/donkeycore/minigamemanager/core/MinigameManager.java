@@ -17,9 +17,10 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.config.PlayerProfileConfiguration;
 import me.donkeycore.minigamemanager.events.minigame.MinigameRegisterEvent;
 import me.donkeycore.minigamemanager.events.minigame.MinigameUnregisterEvent;
-import me.donkeycore.minigamemanager.listeners.MinigameListener;
+import net.milkbowl.vault.economy.Economy;
 
 /*
  * TODO:
@@ -33,7 +34,6 @@ import me.donkeycore.minigamemanager.listeners.MinigameListener;
  * # format ($x, x gems)
  * # boolean: use vault currency as gems
  * - scoreboard:
- * * set scoreboard lines using string array
  * * lobby scoreboard
  * - commands to edit locations
  * - ELO rating system
@@ -65,9 +65,13 @@ public final class MinigameManager {
 	 */
 	MinigameLocations locations;
 	/**
-	 * The listener for health/hunger changes for minigames/lobbies
+	 * The configuration for player profiles
 	 */
-	MinigameListener listener;
+	PlayerProfileConfiguration profileConf;
+	/**
+	 * Vault economy. Null if disabled.
+	 */
+	Economy economy;
 	/**
 	 * The list of minigames requesting events
 	 */
@@ -132,11 +136,20 @@ public final class MinigameManager {
 	}
 	
 	/**
+	 * Get the vault economy
+	 * 
+	 * @return Vault's economy instance, or null if disabled
+	 */
+	public Economy getVaultEconomy() {
+		return economy;
+	}
+	
+	/**
 	 * Get the configuration class for the plugin
 	 * 
 	 * @return An instance of {@link MinigameSettings}
 	 */
-	public MinigameSettings getMinigameConfig() {
+	public MinigameSettings getMinigameSettings() {
 		return config;
 	}
 	
@@ -146,18 +159,17 @@ public final class MinigameManager {
 	 * 
 	 * @return An instance of {@link MinigameLocations}
 	 */
-	public MinigameLocations getMinigameLocations() {
+	public MinigameLocations getDefaultMinigameLocations() {
 		return locations;
 	}
 	
 	/**
-	 * Get the listener for minigames
+	 * Get the configuration for player profiles
 	 * 
-	 * @return An instance of MinigameListener being used to send data to
-	 *         minigames
+	 * @return The PlayerProfileConfiguration instance
 	 */
-	public MinigameListener getListener() {
-		return listener;
+	public PlayerProfileConfiguration getPlayerProfileConfig() {
+		return profileConf;
 	}
 	
 	/**
@@ -248,7 +260,7 @@ public final class MinigameManager {
 	/**
 	 * Represents a minigame that is listening to an event
 	 * 
- 	 * @author DonkeyCore
+	 * @author DonkeyCore
 	 */
 	public static class ListenerEntry {
 		

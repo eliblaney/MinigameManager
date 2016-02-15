@@ -28,7 +28,7 @@ public class CommandJoin implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("join")) {
-			if(manager.getMinigameConfig().entireServer()) {
+			if(manager.getMinigameSettings().entireServer()) {
 				sender.sendMessage(ChatColor.RED + "This command is disabled.");
 				return true;
 			}
@@ -42,7 +42,7 @@ public class CommandJoin implements CommandExecutor {
 			}
 			Player player = (Player) sender;
 			if(manager.getRotationManager().getRotation(player) != null) {
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.ALREADY_IN_ROTATION)));
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.ALREADY_IN_ROTATION)));
 				return true;
 			}
 			int rotation;
@@ -52,7 +52,7 @@ public class CommandJoin implements CommandExecutor {
 				player.sendMessage(ChatColor.RED + "That is not a valid number!");
 				return true;
 			}
-			int maxRotations = manager.getMinigameConfig().getNumberOfRotations();
+			int maxRotations = manager.getMinigameSettings().getNumberOfRotations();
 			if ((rotation < 1 && args.length == 1) || rotation > maxRotations) {
 				String error = ChatColor.RED + "That is not a valid rotation ID! Available rotations: 1";
 				if (maxRotations > 1)
@@ -65,12 +65,12 @@ public class CommandJoin implements CommandExecutor {
 				if (rm.join(player))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.FULL_ROTATIONS)));
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.FULL_ROTATIONS)));
 			} else {
 				if (rm.join(player, rotation - 1))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.FULL_ROTATION)));
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.FULL_ROTATION)));
 			}
 			return true;
 		} else

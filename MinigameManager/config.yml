@@ -75,3 +75,18 @@ minigames:
         enabled: true
         # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
         minimum-players: 5
+
+profiles:
+  # Configuration for the ELO ranking system that places
+  # players in rotations with players of similar experience
+  # For more information, see https://en.wikipedia.org/wiki/Elo_rating_system
+  elo:
+    # Whether to enable ELO ranking
+    enabled: true
+    # The default ELO rating for new players
+    default: 1000
+    # The K factor for updating ELO. Higher the number = more drastic changes
+    K-factor: 32
+  # Whether to enable Vault economy instead of the internal one
+  # If true, Vault needs to be installed (duh!)
+  vault: false

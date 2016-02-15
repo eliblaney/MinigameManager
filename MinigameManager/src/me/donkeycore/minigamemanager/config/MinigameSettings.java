@@ -21,7 +21,7 @@ public class MinigameSettings {
 	 * 
 	 * @return An instance of FileConfiguration
 	 */
-	private FileConfiguration getConfig() {
+	public FileConfiguration getConfig() {
 		return MinigameManager.getPlugin().getConfig();
 	}
 	
@@ -150,6 +150,44 @@ public class MinigameSettings {
 	 */
 	public int getMinimumForMinigame(String minigame) {
 		return getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection("defaults").getConfigurationSection(minigame).getInt("minimum-players");
+	}
+	
+	// Configuration Section: Profiles
+	
+	/**
+	 * Determine whether ELO ratings are enabled
+	 * 
+	 * @return Whether ELO ratings are enabled
+	 */
+	public boolean eloEnabled() {
+		return getConfig().getConfigurationSection("profiles").getConfigurationSection("elo").getBoolean("enabled");
+	}
+	
+	/**
+	 * The the default ELO rating for new players
+	 * 
+	 * @return The default ELO rating
+	 */
+	public long defaultELO() {
+		return getConfig().getConfigurationSection("profiles").getConfigurationSection("elo").getLong("default");
+	}
+	
+	/**
+	 * Get the K-Factor for ELO calculations
+	 * 
+	 * @return The K-Factor
+	 */
+	public int kFactor() {
+		return getConfig().getConfigurationSection("profiles").getConfigurationSection("elo").getInt("K-factor");
+	}
+	
+	/**
+	 * Determine if vault support is enabled
+	 * 
+	 * @return Whether vault support is enabled AND enabled correctly
+	 */
+	public boolean vaultEnabled() {
+		return getConfig().getConfigurationSection("profiles").getBoolean("vault") && MinigameManager.getMinigameManager().getVaultEconomy() != null;
 	}
 	
 }

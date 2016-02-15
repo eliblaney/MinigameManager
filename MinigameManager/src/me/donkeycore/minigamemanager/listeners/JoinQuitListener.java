@@ -1,10 +1,12 @@
 package me.donkeycore.minigamemanager.listeners;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import me.donkeycore.minigamemanager.api.player.PlayerProfile;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
@@ -22,13 +24,15 @@ public class JoinQuitListener implements Listener {
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		if(manager.getMinigameConfig().entireServer())
+		if(manager.getMinigameSettings().entireServer())
 			manager.getRotationManager().join(event.getPlayer());
 	}
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
-		manager.getRotationManager().leave(event.getPlayer(), false);
+		Player player = event.getPlayer();
+		manager.getRotationManager().leave(player, false);
+		PlayerProfile.getPlayerProfile(player.getUniqueId()).saveProfile();
 	}
 	
 }

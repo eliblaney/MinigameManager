@@ -39,7 +39,7 @@ public class Countdown implements Runnable {
 	// Get config number of seconds to wait or 30 if seconds <= 0
 	private int getTotalSecondsLeft() {
 		// Subtract one because timer is delayed 1 second (for the next-minigame message)
-		int seconds = manager.getMinigameConfig().getCountdownSeconds() - 1;
+		int seconds = manager.getMinigameSettings().getCountdownSeconds() - 1;
 		if (seconds < 0)
 			return 30;
 		return seconds;
@@ -47,13 +47,13 @@ public class Countdown implements Runnable {
 	
 	public void run() {
 		if (!force && r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame.getClass())) {
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
+			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
 			if (bt != null)
 				bt.cancel();
 			return;
 		}
 		if (r.getState() == RotationState.STOPPED) { // abandon ship!
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.ROTATION_STOPPED)));
+			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.ROTATION_STOPPED)));
 			if (bt != null)
 				bt.cancel();
 			return;
@@ -64,7 +64,7 @@ public class Countdown implements Runnable {
 			rm.start(r, minigame);
 			// Announce to all players that a game is starting every 10 seconds
 		} else if (secondsLeft % 10 == 0 || secondsLeft <= 5)
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName().replace("_", " ")).replace("%time%", getTimeLeft(secondsLeft--))));
+			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName().replace("_", " ")).replace("%time%", getTimeLeft(secondsLeft--))));
 		else
 			secondsLeft--;
 	}

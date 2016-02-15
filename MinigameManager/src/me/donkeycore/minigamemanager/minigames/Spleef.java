@@ -48,7 +48,7 @@ public class Spleef extends Minigame {
 	}
 	
 	private static String[] getMapinfo(String map) {
-		return getMinigameManager().getMinigameLocations().getMapInfo(Spleef.class.getAnnotation(MinigameAttributes.class).name(), map);
+		return getMinigameManager().getDefaultMinigameLocations().getMapInfo(Spleef.class.getAnnotation(MinigameAttributes.class).name(), map);
 	}
 	
 	@Override

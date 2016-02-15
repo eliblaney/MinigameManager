@@ -82,14 +82,14 @@ public final class DefaultRotationManager implements RotationManager {
 		r.join(player.getUniqueId());
 		players.put(player.getUniqueId(), r);
 		Bukkit.getPluginManager().callEvent(new RotationJoinEvent(r, player));
-		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
+		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameSettings().getMinimumPlayers())
 			start(r);
 		return true;
 	}
 	
 	// find lobbies to join
 	private int findAvailableRotation() {
-		int maxPlayers = manager.getMinigameConfig().getMaximumPlayers();
+		int maxPlayers = manager.getMinigameSettings().getMaximumPlayers();
 		for (int i = 0; i < rotations.size(); i++) {
 			DefaultRotation r = rotations.get(i);
 			// skip if reached max players
@@ -117,13 +117,13 @@ public final class DefaultRotationManager implements RotationManager {
 		Validate.notNull(player, "Player cannot be null!");
 		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation ID! Current number of rotations: " + rotations.size());
 		DefaultRotation r = rotations.get(id);
-		int maxPlayers = manager.getMinigameConfig().getMaximumPlayers();
+		int maxPlayers = manager.getMinigameSettings().getMaximumPlayers();
 		if (r.getPlayers().size() >= maxPlayers)
 			return false;
 		r.join(player.getUniqueId());
 		players.put(player.getUniqueId(), r);
 		Bukkit.getPluginManager().callEvent(new RotationJoinEvent(r, player));
-		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameConfig().getMinimumPlayers())
+		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameSettings().getMinimumPlayers())
 			start(r);
 		return true;
 	}
@@ -195,12 +195,12 @@ public final class DefaultRotationManager implements RotationManager {
 				}
 				if (minigame == null) {
 					// No minigame found most likely because not enough players
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
+					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
 					// Wait for more players to join
 				} else {
 					r.setState(RotationState.COUNTDOWN);
 					// Announce next minigame
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
+					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
 					// Async countdown timer
 					Countdown countdown = new Countdown(manager, rm, r, minigame, force);
 					force = false;
@@ -222,9 +222,9 @@ public final class DefaultRotationManager implements RotationManager {
 		Validate.notNull(minigame, "Minigame cannot be null!");
 		// Set the rotation minigame and copy current players to another list OR end the process if failed
 		if (!r.beginMinigame(minigame)) {
-			r.announce(manager.getMinigameConfig().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
+			r.announce(manager.getMinigameSettings().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
 			r.setState(RotationState.LOBBY);
-			r.teleportAll(manager.getMinigameLocations().getRotationLocation("lobby"));
+			r.teleportAll(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
 			start(r);
 		}
 		// Teleport everybody to possibly random spawns and optionally send them a mapinfo message 

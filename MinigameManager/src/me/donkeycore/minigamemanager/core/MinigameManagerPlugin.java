@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
@@ -19,9 +20,11 @@ import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
+import me.donkeycore.minigamemanager.config.PlayerProfileConfiguration;
 import me.donkeycore.minigamemanager.listeners.JoinQuitListener;
 import me.donkeycore.minigamemanager.listeners.MinigameListener;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
+import net.milkbowl.vault.economy.Economy;
 
 /**
  * The JavaPlugin for MinigameManager
@@ -84,13 +87,29 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		manager.config = new MinigameSettings();
 		getLogger().info("Initializing config... (Part 2: Locations)");
 		manager.locations = new MinigameLocations();
+		getLogger().info("Initializing config... (Part 3: Profiles)");
+		manager.profileConf = new PlayerProfileConfiguration();
+		// Optional Vault economy support
+		if(manager.config.getConfig().getConfigurationSection("profiles").getBoolean("vault")) {
+			if(Bukkit.getPluginManager().getPlugin("Vault") == null)
+				getLogger().warning("Vault is enabled in config but the Vault plugin was not found!");
+			else {
+				getLogger().info("Hooking into Vault...");
+				RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServicesManager().getRegistration(Economy.class);
+				// FIXME: Always returns null for some reason
+		        if (economyProvider != null)
+		            manager.economy = economyProvider.getProvider();
+		        if(manager.economy == null)
+		        	getLogger().warning("Failed to hook into Vault economy! Will use internal currency instead.");
+			}
+		}
 		getLogger().info("Registering commands...");
 		getCommand("minigamemanager").setExecutor(new CommandMinigame(manager));
 		getCommand("join").setExecutor(new CommandJoin(manager));
 		getCommand("leave").setExecutor(new CommandLeave(manager));
 		getLogger().info("Registering listeners...");
 		Bukkit.getPluginManager().registerEvents(new JoinQuitListener(manager), this);
-		Bukkit.getPluginManager().registerEvents(manager.listener = new MinigameListener(manager), this);
+		Bukkit.getPluginManager().registerEvents(new MinigameListener(manager), this);
 		getLogger().info("Creating rotation manager...");
 		// lock to prevent further editing
 		SubstitutionHandler.lock();

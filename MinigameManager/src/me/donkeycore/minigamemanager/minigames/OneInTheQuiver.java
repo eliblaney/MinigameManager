@@ -60,7 +60,7 @@ public class OneInTheQuiver extends Minigame {
 	}
 	
 	private static String[] getMapinfo(String map) {
-		return getMinigameManager().getMinigameLocations().getMapInfo(OneInTheQuiver.class.getAnnotation(MinigameAttributes.class).name(), map);
+		return getMinigameManager().getDefaultMinigameLocations().getMapInfo(OneInTheQuiver.class.getAnnotation(MinigameAttributes.class).name(), map);
 	}
 	
 	@Override

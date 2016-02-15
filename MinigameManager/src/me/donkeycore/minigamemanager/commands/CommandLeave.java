@@ -28,7 +28,7 @@ public class CommandLeave implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("leave")) {
-			if(manager.getMinigameConfig().entireServer()) {
+			if(manager.getMinigameSettings().entireServer()) {
 				sender.sendMessage(ChatColor.RED + "This command is disabled.");
 				return true;
 			}
@@ -45,7 +45,7 @@ public class CommandLeave implements CommandExecutor {
 			if(manager.getRotationManager().leave(player, false))
 				Bukkit.getPluginManager().callEvent(new RotationLeaveEvent(rotation, player));
 			else
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameConfig().getMessage(MessageType.NOT_IN_ROTATION)));
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.NOT_IN_ROTATION)));
 		}
 		return true;
 	}

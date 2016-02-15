@@ -91,7 +91,7 @@ public abstract class Minigame {
 		 * get it from a config
 		 */
 		if (isDefault())
-			this.spawns = getMinigameManager().getMinigameLocations().getMinigameSpawns(getName(), map);
+			this.spawns = getMinigameManager().getDefaultMinigameLocations().getMinigameSpawns(getName(), map);
 		this.mapName = mapName;
 		this.mapAuthors = mapAuthors;
 	}
@@ -110,7 +110,7 @@ public abstract class Minigame {
 	 */
 	public final void mapinfo() {
 		if (mapName != null && mapAuthors != null)
-			announce(ChatColor.translateAlternateColorCodes('&', getMinigameManager().getMinigameConfig().getMessage(MessageType.MAPINFO)).replace("%name%", mapName).replace("%author%", mapAuthors));
+			announce(ChatColor.translateAlternateColorCodes('&', getMinigameManager().getMinigameSettings().getMessage(MessageType.MAPINFO)).replace("%name%", mapName).replace("%author%", mapAuthors));
 	}
 	
 	/**
