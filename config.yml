@@ -1,0 +1,92 @@
+##########################################
+#         MinigameManager config         #
+#              by DonkeyCore             #
+##########################################
+
+# Messages for various events
+messages:
+  # When a player joins a rotation [Available variables: %rotation%]
+  join: "&aYou have joined rotation %rotation%!"
+  # When a player leaves a rotation (using /leave or quitting the game)
+  leave: "&cYou have left the rotation!"
+  # When a player is kicked from a rotation (kicked by admin or during shutdown)
+  kick: "&cYou have been kicked from the rotation!"
+  # A player joins, but a minigame has already started
+  join-after-start: "&eThere is a minigame currently running right now. You can play when it ends, so please wait!"
+
+  # When a player tries to join a rotation, but they are all full
+  full-rotations: "&cThere are no available rotations! Try again later."
+  # When a player tries to join a SPECIFIC rotation, but it is full
+  full-rotation: "&cThat rotation is full! Try a different one."
+  # When a player tries to join a rotation already is in one
+  already-in-rotation: "&cYou are already in a rotation!"
+  # When a player tries to leave a rotation, but they aren't in one
+  not-in-rotation: "&cYou are not currently in a rotation!"
+
+  # When there isn't enough players to start a minigame
+  not-enough-players: "&cNot enough players!"
+  # When an admin stops a rotation (using /mm stop) OR plugin is being disabled (reload, shutdown)
+  rotation-stopped: "&cAn admin has stopped the rotation. Please be patient!"
+  # When the rotation announces the next minigame [Available variables: %minigame%]
+  next-minigame: "&eThe next minigame will be &l%minigame%&e!"
+  # When the countdown timer is ticking [Available variables: %minigame%, %time%]
+  countdown: "&e%minigame% will start in &l%time%&e!"
+
+  # How the map information is to be displayed if available. More info in locations.yml
+  mapinfo: |
+    &e&m-----------------------------------
+    &e> Now playing on &6%name%
+    &e> by &6%author%
+    &e&m-----------------------------------
+
+# Everything to do with rotations and the rotation lobby
+rotations:
+  # The amount of rotations in total (requires reload)
+  amount: 1
+  # Minimum players required to join a game
+  # NOTE - A minigame that requires more players
+  # than the current amount will not start until
+  # there is enough players to do so
+  minimum-players: 5
+  # Additional players cannot join this rotation when the maximum is reached
+  maximum-players: 10
+  # The time to count down each time a new minigame is ready to play
+  countdown-seconds: 30
+  # Whether people in different rotations can see each other in the lobby
+  lobby-hide-players: true
+  # When somebody joins the server, automatically assign them to a rotation and let them leave on quit
+  entire-server: false
+
+# Minigame-specific configuration
+minigames:
+  # Configure the default minigames
+  default-minigames:
+    # Should any default minigames be in the rotation? (requires reload)
+    enabled: true
+    # Configure each default minigame specifically
+    defaults:
+      Spleef:
+        # Should this minigame be in the rotation? (takes effect after next minigame finishes or reload)
+        enabled: true
+        # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
+        minimum-players: 5
+      One_In_The_Quiver:
+        # Should this minigame be in the rotation? (takes effect after next minigame finishes or reload)
+        enabled: true
+        # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
+        minimum-players: 5
+
+profiles:
+  # Configuration for the ELO ranking system that places
+  # players in rotations with players of similar experience
+  # For more information, see https://en.wikipedia.org/wiki/Elo_rating_system
+  elo:
+    # Whether to enable ELO ranking
+    enabled: true
+    # The default ELO rating for new players
+    default: 1000
+    # The K factor for updating ELO. Higher the number = more drastic changes
+    K-factor: 32
+  # Whether to enable Vault economy instead of the internal one
+  # If true, Vault needs to be installed (duh!)
+  vault: false
