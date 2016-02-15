@@ -30,8 +30,7 @@ import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardHelper;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
-@DefaultMinigame
-@MinigameAttributes(name = "One_In_The_Quiver", type = MinigameType.MOST_POINTS, authors = "DonkeyCore", alwaysSaturated = true, canDropItems = false, canPickUpItems = false)
+@MinigameAttributes(name = "One_In_The_Quiver", type = MinigameType.MOST_POINTS, authors = "DonkeyCore", alwaysSaturated = true, canDropItems = false, canPickUpItems = false, isDefault = true)
 public class OneInTheQuiver extends Minigame {
 	
 	/**
@@ -61,7 +60,7 @@ public class OneInTheQuiver extends Minigame {
 	}
 	
 	private static String[] getMapinfo(String map) {
-		return getMinigameManager().getMinigameLocations().getMapInfo(((MinigameAttributes) OneInTheQuiver.class.getAnnotation(MinigameAttributes.class)).name(), map);
+		return getMinigameManager().getMinigameLocations().getMapInfo(OneInTheQuiver.class.getAnnotation(MinigameAttributes.class).name(), map);
 	}
 	
 	@Override

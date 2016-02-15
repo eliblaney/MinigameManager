@@ -27,8 +27,7 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
  * 
  * @author DonkeyCore
  */
-@DefaultMinigame
-@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true, canDropItems = false, canPickUpItems = false)
+@MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true, canDropItems = false, canPickUpItems = false, isDefault = true)
 public class Spleef extends Minigame {
 	
 	private ItemStack shovel;
@@ -49,7 +48,7 @@ public class Spleef extends Minigame {
 	}
 	
 	private static String[] getMapinfo(String map) {
-		return getMinigameManager().getMinigameLocations().getMapInfo(((MinigameAttributes) Spleef.class.getAnnotation(MinigameAttributes.class)).name(), map);
+		return getMinigameManager().getMinigameLocations().getMapInfo(Spleef.class.getAnnotation(MinigameAttributes.class).name(), map);
 	}
 	
 	@Override

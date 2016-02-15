@@ -63,4 +63,11 @@ public @interface MinigameAttributes {
 	 */
 	boolean canPickUpItems() default true;
 	
+	/**
+	 * Whether the minigame is a default minigame that came with MinigameManager. Most likely false.
+	 * 
+	 * @return Whether the minigame is a default minigame
+	 */
+	boolean isDefault() default false;
+	
 }

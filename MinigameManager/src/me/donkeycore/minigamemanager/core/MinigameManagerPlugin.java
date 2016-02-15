@@ -10,6 +10,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.SubstitutionHandler;
@@ -18,9 +19,8 @@ import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
-import me.donkeycore.minigamemanager.listeners.MinigameListener;
 import me.donkeycore.minigamemanager.listeners.JoinQuitListener;
-import me.donkeycore.minigamemanager.minigames.DefaultMinigame;
+import me.donkeycore.minigamemanager.listeners.MinigameListener;
 import me.donkeycore.minigamemanager.rotations.DefaultRotationManager;
 
 /**
@@ -171,7 +171,8 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		} else {
 			// disable any existing ones (in case of config reload)
 			for (Class<? extends Minigame> minigame : manager.getMinigames()) {
-				if (minigame.getAnnotation(DefaultMinigame.class) != null)
+				MinigameAttributes attr = minigame.getAnnotation(MinigameAttributes.class);
+				if (attr != null && attr.isDefault())
 					manager.unregisterMinigame(minigame);
 			}
 		}

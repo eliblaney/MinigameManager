@@ -30,7 +30,6 @@ import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.teams.Team;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
-import me.donkeycore.minigamemanager.minigames.DefaultMinigame;
 
 /**
  * The main minigame API class; all minigames should extend this class
@@ -103,7 +102,7 @@ public abstract class Minigame {
 	 * @return Whether the minigame is a default minigame
 	 */
 	public boolean isDefault() {
-		return getClass().getAnnotation(DefaultMinigame.class) != null;
+		return getAttributes().isDefault();
 	}
 	
 	/**
