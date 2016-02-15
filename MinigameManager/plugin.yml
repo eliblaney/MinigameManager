@@ -15,7 +15,7 @@ commands:
   minigamemanager:
     description: "Main plugin administration command"
     permission: minigamemanager.admin
-    usage: "§cUsage: /<command> [help|list|info minigame|<start|stop|force|status> <rotation>|reload]"
+    usage: "§cUsage: /<command> [help|list|info minigame|<start|stop|force|status> <rotation>|next <rotation> <minigame>|reload]"
     aliases: [minigame, mm]
 permissions:
   minigamemanager.*:
@@ -36,6 +36,7 @@ permissions:
       minigamemanager.admin.stop: true
       minigamemanager.admin.status: true
       minigamemanager.admin.info: true
+      minigamemanager.admin.next: true
   minigamemanager.admin.help:
     description: "Allow player to view the help page"
     default: op
@@ -56,6 +57,9 @@ permissions:
     default: op
   minigamemanager.admin.info:
     description: "Allow player to view information about a minigame"
+    default: op
+  minigamemanager.admin.next:
+    description: "Allow player to set the next minigame in a rotation"
     default: op
   minigamemanager.join:
     description: "Allow player to join games"

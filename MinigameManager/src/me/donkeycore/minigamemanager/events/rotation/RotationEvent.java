@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.events;
+package me.donkeycore.minigamemanager.events.rotation;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

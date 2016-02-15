@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
-import me.donkeycore.minigamemanager.events.RotationLeaveEvent;
+import me.donkeycore.minigamemanager.events.rotation.RotationLeaveEvent;
 import net.md_5.bungee.api.ChatColor;
 
 /**

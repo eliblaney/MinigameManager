@@ -17,8 +17,8 @@ import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
- * Listens for food level changes or health changes in minigames or lobbies and
- * cancels them
+ * Listens for health/food level changes, item drops/pickups, and respawns in
+ * minigames & lobbies
  * 
  * @author DonkeyCore
  */

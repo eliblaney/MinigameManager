@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.events;
+package me.donkeycore.minigamemanager.events.minigame;
 
 import org.bukkit.event.HandlerList;
 
