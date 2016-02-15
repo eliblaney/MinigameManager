@@ -24,8 +24,6 @@ import me.donkeycore.minigamemanager.listeners.MinigameListener;
 /*
  * TODO:
  * - stuff to make minigames EASIER to make
- * - config options:
- * * server-wide (join rotation on join server, leave rotation on quit server)
  * - beta test at some point
  * - future: create entire minigame from config or lua/python
  * - gems:

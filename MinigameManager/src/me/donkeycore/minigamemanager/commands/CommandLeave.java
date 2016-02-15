@@ -28,6 +28,10 @@ public class CommandLeave implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("leave")) {
+			if(manager.getMinigameConfig().entireServer()) {
+				sender.sendMessage("\u00a7cThis command is disabled.");
+				return true;
+			}
 			if (!(sender instanceof Player)) {
 				sender.sendMessage("§cOnly players can run this command!");
 				return true;

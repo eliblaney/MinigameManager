@@ -28,12 +28,16 @@ public class CommandJoin implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("join")) {
+			if(manager.getMinigameConfig().entireServer()) {
+				sender.sendMessage("\u00a7cThis command is disabled.");
+				return true;
+			}
 			if (!(sender instanceof Player)) {
-				sender.sendMessage("§cOnly players can run this command!");
+				sender.sendMessage("\u00a7cOnly players can run this command!");
 				return true;
 			}
 			if (args.length > 1) {
-				sender.sendMessage("§cToo many arguments!");
+				sender.sendMessage("\u00a7cToo many arguments!");
 				return false;
 			}
 			Player player = (Player) sender;
@@ -45,12 +49,12 @@ public class CommandJoin implements CommandExecutor {
 			try {
 				rotation = args.length == 1 ? Integer.parseInt(args[0]) : Integer.MIN_VALUE;
 			} catch (NumberFormatException e) {
-				player.sendMessage("§cThat is not a valid number!");
+				player.sendMessage("\u00a7cThat is not a valid number!");
 				return true;
 			}
 			int maxRotations = manager.getMinigameConfig().getNumberOfRotations();
 			if ((rotation < 1 && args.length == 1) || rotation > maxRotations) {
-				String error = "§cThat is not a valid rotation ID! Available rotations: 1";
+				String error = "\u00a7cThat is not a valid rotation ID! Available rotations: 1";
 				if (maxRotations > 1)
 					error += "-" + maxRotations;
 				player.sendMessage(error);

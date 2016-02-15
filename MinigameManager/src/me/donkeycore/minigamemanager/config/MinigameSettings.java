@@ -93,6 +93,15 @@ public class MinigameSettings {
 		return getConfig().getConfigurationSection("rotations").getBoolean("lobby-hide-players");
 	}
 	
+	/**
+	 * Whether to have players join a rotation when the join the server and leave on quit
+	 * 
+	 * @return Whether to automatically assign players a rotation
+	 */
+	public boolean entireServer() {
+		return getConfig().getConfigurationSection("rotations").getBoolean("entire-server");
+	}
+	
 	// Configuration section: Minigames
 	
 	/**

@@ -54,6 +54,8 @@ rotations:
   countdown-seconds: 30
   # Whether people in different rotations can see each other in the lobby
   lobby-hide-players: true
+  # When somebody joins the server, automatically assign them to a rotation and let them leave on quit
+  entire-server: false
 
 # Minigame-specific configuration
 minigames:
