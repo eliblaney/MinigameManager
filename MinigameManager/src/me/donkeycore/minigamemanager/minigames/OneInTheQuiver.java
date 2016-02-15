@@ -107,9 +107,9 @@ public class OneInTheQuiver extends Minigame {
 					if (proj instanceof Arrow && projShooter instanceof Player) {
 						Player killer = (Player) projShooter;
 						if (entity.getUniqueId().equals(killer.getUniqueId()))
-							announce("\u00a76" + entity.getName() + " \u00a7ccommitted suicide.");
+							announce(ChatColor.GOLD + entity.getName() + ChatColor.RED + " committed suicide.");
 						else {
-							announce("\u00a7c" + entity.getName() + " \u00a7rwas killed by \u00a7c" + killer.getName() + "\u00a7r.");
+							announce(ChatColor.RED + entity.getName() + ChatColor.RESET + " was killed by " + ChatColor.RED + killer.getName() + ChatColor.RESET + ".");
 							killer.getInventory().addItem(new ItemStack(Material.ARROW));
 							kills.put(ChatColor.GREEN + killer.getName(), kills.get(ChatColor.GREEN + killer.getName()) + 1);
 						}
@@ -136,7 +136,7 @@ public class OneInTheQuiver extends Minigame {
 			public void onEvent(PlayerDeathEvent event) {
 				Player player = event.getEntity();
 				if (isAlive(player)) {
-					announce("\u00a76" + player.getName() + " \u00a7c" + event.getDeathMessage().replace(player.getName(), "").trim());
+					announce("\u00a76" + player.getName() + " " + ChatColor.RED + event.getDeathMessage().replace(player.getName(), "").trim());
 					event.getDrops().clear();
 					event.setDeathMessage(null);
 					event.setNewTotalExp(0);
@@ -160,7 +160,7 @@ public class OneInTheQuiver extends Minigame {
 							maxKills = entry.getValue().intValue();
 						}
 					}
-					titleAll("\u00a72\u00a7l" + getPlayer(winner).getName() + " won!", null, 5, 20, 5);
+					titleAll(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + getPlayer(winner).getName() + " won!", null, 5, 20, 5);
 					end();
 				}
 			}
@@ -182,7 +182,7 @@ public class OneInTheQuiver extends Minigame {
 		player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 120, 10));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 10));
 		// tell them that they will respawn
-		sendTitleMessage(player, "", "\u00a7lRespawning in 3 seconds...", 5, 50, 5);
+		sendTitleMessage(player, "", ChatColor.RESET + "" + ChatColor.BOLD + "Respawning in 3 seconds...", 5, 50, 5);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(MinigameManager.getPlugin(), new Runnable() {
 			public void run() {
 				// set them back alive
@@ -198,7 +198,7 @@ public class OneInTheQuiver extends Minigame {
 	
 	private void updateScoreboard() {
 		// build a scoreboard with a display name of "Kills" in red, listing the alive player names in green with their kills
-		Scoreboard s = new ScoreboardBuilder("oitq" + getId() + "_kills", "\u00a76\u00a7l" + time + " \u00a7e\u00a7lseconds left").setLines(kills).build();
+		Scoreboard s = new ScoreboardBuilder("oitq" + getId() + "_kills", ChatColor.GOLD + "" + ChatColor.BOLD + time + ChatColor.YELLOW + ChatColor.BOLD + " seconds left").setLines(kills).build();
 		// update the scoreboard for everybody
 		setScoreboard(s);
 	}

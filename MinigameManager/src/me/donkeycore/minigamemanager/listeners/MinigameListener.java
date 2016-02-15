@@ -125,14 +125,14 @@ public class MinigameListener implements Listener {
 					try {
 						int i = Integer.parseInt(ChatColor.stripColor(st.toLowerCase()));
 						Rotation rot = rm.getRotation(i - 1);
-						player.sendMessage("\u00a7e===<\u00a76Rotation Information\u00a7e>===");
-						player.sendMessage("\u00a7e> State: " + rot.getState().toColoredString());
+						player.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Rotation Information" + ChatColor.YELLOW + ">===");
+						player.sendMessage(ChatColor.YELLOW + "> State: " + rot.getState().toColoredString());
 						if (rot.getState() == RotationState.INGAME) {
-							player.sendMessage("\u00a7e> Minigame: \u00a76" + rot.getCurrentMinigame().getName().replace("_", ""));
-							player.sendMessage("\u00a7e> Ingame: \u00a76" + rot.getInGame().size());
+							player.sendMessage(ChatColor.YELLOW + "> Minigame: " + ChatColor.GOLD + rot.getCurrentMinigame().getName().replace("_", ""));
+							player.sendMessage(ChatColor.YELLOW + "> Ingame: " + ChatColor.GOLD + rot.getInGame().size());
 						}
-						player.sendMessage("\u00a7e> Total Players: \u00a76" + rot.getPlayers().size());
-						player.sendMessage("\u00a7e===<\u00a76Rotation Information\u00a7e>===");
+						player.sendMessage(ChatColor.YELLOW + "> Total Players: " + ChatColor.GOLD + rot.getPlayers().size());
+						player.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Rotation Information" + ChatColor.YELLOW + ">===");
 					} catch (NumberFormatException e) {
 						continue;
 					}
@@ -146,8 +146,8 @@ public class MinigameListener implements Listener {
 						if (attr == null)
 							continue;
 						if (ChatColor.stripColor(st).replace(" ", "").replace("_", "").replace("-", "").toLowerCase().contains(attr.name().toLowerCase().replace(" ", "").replace("_", "").replace("-", ""))) {
-							player.sendMessage("\u00a7e===<\u00a76Minigame Information\u00a7e>===");
-							player.sendMessage("\u00a7e> Name: \u00a76" + attr.name().replace("_", " "));
+							player.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Minigame Information" + ChatColor.YELLOW + ">===");
+							player.sendMessage(ChatColor.YELLOW + "> Name: " + ChatColor.GOLD + attr.name().replace("_", " "));
 							String[] _authors = attr.authors();
 							String authors = "";
 							if (_authors.length > 0) {
@@ -158,10 +158,10 @@ public class MinigameListener implements Listener {
 									for (String a : _authors)
 										authors += ", " + a;
 								}
-								player.sendMessage("\u00a7e> Author(s): \u00a76" + authors.substring(2));
+								player.sendMessage(ChatColor.YELLOW + "> Author(s): " + ChatColor.GOLD + authors.substring(2));
 							}
-							player.sendMessage("\u00a7e> Type: \u00a76" + attr.type().toString());
-							player.sendMessage("\u00a7e===<\u00a76Minigame Information\u00a7e>===");
+							player.sendMessage(ChatColor.YELLOW + "> Type: " + ChatColor.GOLD + attr.type().toString());
+							player.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Minigame Information" + ChatColor.YELLOW + ">===");
 							return;
 						}
 					}

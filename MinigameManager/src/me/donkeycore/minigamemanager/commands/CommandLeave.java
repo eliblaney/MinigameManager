@@ -29,15 +29,15 @@ public class CommandLeave implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("leave")) {
 			if(manager.getMinigameConfig().entireServer()) {
-				sender.sendMessage("\u00a7cThis command is disabled.");
+				sender.sendMessage(ChatColor.RED + "This command is disabled.");
 				return true;
 			}
 			if (!(sender instanceof Player)) {
-				sender.sendMessage("§cOnly players can run this command!");
+				sender.sendMessage(ChatColor.RED + "Only players can run this command!");
 				return true;
 			}
 			if (args.length > 0) {
-				sender.sendMessage("§cToo many arguments!");
+				sender.sendMessage(ChatColor.RED + "Too many arguments!");
 				return false;
 			}
 			Player player = (Player) sender;

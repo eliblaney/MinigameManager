@@ -1,5 +1,7 @@
 package me.donkeycore.minigamemanager.api.rotation;
 
+import org.bukkit.ChatColor;
+
 /**
  * The state of a rotation
  * 
@@ -33,11 +35,11 @@ public enum RotationState {
 	public String toColoredString() {
 		switch (this) {
 			default:
-				return "§6" + toString();
+				return ChatColor.GOLD + toString();
 			case INGAME:
-				return "§a" + toString();
+				return ChatColor.GREEN + toString();
 			case STOPPED:
-				return "§c" + toString();
+				return ChatColor.RED + toString();
 		}
 	}
 	

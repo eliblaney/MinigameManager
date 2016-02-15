@@ -86,13 +86,13 @@ public class Spleef extends Minigame {
 	
 	private void kill(Player player) {
 		// announce their death and mark them as dead
-		announce("\u00a7c" + player.getName() + " \u00a7rdied from \u00a76burning in lava\u00a7r.");
+		announce(ChatColor.RED + player.getName() + ChatColor.RESET + " died from " + ChatColor.RED + "burning in lava" + ChatColor.RESET + ".");
 		setAlive(player, false);
 		// update the scoreboard without the player in the list
 		updateScoreboard();
 		// We have a winner!
 		if (getAliveAmount() == 1) {
-			titleAll("\u00a7a" + getAliveNames()[0] + " \u00a7rwins!", null, 5, 20, 5);
+			titleAll(ChatColor.GREEN + getAliveNames()[0] + ChatColor.RESET + " wins!", null, 5, 20, 5);
 			end();
 			// We're just testing with a single person, everything seemed to work fine
 		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
@@ -105,7 +105,7 @@ public class Spleef extends Minigame {
 	
 	private void updateScoreboard() {
 		// build a scoreboard with a display name of "Alive" in aqua/bold, listing the alive player names in green
-		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", "\u00a7b\u00a7lAlive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
+		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", ChatColor.AQUA + "" + ChatColor.BLUE + "Alive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
 		// update the scoreboard for everybody
 		setScoreboard(s);
 	}
