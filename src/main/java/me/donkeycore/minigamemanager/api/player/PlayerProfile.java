@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import me.donkeycore.minigamemanager.api.util.ELO;
+import me.donkeycore.minigamemanager.api.util.ELO.GameResult;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 public class PlayerProfile {
@@ -83,7 +85,7 @@ public class PlayerProfile {
 	 * @return Whether the ELO of the player successfully updated
 	 */
 	public boolean winELO(long otherELO) {
-		return updateELO(otherELO, 1);
+		return updateELO(otherELO, GameResult.WON);
 	}
 	
 	/**
@@ -94,7 +96,7 @@ public class PlayerProfile {
 	 * @return Whether the ELO of the player successfully updated
 	 */
 	public boolean loseELO(long otherELO) {
-		return updateELO(otherELO, 0);
+		return updateELO(otherELO, GameResult.LOST);
 	}
 	
 	/**
@@ -105,27 +107,38 @@ public class PlayerProfile {
 	 * @return Whether the ELO of the player successfully updated
 	 */
 	public boolean drawELO(long otherELO) {
-		return updateELO(otherELO, 0.5);
+		return updateELO(otherELO, GameResult.DRAW);
 	}
 	
 	/**
 	 * Update the player's ELO based on their opponent and the game's outcome
 	 * 
 	 * @param otherELO The other player's ELO rating
-	 * @param playerScore Whether the player won, lost, or tied. Can only be 1, 0, or 0.5 respectively.
+	 * @param playerScore Whether the player won, lost, or drew
 	 * 
 	 * @return Whether the ELO of the player successfully updated
 	 */
-	private boolean updateELO(long otherELO, double playerScore) {
-		if(playerScore != 1 && playerScore != 0 && playerScore != 0.5)
-			throw new IllegalArgumentException("playerScore can only be 1, 0, or 0.5 but " + playerScore + " was given");
-		if(!MinigameManager.getMinigameManager().getMinigameSettings().eloEnabled())
+	private boolean updateELO(long otherELO, GameResult score) {
+		if (!MinigameManager.getMinigameManager().getMinigameSettings().eloEnabled())
 			return false;
-		double playerRating = Math.pow(10, data.getELO() / 400);
-		double otherRating = Math.pow(10, otherELO / 400);
-		double playerExpected = playerRating / (playerRating + otherRating);
-		data.setELO((long) (playerRating + MinigameManager.getMinigameManager().getMinigameSettings().kFactor() * (playerScore - playerExpected)));
+		data.setELO(ELO.getUpdatedELO(data.getELO(), otherELO, data.getGamesPlayed(), score));
 		return true;
+	}
+	
+	/**
+	 * Mark that a player has played a game. Increments their total games played by 1.
+	 */
+	public void playedGame() {
+		data.setGamesPlayed(data.getGamesPlayed() + 1);
+	}
+	
+	/**
+	 * Determine whether the player is a pro
+	 * 
+	 * @return true if their ELO rating is above 2400, false otherwise
+	 */
+	public boolean isPro() {
+		return ELO.isPro(data.getELO());
 	}
 	
 	/**

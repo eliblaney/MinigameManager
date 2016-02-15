@@ -111,6 +111,7 @@ public class PlayerProfileConfiguration {
 			data.setELO(cs.getLong("elo"));
 		if(!settings.vaultEnabled())
 			data.setCurrency(cs.getDouble("currency"));
+		data.setGamesPlayed(cs.getLong("gamesPlayed"));
 		return data;
 	}
 	
@@ -122,11 +123,17 @@ public class PlayerProfileConfiguration {
 	public void saveProfile(PlayerProfile profile) {
 		ProfileData data = profile.getData();
 		ConfigurationSection cs = getConfig().getConfigurationSection(profile.getUUID().toString());
+		if(cs == null) {
+			getConfig().createSection(profile.getUUID().toString());
+			cs = getConfig().getConfigurationSection(profile.getUUID().toString());
+		}
 		MinigameSettings settings = MinigameManager.getMinigameManager().getMinigameSettings();
 		if(settings.eloEnabled())
 			cs.set("elo", data.getELO());
 		if(!settings.vaultEnabled())
 			cs.set("currency", data.getCurrency());
+		cs.set("gamesPlayed", data.getGamesPlayed());
+		saveConfig();
 	}
 	
 }

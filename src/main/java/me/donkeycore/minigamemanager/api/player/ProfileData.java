@@ -10,7 +10,29 @@ public class ProfileData {
 	 * Amount of money belonging to the player
 	 */
 	private double currency;
+	/**
+	 * The amount of games this player has played
+	 */
+	private long gamesPlayed;
 	
+	/**
+	 * Get the amount of games this player has played
+	 * 
+	 * @return The amount of games played
+	 */
+	public long getGamesPlayed() {
+		return gamesPlayed;
+	}
+	
+	/**
+	 * Set the number of games this player has played
+	 * 
+	 * @param gamesPlayed The new number of games played
+	 */
+	public void setGamesPlayed(long gamesPlayed) {
+		this.gamesPlayed = gamesPlayed;
+	}
+
 	/**
 	 * Get the ELO rating for this player
 	 * 

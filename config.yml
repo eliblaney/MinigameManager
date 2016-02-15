@@ -85,8 +85,6 @@ profiles:
     enabled: true
     # The default ELO rating for new players
     default: 1000
-    # The K factor for updating ELO. Higher the number = more drastic changes
-    K-factor: 32
   # Whether to enable Vault economy instead of the internal one
   # If true, Vault needs to be installed (duh!)
   vault: false

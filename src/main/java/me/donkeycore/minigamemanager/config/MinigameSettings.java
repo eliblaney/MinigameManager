@@ -173,15 +173,6 @@ public class MinigameSettings {
 	}
 	
 	/**
-	 * Get the K-Factor for ELO calculations
-	 * 
-	 * @return The K-Factor
-	 */
-	public int kFactor() {
-		return getConfig().getConfigurationSection("profiles").getConfigurationSection("elo").getInt("K-factor");
-	}
-	
-	/**
 	 * Determine if vault support is enabled
 	 * 
 	 * @return Whether vault support is enabled AND enabled correctly

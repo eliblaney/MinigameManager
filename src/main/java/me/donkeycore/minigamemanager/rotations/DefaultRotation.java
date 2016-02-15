@@ -15,6 +15,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
+import me.donkeycore.minigamemanager.api.player.PlayerProfile;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
@@ -221,6 +222,8 @@ public final class DefaultRotation implements Rotation {
 		// clear/reset everything, and teleport everybody to the lobby
 		for (UUID u : inGame) {
 			Player player = Bukkit.getPlayer(u);
+			if(error == MinigameErrors.SUCCESS)
+				PlayerProfile.getPlayerProfile(player.getUniqueId()).playedGame();
 			for (PotionEffect pe : player.getActivePotionEffects())
 				player.removePotionEffect(pe.getType());
 			player.setFireTicks(0);
