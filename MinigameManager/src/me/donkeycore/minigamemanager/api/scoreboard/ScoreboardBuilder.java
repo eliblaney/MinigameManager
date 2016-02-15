@@ -1,7 +1,6 @@
 package me.donkeycore.minigamemanager.api.scoreboard;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -15,14 +14,7 @@ import org.bukkit.scoreboard.Scoreboard;
  */
 public class ScoreboardBuilder {
 	
-	/**
-	 * The scoreboard object being manipulated
-	 */
-	private final Scoreboard s;
-	/**
-	 * The objective to use
-	 */
-	private final Objective o;
+	private final ScoreboardHelper helper;
 	
 	/**
 	 * Create an instance of the scoreboard builder
@@ -40,11 +32,12 @@ public class ScoreboardBuilder {
 	 * @param displayName The text to appear above all scores on the sidebar
 	 */
 	public ScoreboardBuilder(String objective, String displayName) {
-		this.s = Bukkit.getScoreboardManager().getNewScoreboard();
+		Scoreboard s = Bukkit.getScoreboardManager().getNewScoreboard();
 		s.registerNewObjective(objective, "dummy");
-		this.o = s.getObjective(objective);
+		Objective o = s.getObjective(objective);
 		o.setDisplaySlot(DisplaySlot.SIDEBAR);
 		o.setDisplayName(displayName);
+		helper = new ScoreboardHelper(s, o);
 	}
 	
 	/**
@@ -53,7 +46,16 @@ public class ScoreboardBuilder {
 	 * @return The scoreboard
 	 */
 	public Scoreboard build() {
-		return s;
+		return helper.getScoreboard();
+	}
+	
+	/**
+	 * Get the scoreboard helper being used to create the scoreboard
+	 * 
+	 * @return The scoreboard helper
+	 */
+	public ScoreboardHelper getHelper() {
+		return helper;
 	}
 	
 	/**
@@ -64,10 +66,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder setOrderedLines(String... lines) {
-		clear();
-		int n = lines.length;
-		for (String str : lines)
-			o.getScore(str).setScore(--n);
+		helper.setOrderedLines(lines);
 		return this;
 	}
 	
@@ -79,9 +78,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder setLines(String... lines) {
-		clear();
-		for (String str : lines)
-			o.getScore(str).setScore(0);
+		helper.setLines(lines);
 		return this;
 	}
 	
@@ -93,9 +90,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder setLines(Map<String, Integer> scores) {
-		clear();
-		for (Entry<String, Integer> e : scores.entrySet())
-			o.getScore(e.getKey()).setScore(e.getValue());
+		helper.setLines(scores);
 		return this;
 	}
 	
@@ -105,8 +100,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder clear() {
-		for (String str : s.getEntries())
-			s.resetScores(str);
+		helper.clear();
 		return this;
 	}
 	

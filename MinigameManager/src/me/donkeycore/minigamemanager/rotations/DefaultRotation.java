@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.Scoreboard;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
@@ -33,7 +34,8 @@ public final class DefaultRotation implements Rotation {
 	 */
 	private final List<UUID> players = new ArrayList<>();
 	/**
-	 * Separate array for those in-game to separate newly joining from currently playing
+	 * Separate array for those in-game to separate newly joining from currently
+	 * playing
 	 */
 	private final List<UUID> inGame = new ArrayList<>();
 	/**
@@ -57,7 +59,8 @@ public final class DefaultRotation implements Rotation {
 	 */
 	private RotationState state = RotationState.LOBBY;
 	/**
-	 * Blank scoreboard for use when leaving a minigame to clear any active scoreboards
+	 * Blank scoreboard for use when leaving a minigame to clear any active
+	 * scoreboards
 	 */
 	private final Scoreboard blankScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	
@@ -121,9 +124,13 @@ public final class DefaultRotation implements Rotation {
 			// clear the scoreboard, teleport to spawn, and send a message
 			Player p = Bukkit.getPlayer(uuid);
 			if (p != null) {
+				for (PotionEffect pe : p.getActivePotionEffects())
+					p.removePotionEffect(pe.getType());
+				p.setFireTicks(0);
 				p.getInventory().clear();
 				p.setScoreboard(blankScoreboard);
 				p.teleport(MinigameManager.getMinigameManager().getMinigameLocations().getRotationLocation("spawn"));
+				p.setGameMode(GameMode.ADVENTURE);
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameConfig().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
 			// sad, sad times
@@ -168,7 +175,7 @@ public final class DefaultRotation implements Rotation {
 	 * Begin the minigame
 	 * 
 	 * @param minigame The minigame to start
-	 * 
+	 * 			
 	 * @return Whether the process was successful
 	 */
 	protected boolean beginMinigame(Minigame minigame) {
@@ -214,6 +221,9 @@ public final class DefaultRotation implements Rotation {
 		// clear/reset everything, and teleport everybody to the lobby
 		for (UUID u : inGame) {
 			Player player = Bukkit.getPlayer(u);
+			for (PotionEffect pe : player.getActivePotionEffects())
+				player.removePotionEffect(pe.getType());
+			player.setFireTicks(0);
 			player.getInventory().clear();
 			player.setScoreboard(blankScoreboard);
 			player.setGameMode(GameMode.ADVENTURE);
@@ -269,7 +279,7 @@ public final class DefaultRotation implements Rotation {
 	public Minigame getCurrentMinigame() {
 		return minigame;
 	}
-
+	
 	public Class<? extends Minigame> getLastMinigame() {
 		return lastMinigame;
 	}

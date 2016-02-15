@@ -105,7 +105,7 @@ public class Spleef extends Minigame {
 	
 	private void updateScoreboard() {
 		// build a scoreboard with a display name of "Alive" in aqua/bold, listing the alive player names in green
-		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", ChatColor.AQUA + "" + ChatColor.BLUE + "Alive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
+		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", ChatColor.AQUA + "" + ChatColor.BOLD + "Alive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
 		// update the scoreboard for everybody
 		setScoreboard(s);
 	}
