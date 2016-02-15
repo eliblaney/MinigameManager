@@ -15,5 +15,5 @@ hs_err_pid*
 .project
 .classpath
 .settings/
-# Eclipse seems to really want its own .gitignore for some reason...
-MinigameManager/.gitignore
+bin/
+target/
