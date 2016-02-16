@@ -41,6 +41,8 @@ public class PlayerProfile {
 	 * Get a player's corresponding PlayerProfile
 	 * 
 	 * @param uuid The player's UUID
+	 * 
+	 * @return A PlayerProfile instance corresponding with the UUID
 	 */
 	public static PlayerProfile getPlayerProfile(UUID uuid) {
 		for (PlayerProfile profile : profiles) {
@@ -114,7 +116,7 @@ public class PlayerProfile {
 	 * Update the player's ELO based on their opponent and the game's outcome
 	 * 
 	 * @param otherELO The other player's ELO rating
-	 * @param playerScore Whether the player won, lost, or drew
+	 * @param score Whether the player won, lost, or drew
 	 * 
 	 * @return Whether the ELO of the player successfully updated
 	 */

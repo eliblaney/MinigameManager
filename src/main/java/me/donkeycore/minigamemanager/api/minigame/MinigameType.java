@@ -26,6 +26,10 @@ public enum MinigameType {
 	
 	/**
 	 * Specify the minigame type if the current type is OTHER
+	 * 
+	 * @param desc The description of the type
+	 * 
+	 * @return The type itself
 	 */
 	public MinigameType of(String desc) {
 		if(this != OTHER)

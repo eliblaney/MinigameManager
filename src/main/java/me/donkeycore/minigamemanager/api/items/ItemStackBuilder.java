@@ -239,12 +239,12 @@ public class ItemStackBuilder {
 	 * 
 	 * @return The builder instance
 	 * 
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 * @throws InstantiationException
+	 * @throws IllegalAccessException Thrown by a problem in reflection
+	 * @throws IllegalArgumentException Thrown by a problem in reflection
+	 * @throws InvocationTargetException Thrown by a problem in reflection
+	 * @throws NoSuchMethodException Thrown by a problem in reflection
+	 * @throws SecurityException Thrown by a problem in reflection
+	 * @throws InstantiationException Thrown by a problem in reflection
 	 */
 	public ItemStackBuilder canDestroy(String... destroyable) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException {
 		Class<?> nbttagcompound = getNMSClass("NBTTagCompound");
@@ -286,12 +286,12 @@ public class ItemStackBuilder {
 	 * 
 	 * @return The builder instance
 	 * 
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 * @throws InstantiationException
+	 * @throws IllegalAccessException Thrown by a problem in reflection
+	 * @throws IllegalArgumentException Thrown by a problem in reflection
+	 * @throws InvocationTargetException Thrown by a problem in reflection
+	 * @throws NoSuchMethodException Thrown by a problem in reflection
+	 * @throws SecurityException Thrown by a problem in reflection
+	 * @throws InstantiationException Thrown by a problem in reflection
 	 */
 	public ItemStackBuilder canPlaceOn(String... placeable) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, InstantiationException {
 		Class<?> nbttagcompound = getNMSClass("NBTTagCompound");

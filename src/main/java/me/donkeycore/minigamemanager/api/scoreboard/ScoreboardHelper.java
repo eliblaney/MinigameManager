@@ -92,7 +92,7 @@ public class ScoreboardHelper {
 	/**
 	 * Set the lines of the scoreboard to what is specified with scores
 	 * 
-	 * @param lines The new lines of the scoreboard
+	 * @param scores A map representing the new lines of the scoreboard
 	 * 
 	 * @return The helper instance
 	 */

@@ -20,7 +20,7 @@ public final class ELO {
 	 * @param playerELO The player's current ELO to be changed
 	 * @param otherELO The other player's ELO rating
 	 * @param gamesPlayed The amount of games this player has played
-	 * @param playerScore Whether the player won, lost, or drew
+	 * @param score Whether the player won, lost, or drew
 	 * 
 	 * @return The player's new ELO
 	 */

@@ -160,7 +160,7 @@ public abstract class Minigame {
 	/**
 	 * Call this to end the minigame and continue to the next rotation<br>
 	 * <b>Note:</b> If this method is being overriden, make sure there is a call
-	 * to {@link Rotation#finish(int)} or a call to
+	 * to {@link Rotation#finish(int, WinnerList)} or a call to
 	 * 
 	 * <pre>
 	 * super.end()
@@ -868,7 +868,7 @@ public abstract class Minigame {
 	/**
 	 * Create a listener for an event
 	 * 
-	 * @param event The event to listen for
+	 * @param <E> The event type to listen for
 	 * @param listener What to do when the event happens
 	 */
 	@SuppressWarnings("unchecked")
@@ -948,6 +948,8 @@ public abstract class Minigame {
 		/**
 		 * Create a tuple
 		 * 
+		 * @param <L> The object to be on the left
+		 * @param <R> The object to be on the right
 		 * @param l The object on the left
 		 * @param r The object on the right
 		 * 			
