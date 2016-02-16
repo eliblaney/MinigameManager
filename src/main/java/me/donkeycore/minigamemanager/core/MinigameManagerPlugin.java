@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -12,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.player.PlayerProfile;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.SubstitutionHandler;
@@ -96,7 +98,6 @@ public class MinigameManagerPlugin extends JavaPlugin {
 			else {
 				getLogger().info("Hooking into Vault...");
 				RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServicesManager().getRegistration(Economy.class);
-				// FIXME: Does not recognize Vault for some reason
 				if (economyProvider != null)
 					manager.economy = economyProvider.getProvider();
 				if (manager.economy == null)
@@ -145,8 +146,13 @@ public class MinigameManagerPlugin extends JavaPlugin {
 	public void onDisable() {
 		if (manager == null)
 			throw new IllegalStateException("MinigameManager has not been enabled!");
-		manager.rotationManager.shutdown();
 		// Prepare everything for shutdown
+		getLogger().info("Stopping rotations...");
+		manager.rotationManager.shutdown();
+		// Save everybody's profiles
+		getLogger().info("Saving player profiles...");
+		for(Player player : Bukkit.getOnlinePlayers())
+			PlayerProfile.getPlayerProfile(player.getUniqueId()).saveProfile();
 		getLogger().info(getDescription().getName() + " v" + getDescription().getVersion() + " by DonkeyCore has been disabled!");
 	}
 	

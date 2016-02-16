@@ -10,18 +10,18 @@ public final class SingleWinnerList implements WinnerList {
 	private String fName, sName, tName;
 	
 	public SingleWinnerList(UUID firstPlace) {
-		this.firstPlace = firstPlace;
+		setFirstPlace(new UUID[]{firstPlace});
 	}
 	
 	public SingleWinnerList(UUID firstPlace, UUID secondPlace) {
-		this.firstPlace = firstPlace;
-		this.secondPlace = secondPlace;
+		setFirstPlace(new UUID[]{firstPlace});
+		setSecondPlace(new UUID[]{secondPlace});
 	}
 	
 	public SingleWinnerList(UUID firstPlace, UUID secondPlace, UUID thirdPlace) {
-		this.firstPlace = firstPlace;
-		this.secondPlace = secondPlace;
-		this.thirdPlace = thirdPlace;
+		setFirstPlace(new UUID[]{firstPlace});
+		setSecondPlace(new UUID[]{secondPlace});
+		setThirdPlace(new UUID[]{thirdPlace});
 	}
 	
 	public UUID[] getFirstPlace() {
@@ -30,14 +30,15 @@ public final class SingleWinnerList implements WinnerList {
 	
 	public void setFirstPlace(UUID[] firstPlace) {
 		this.firstPlace = firstPlace[0];
-		setFirstPlaceName(Bukkit.getPlayer(this.firstPlace).getName());
+		if (this.firstPlace != null)
+			setFirstPlaceName(Bukkit.getPlayer(this.firstPlace).getName());
 	}
-
+	
 	@Override
 	public String getFirstPlaceName() {
 		return fName;
 	}
-
+	
 	@Override
 	public void setFirstPlaceName(String name) {
 		this.fName = name;
@@ -49,14 +50,15 @@ public final class SingleWinnerList implements WinnerList {
 	
 	public void setSecondPlace(UUID[] secondPlace) {
 		this.secondPlace = secondPlace[0];
-		setSecondPlaceName(Bukkit.getPlayer(this.secondPlace).getName());
+		if (this.secondPlace != null)
+			setSecondPlaceName(Bukkit.getPlayer(this.secondPlace).getName());
 	}
-
+	
 	@Override
 	public String getSecondPlaceName() {
 		return sName;
 	}
-
+	
 	@Override
 	public void setSecondPlaceName(String name) {
 		this.sName = name;
@@ -68,14 +70,15 @@ public final class SingleWinnerList implements WinnerList {
 	
 	public void setThirdPlace(UUID[] thirdPlace) {
 		this.thirdPlace = thirdPlace[0];
-		setThirdPlaceName(Bukkit.getPlayer(this.thirdPlace).getName());
+		if (this.thirdPlace != null)
+			setThirdPlaceName(Bukkit.getPlayer(this.thirdPlace).getName());
 	}
-
+	
 	@Override
 	public String getThirdPlaceName() {
 		return tName;
 	}
-
+	
 	@Override
 	public void setThirdPlaceName(String name) {
 		this.tName = name;

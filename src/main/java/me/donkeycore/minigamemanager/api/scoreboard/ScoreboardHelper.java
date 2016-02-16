@@ -43,16 +43,20 @@ public class ScoreboardHelper {
 			@Override
 			public void run() {
 				onUpdate.run();
-				for(Player player : recipients)
-					player.setScoreboard(scoreboard);
+				if (timer != null) {
+					for (Player player : recipients)
+						player.setScoreboard(scoreboard);
+				}
 			}
 		}.runTaskTimer(MinigameManager.getPlugin(), 0, tickDelay);
 		return this;
 	}
 	
 	public ScoreboardHelper stopUpdating() {
-		if(timer != null)
+		if (timer != null) {
 			timer.cancel();
+			timer = null;
+		}
 		return this;
 	}
 	
@@ -101,7 +105,7 @@ public class ScoreboardHelper {
 	
 	/**
 	 * Clear all the lines in the scorebaord
-	 *  
+	 * 
 	 * @return The helper instance
 	 */
 	public ScoreboardHelper clear() {

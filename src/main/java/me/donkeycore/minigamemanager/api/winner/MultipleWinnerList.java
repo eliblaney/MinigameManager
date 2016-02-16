@@ -8,18 +8,18 @@ public final class MultipleWinnerList implements WinnerList {
 	private String fName, sName, tName;
 	
 	public MultipleWinnerList(UUID[] firstPlace) {
-		this.firstPlace = firstPlace;
+		setFirstPlace(firstPlace);
 	}
 	
 	public MultipleWinnerList(UUID[] firstPlace, UUID[] secondPlace) {
-		this.firstPlace = firstPlace;
-		this.secondPlace = secondPlace;
+		setFirstPlace(firstPlace);
+		setSecondPlace(secondPlace);
 	}
 	
 	public MultipleWinnerList(UUID[] firstPlace, UUID[] secondPlace, UUID[] thirdPlace) {
-		this.firstPlace = firstPlace;
-		this.secondPlace = secondPlace;
-		this.thirdPlace = thirdPlace;
+		setFirstPlace(firstPlace);
+		setSecondPlace(secondPlace);
+		setThirdPlace(thirdPlace);
 	}
 	
 	public UUID[] getFirstPlace() {

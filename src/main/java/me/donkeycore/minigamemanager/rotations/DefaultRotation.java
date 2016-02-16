@@ -1,7 +1,6 @@
 package me.donkeycore.minigamemanager.rotations;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -218,11 +217,10 @@ public final class DefaultRotation implements Rotation {
 							PlayerProfile fp = PlayerProfile.getPlayerProfile(f);
 							for (UUID u : notFirst)
 								fp.winELO(PlayerProfile.getPlayerProfile(u).getData().getELO());
-							((Player) fp.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + fp.getData().getELO());
 						}
 					}
 					if (second != null) {
-						UUID[] notSecond = subtract(inGame, first);
+						UUID[] notSecond = subtract(inGame, second);
 						for (UUID s : second) {
 							PlayerProfile sp = PlayerProfile.getPlayerProfile(s);
 							for (UUID u : notSecond) {
@@ -232,11 +230,10 @@ public final class DefaultRotation implements Rotation {
 								else
 									sp.winELO(uelo);
 							}
-							((Player) sp.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + sp.getData().getELO());
 						}
 					}
 					if (third != null) {
-						UUID[] notThird = subtract(inGame, first);
+						UUID[] notThird = subtract(inGame, third);
 						for (UUID t : third) {
 							PlayerProfile tp = PlayerProfile.getPlayerProfile(t);
 							for (UUID u : notThird) {
@@ -246,8 +243,15 @@ public final class DefaultRotation implements Rotation {
 								else
 									tp.winELO(uelo);
 							}
-							((Player) tp.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + tp.getData().getELO());
 						}
+					}
+					for (UUID uuid : inGame) {
+						PlayerProfile p = PlayerProfile.getPlayerProfile(uuid);
+						if ((first == null || !contains(first, uuid)) && (second == null || !contains(second, uuid)) && (third == null || !contains(third, uuid))) {
+							for (UUID u : inGame)
+								p.loseELO(PlayerProfile.getPlayerProfile(u).getData().getELO());
+						}
+						((Player) p.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + p.getData().getELO());
 					}
 				}
 			}
@@ -258,8 +262,7 @@ public final class DefaultRotation implements Rotation {
 	}
 	
 	private static UUID[] subtract(List<UUID> root, UUID[] subtract) {
-		List<UUID> rootClone = new ArrayList<UUID>(root.size());
-		Collections.copy(rootClone, root);
+		List<UUID> rootClone = new ArrayList<UUID>(root);
 		for (UUID u : subtract) {
 			if (rootClone.contains(u))
 				rootClone.remove(u);

@@ -133,7 +133,13 @@ public class OneInTheQuiver extends Minigame {
 			public void onEvent(PlayerDeathEvent event) {
 				Player player = event.getEntity();
 				if (isAlive(player)) {
-					announce(ChatColor.GOLD + player.getName() + " " + ChatColor.RED + event.getDeathMessage().replace(player.getName(), "").trim());
+					Player killer = player.getKiller();
+					if (killer != null) {
+						announce(ChatColor.RED + player.getName() + ChatColor.RESET + " was killed by " + ChatColor.RED + killer.getName() + ChatColor.RESET + ".");
+						killer.getInventory().addItem(new ItemStack(Material.ARROW));
+						kills.put(ChatColor.GREEN + killer.getName(), kills.get(ChatColor.GREEN + killer.getName()) + 1);
+					} else
+						announce(ChatColor.GOLD + player.getName() + " " + ChatColor.RED + event.getDeathMessage().replace(player.getName(), "").trim());
 					event.getDrops().clear();
 					event.setDeathMessage(null);
 					event.setNewTotalExp(0);
@@ -155,18 +161,35 @@ public class OneInTheQuiver extends Minigame {
 				scoreboardHelper.setLines(kills);
 				if (time-- == 0) {
 					scoreboardHelper.stopUpdating();
-					UUID winner = null;
-					int maxKills = -1;
-					for (Map.Entry<String, Integer> entry : kills.entrySet()) {
-						if (entry.getValue() > maxKills) {
-							winner = getPlayer(entry.getKey().substring(2)).getUniqueId();
-							maxKills = entry.getValue().intValue();
-						}
+					UUID first = null, second = null, third = null;
+					// get first place and remove it from the list
+					first = getTop();
+					kills.remove(ChatColor.GREEN + Bukkit.getPlayer(first).getName());
+					// get second place if possible and remove it from the list
+					if (kills.size() > 0) {
+						second = getTop();
+						kills.remove(ChatColor.GREEN + Bukkit.getPlayer(second).getName());
 					}
-					end(new SingleWinnerList(winner));
+					// get third place if possible and remove it from the list
+					if (kills.size() > 0)
+						third = getTop();
+					// end the minigame!
+					end(new SingleWinnerList(first, second, third));
 				}
 			}
 		});
+	}
+	
+	private UUID getTop() {
+		UUID top = null;
+		int maxKills = -1;
+		for (Map.Entry<String, Integer> entry : kills.entrySet()) {
+			if (entry.getValue() > maxKills) {
+				top = getPlayer(entry.getKey().substring(2)).getUniqueId();
+				maxKills = entry.getValue().intValue();
+			}
+		}
+		return top;
 	}
 	
 	@Override
@@ -180,6 +203,9 @@ public class OneInTheQuiver extends Minigame {
 		player.setHealth(player.getMaxHealth());
 		// set them to dead
 		setAlive(player, false);
+		// reset all potion effects (to prevent a bug where resistence could not be applied if killed to quickly)
+		for(PotionEffect pe : player.getActivePotionEffects())
+			player.removePotionEffect(pe.getType());
 		// give resistance and blindness
 		player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 120, 10));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 10));
@@ -187,7 +213,7 @@ public class OneInTheQuiver extends Minigame {
 		sendTitleMessage(player, "", ChatColor.RESET + "" + ChatColor.BOLD + "Respawning in 3 seconds...", 5, 50, 5);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(MinigameManager.getPlugin(), new Runnable() {
 			public void run() {
-				if(isPlaying(player)) {
+				if (isPlaying(player)) {
 					// set them back alive
 					setAlive(player, true);
 					// teleport them to a random location

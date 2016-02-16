@@ -234,8 +234,8 @@ public final class DefaultRotationManager implements RotationManager {
 				r.leave(u);
 			else
 				player.teleport(minigame.getStartingLocation(player));
-			minigame.mapinfo();
 		}
+		minigame.mapinfo();
 		minigame.onStart();
 	}
 	
