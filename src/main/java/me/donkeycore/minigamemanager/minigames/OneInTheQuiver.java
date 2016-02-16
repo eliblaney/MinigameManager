@@ -28,6 +28,7 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardHelper;
+import me.donkeycore.minigamemanager.api.winner.SingleWinnerList;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 @MinigameAttributes(name = "One_In_The_Quiver", type = MinigameType.MOST_POINTS, authors = "DonkeyCore", alwaysSaturated = true, canDropItems = false, canPickUpItems = false, isDefault = true)
@@ -162,8 +163,7 @@ public class OneInTheQuiver extends Minigame {
 							maxKills = entry.getValue().intValue();
 						}
 					}
-					titleAll(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + getPlayer(winner).getName() + " won!", null, 5, 20, 5);
-					end();
+					end(new SingleWinnerList(winner));
 				}
 			}
 		});

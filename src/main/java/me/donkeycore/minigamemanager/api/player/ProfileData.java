@@ -32,7 +32,7 @@ public class ProfileData {
 	public void setGamesPlayed(long gamesPlayed) {
 		this.gamesPlayed = gamesPlayed;
 	}
-
+	
 	/**
 	 * Get the ELO rating for this player
 	 * 

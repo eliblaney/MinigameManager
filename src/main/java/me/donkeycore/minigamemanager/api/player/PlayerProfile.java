@@ -25,13 +25,13 @@ public class PlayerProfile {
 	 * All active player profiles - only 1 per player
 	 */
 	private static final List<PlayerProfile> profiles = new ArrayList<>();
-
+	
 	/**
 	 * Create a new PlayerProfile
 	 * 
 	 * @param uuid The player's UUID
 	 */
-	private PlayerProfile(UUID uuid){
+	private PlayerProfile(UUID uuid) {
 		this.uuid = uuid;
 		this.data = MinigameManager.getMinigameManager().getPlayerProfileConfig().getProfileData(this);
 		profiles.add(this);
@@ -43,8 +43,8 @@ public class PlayerProfile {
 	 * @param uuid The player's UUID
 	 */
 	public static PlayerProfile getPlayerProfile(UUID uuid) {
-		for(PlayerProfile profile : profiles) {
-			if(profile.getUUID().equals(uuid))
+		for (PlayerProfile profile : profiles) {
+			if (profile.getUUID().equals(uuid))
 				return profile;
 		}
 		return new PlayerProfile(uuid);
@@ -126,7 +126,8 @@ public class PlayerProfile {
 	}
 	
 	/**
-	 * Mark that a player has played a game. Increments their total games played by 1.
+	 * Mark that a player has played a game. Increments their total games played
+	 * by 1.
 	 */
 	public void playedGame() {
 		data.setGamesPlayed(data.getGamesPlayed() + 1);
@@ -147,7 +148,11 @@ public class PlayerProfile {
 	 * @param money The amount of money to give
 	 */
 	public void deposit(double money) {
-		data.setCurrency(data.getCurrency() + money);
+		MinigameManager manager = MinigameManager.getMinigameManager();
+		if (manager.useVaultEcon())
+			manager.getVaultEconomy().depositPlayer(getPlayer(), money);
+		else
+			data.setCurrency(data.getCurrency() + money);
 	}
 	
 	/**
@@ -155,13 +160,21 @@ public class PlayerProfile {
 	 * 
 	 * @param money How much money to take
 	 * 
-	 * @return Whether the money was successfully taken or the player did not have enough
+	 * @return Whether the money was successfully taken or the player did not
+	 *         have enough
 	 */
 	public boolean withdraw(double money) {
-		double currency = data.getCurrency();
-		if(!canAfford(money))
-			return false;
-		data.setCurrency(currency - money);
+		MinigameManager manager = MinigameManager.getMinigameManager();
+		if (manager.useVaultEcon()) {
+			if (!manager.getVaultEconomy().has(getPlayer(), money))
+				return false;
+			manager.getVaultEconomy().withdrawPlayer(getPlayer(), money);
+		} else {
+			double currency = data.getCurrency();
+			if (!canAfford(money))
+				return false;
+			data.setCurrency(currency - money);
+		}
 		return true;
 	}
 	

@@ -28,6 +28,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import me.donkeycore.minigamemanager.api.nms.ReflectionAPI;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.teams.Team;
+import me.donkeycore.minigamemanager.api.winner.WinnerList;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -166,16 +167,19 @@ public abstract class Minigame {
 	 * </pre>
 	 * 
 	 * @param error The error code (0 = no error)
+	 * @param winners The winners of the minigame
 	 */
-	public void end(int error) {
-		r.finish(error);
+	public void end(int error, WinnerList winners) {
+		r.finish(error, winners);
 	}
 	
 	/**
 	 * End the minigame with nothing wrong. Equivalent to {@code}end(0){@code}
+	 * 
+	 * @param winners The winners of the minigame
 	 */
-	public final void end() {
-		end(0);
+	public final void end(WinnerList winners) {
+		end(0, winners);
 	}
 	
 	/**

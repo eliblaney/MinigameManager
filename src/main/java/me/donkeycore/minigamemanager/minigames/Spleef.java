@@ -1,6 +1,7 @@
 package me.donkeycore.minigamemanager.minigames;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,6 +20,7 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
 import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
+import me.donkeycore.minigamemanager.api.winner.SingleWinnerList;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
@@ -31,6 +33,7 @@ import me.donkeycore.minigamemanager.core.MinigameManager;
 public class Spleef extends Minigame {
 	
 	private ItemStack shovel;
+	private UUID secondPlace, thirdPlace;
 	
 	{
 		ItemStackBuilder builder = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("♪ Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS);
@@ -87,19 +90,20 @@ public class Spleef extends Minigame {
 		// announce their death and mark them as dead
 		announce(ChatColor.RED + player.getName() + ChatColor.RESET + " died from " + ChatColor.RED + "burning in lava" + ChatColor.RESET + ".");
 		setAlive(player, false);
+		thirdPlace = secondPlace;
+		secondPlace = player.getUniqueId();
 		// update the scoreboard without the player in the list
 		updateScoreboard();
 		// We have a winner!
-		if (getAliveAmount() == 1) {
-			titleAll(ChatColor.GREEN + getAliveNames()[0] + ChatColor.RESET + " wins!", null, 5, 20, 5);
-			end();
+		if (getAliveAmount() == 1)
+			end(new SingleWinnerList(getAliveUUIDs()[0], secondPlace, thirdPlace));
 			// We're just testing with a single person, everything seemed to work fine
-		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
-			announce("\u00a7aFinished!");
-			end();
+		else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
+			announce(ChatColor.GREEN + "Finished!");
+			end(null);
 			// Just in case, end the game if there aren't any people left (though this case should never happen)
 		} else if (getAliveAmount() < 1)
-			end(MinigameErrors.NOT_ENOUGH_PLAYERS);
+			end(MinigameErrors.NOT_ENOUGH_PLAYERS, null);
 	}
 	
 	private void updateScoreboard() {

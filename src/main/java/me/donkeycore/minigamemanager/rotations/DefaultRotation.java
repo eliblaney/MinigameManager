@@ -1,6 +1,7 @@
 package me.donkeycore.minigamemanager.rotations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ import me.donkeycore.minigamemanager.api.player.PlayerProfile;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
+import me.donkeycore.minigamemanager.api.winner.WinnerList;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -135,11 +137,11 @@ public final class DefaultRotation implements Rotation {
 				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameSettings().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
 			// sad, sad times
-			if (inGame.size() < 2) {
+			if (inGame.size() < 2 && state != RotationState.LOBBY && state != RotationState.STOPPED) {
 				if (minigame != null)
-					minigame.end(MinigameErrors.NOT_ENOUGH_PLAYERS);
+					minigame.end(MinigameErrors.NOT_ENOUGH_PLAYERS, null);
 				else
-					finish(MinigameErrors.NOT_ENOUGH_PLAYERS);
+					finish(MinigameErrors.NOT_ENOUGH_PLAYERS, null);
 			}
 		} else
 			throw new IllegalArgumentException("Player was not in rotation!");
@@ -176,7 +178,7 @@ public final class DefaultRotation implements Rotation {
 	 * Begin the minigame
 	 * 
 	 * @param minigame The minigame to start
-	 * 			
+	 * 
 	 * @return Whether the process was successful
 	 */
 	protected boolean beginMinigame(Minigame minigame) {
@@ -200,10 +202,77 @@ public final class DefaultRotation implements Rotation {
 	}
 	
 	@Override
-	public void finish(int error) {
+	public void finish(int error, WinnerList winners) {
+		if (error == MinigameErrors.SUCCESS) {
+			for (UUID uuid : inGame)
+				PlayerProfile.getPlayerProfile(uuid).playedGame();
+			if (winners != null) {
+				minigame.titleAll(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + winners.getFirstPlaceName() + " won!", null, 5, 20, 5);
+				if (MinigameManager.getMinigameManager().getMinigameSettings().eloEnabled()) {
+					UUID[] first = winners.getFirstPlace();
+					UUID[] second = winners.getSecondPlace();
+					UUID[] third = winners.getThirdPlace();
+					if (first != null) {
+						UUID[] notFirst = subtract(inGame, first);
+						for (UUID f : first) {
+							PlayerProfile fp = PlayerProfile.getPlayerProfile(f);
+							for (UUID u : notFirst)
+								fp.winELO(PlayerProfile.getPlayerProfile(u).getData().getELO());
+							((Player) fp.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + fp.getData().getELO());
+						}
+					}
+					if (second != null) {
+						UUID[] notSecond = subtract(inGame, first);
+						for (UUID s : second) {
+							PlayerProfile sp = PlayerProfile.getPlayerProfile(s);
+							for (UUID u : notSecond) {
+								long uelo = PlayerProfile.getPlayerProfile(u).getData().getELO();
+								if (contains(first, u))
+									sp.loseELO(uelo);
+								else
+									sp.winELO(uelo);
+							}
+							((Player) sp.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + sp.getData().getELO());
+						}
+					}
+					if (third != null) {
+						UUID[] notThird = subtract(inGame, first);
+						for (UUID t : third) {
+							PlayerProfile tp = PlayerProfile.getPlayerProfile(t);
+							for (UUID u : notThird) {
+								long uelo = PlayerProfile.getPlayerProfile(u).getData().getELO();
+								if (contains(first, u) || contains(second, u))
+									tp.loseELO(uelo);
+								else
+									tp.winELO(uelo);
+							}
+							((Player) tp.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + tp.getData().getELO());
+						}
+					}
+				}
+			}
+		}
 		// stop everything with an optional error, then restart the countdown
 		stop(error);
 		resume();
+	}
+	
+	private static UUID[] subtract(List<UUID> root, UUID[] subtract) {
+		List<UUID> rootClone = new ArrayList<UUID>(root.size());
+		Collections.copy(rootClone, root);
+		for (UUID u : subtract) {
+			if (rootClone.contains(u))
+				rootClone.remove(u);
+		}
+		return rootClone.toArray(new UUID[rootClone.size()]);
+	}
+	
+	private static boolean contains(UUID[] root, UUID check) {
+		for (UUID u : root) {
+			if (u.equals(check))
+				return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -222,8 +291,6 @@ public final class DefaultRotation implements Rotation {
 		// clear/reset everything, and teleport everybody to the lobby
 		for (UUID u : inGame) {
 			Player player = Bukkit.getPlayer(u);
-			if(error == MinigameErrors.SUCCESS)
-				PlayerProfile.getPlayerProfile(player.getUniqueId()).playedGame();
 			for (PotionEffect pe : player.getActivePotionEffects())
 				player.removePotionEffect(pe.getType());
 			player.setFireTicks(0);

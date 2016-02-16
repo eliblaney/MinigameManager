@@ -32,7 +32,8 @@ public final class ELO {
 	}
 	
 	/**
-	 * Get the K-Factor for a player with a certain ELO according to the FIDE standards
+	 * Get the K-Factor for a player with a certain ELO according to the FIDE
+	 * standards
 	 * 
 	 * @param playerELO The player's ELO
 	 * @param gamesPlayed The amount of games this player has played
@@ -41,10 +42,10 @@ public final class ELO {
 	 */
 	public static int getKFactor(long playerELO, long gamesPlayed) {
 		// Beginner
-		if(gamesPlayed < 30)
+		if (gamesPlayed < 30)
 			return 25;
 		// Pro (permanently pro)
-		if(isPro(playerELO) && gamesPlayed >= 30)
+		if (isPro(playerELO) && gamesPlayed >= 30)
 			return 10;
 		// Normal
 		return 15;

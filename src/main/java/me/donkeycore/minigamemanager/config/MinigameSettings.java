@@ -178,7 +178,7 @@ public class MinigameSettings {
 	 * @return Whether vault support is enabled AND enabled correctly
 	 */
 	public boolean vaultEnabled() {
-		return getConfig().getConfigurationSection("profiles").getBoolean("vault") && MinigameManager.getMinigameManager().getVaultEconomy() != null;
+		return getConfig().getConfigurationSection("profiles").getBoolean("vault") && MinigameManager.getMinigameManager().useVaultEcon();
 	}
 	
 }

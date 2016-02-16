@@ -65,12 +65,12 @@ public class MinigameManagerPlugin extends JavaPlugin {
 			// the current plugin manager will be used to do the actual processing
 			PluginManager pm = (PluginManager) pluginManager.get(server);
 			// there shouldn't already be a MinigamePluginManagerWrapper instance
-			if(serverStartup = !pm.getClass().getName().equals(MinigamePluginManagerWrapper.class.getName()))
+			if (serverStartup = !pm.getClass().getName().equals(MinigamePluginManagerWrapper.class.getName()))
 				// inject the wrapper so that the plugin can send all events to minigames
 				pluginManager.set(server, new MinigamePluginManagerWrapper(pm));
 			else {
 				getLogger().info("Previous MinigamePluginManagerWrapper found, finding root...");
-				while(pm.getClass().getName().equals(MinigamePluginManagerWrapper.class.getName())) {
+				while (pm.getClass().getName().equals(MinigamePluginManagerWrapper.class.getName())) {
 					Field f = pm.getClass().getDeclaredField("pm");
 					f.setAccessible(true);
 					pm = (PluginManager) f.get(pm);
@@ -90,17 +90,19 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		getLogger().info("Initializing config... (Part 3: Profiles)");
 		manager.profileConf = new PlayerProfileConfiguration();
 		// Optional Vault economy support
-		if(manager.config.getConfig().getConfigurationSection("profiles").getBoolean("vault")) {
-			if(Bukkit.getPluginManager().getPlugin("Vault") == null)
+		if (manager.config.getConfig().getConfigurationSection("profiles").getBoolean("vault")) {
+			if (Bukkit.getPluginManager().getPlugin("Vault") == null)
 				getLogger().warning("Vault is enabled in config but the Vault plugin was not found!");
 			else {
 				getLogger().info("Hooking into Vault...");
 				RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServicesManager().getRegistration(Economy.class);
 				// FIXME: Does not recognize Vault for some reason
-		        if (economyProvider != null)
-		            manager.economy = economyProvider.getProvider();
-		        if(manager.economy == null)
-		        	getLogger().warning("Failed to hook into Vault economy! Will use internal currency instead.");
+				if (economyProvider != null)
+					manager.economy = economyProvider.getProvider();
+				if (manager.economy == null)
+					getLogger().warning("Failed to hook into Vault economy! Will use internal currency instead.");
+				else
+					manager.vaultEcon = true;
 			}
 		}
 		getLogger().info("Registering commands...");
@@ -149,8 +151,10 @@ public class MinigameManagerPlugin extends JavaPlugin {
 	}
 	
 	/**
-	 * Helpful method to determine whether the server is starting up or the plugins are simply being reloaded<br>
-	 * Determined by the plugin being able to successfully inject the custom plugin manager
+	 * Helpful method to determine whether the server is starting up or the
+	 * plugins are simply being reloaded<br>
+	 * Determined by the plugin being able to successfully inject the custom
+	 * plugin manager
 	 * 
 	 * @return Whether the server is starting up
 	 */

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.winner.WinnerList;
 
 /**
  * The main rotation class; represents a single rotation lobby
@@ -51,8 +52,9 @@ public interface Rotation {
 	 * regarded
 	 * 
 	 * @param error The error code (0 = no error)
+	 * @param winners The winners of the minigame
 	 */
-	void finish(int error);
+	void finish(int error, WinnerList winners);
 	
 	/**
 	 * Announce a message to everybody in the rotation

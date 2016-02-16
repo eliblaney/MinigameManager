@@ -73,6 +73,10 @@ public final class MinigameManager {
 	 */
 	Economy economy;
 	/**
+	 * Whether vault economy is enabled
+	 */
+	boolean vaultEcon = false;
+	/**
 	 * The list of minigames requesting events
 	 */
 	List<ListenerEntry> listeners = new ArrayList<>();
@@ -142,6 +146,15 @@ public final class MinigameManager {
 	 */
 	public Economy getVaultEconomy() {
 		return economy;
+	}
+	
+	/**
+	 * Whether to use Vault econ or not
+	 * 
+	 * @return Whether to use Vault econ
+	 */
+	public boolean useVaultEcon() {
+		return vaultEcon;
 	}
 	
 	/**
