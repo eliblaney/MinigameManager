@@ -76,6 +76,17 @@ minigames:
         # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
         minimum-players: 5
 
+# Configuration for currency awarded after games
+currency:
+  # Whether to use the prefix for currency, or the suffix
+  use-prefix: true
+  # Prefix for the currency. Example below is the dollar sign
+  prefix: "$"
+  # Suffix for the currency. Example below is " gems"
+  suffix: " gems"
+  # How the currency will be referred to in scoreboards and such
+  name: "Money"
+
 profiles:
   # Configuration for the ELO ranking system that places
   # players in rotations with players of similar experience

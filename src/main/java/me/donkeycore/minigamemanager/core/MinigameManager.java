@@ -30,7 +30,6 @@ import net.milkbowl.vault.economy.Economy;
  * - future: create entire minigame from config or lua/python
  * - currency:
  * * rename-able
- * * minigames can customize amounts after each game per player
  * * config:
  * # format ($x, x gems)
  * - scoreboard:

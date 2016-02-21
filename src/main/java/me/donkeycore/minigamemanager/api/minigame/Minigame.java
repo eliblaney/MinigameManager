@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -191,10 +192,13 @@ public abstract class Minigame {
 	 * Register a bonus to be awarded to a player
 	 * 
 	 * @param uuid UUID of the player to award
-	 * @param currency Amount to award
+	 * @param bonus Amount to award
 	 * @param reason Reason for awarding the currency
 	 */
 	public final void awardBonus(UUID uuid, int bonus, String reason) {
+		Validate.notNull(uuid, "UUID cannot be null");
+		Validate.isTrue(bonus > 0, "Bonus must be positive");
+		Validate.notEmpty(reason, "There must be a reason for awarding bonuses");
 		bonuses.add(new Bonus(uuid, bonus, reason));
 	}
 	

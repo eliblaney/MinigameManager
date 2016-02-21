@@ -152,6 +152,44 @@ public class MinigameSettings {
 		return getConfig().getConfigurationSection("minigames").getConfigurationSection("default-minigames").getConfigurationSection("defaults").getConfigurationSection(minigame).getInt("minimum-players");
 	}
 	
+	// Configuration Section: Currency
+	
+	/**
+	 * Determine whether to use a prefix for currency or suffix
+	 *
+	 * @return Whether to use prefixes or not
+	 */
+	public boolean useCurrencyPrefix() {
+		return getConfig().getConfigurationSection("currency").getBoolean("use-prefix");
+	}
+	
+	/**
+	 * Get the prefix to use for currency
+	 * 
+	 * @return The currency prefix
+	 */
+	public String getCurrencyPrefix() {
+		return getConfig().getConfigurationSection("currency").getString("prefix");
+	}
+	
+	/**
+	 * Get the suffix to use for currency
+	 * 
+	 * @return The currency suffix
+	 */
+	public String getCurrencySuffix() {
+		return getConfig().getConfigurationSection("currency").getString("suffix");
+	}
+	
+	/**
+	 * Get the name of the currency
+	 * 
+	 * @return The name of the currency
+	 */
+	public String getCurrencyName() {
+		return getConfig().getConfigurationSection("currency").getString("name");
+	}
+	
 	// Configuration Section: Profiles
 	
 	/**

@@ -22,6 +22,7 @@ import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.api.winner.WinnerList;
 import me.donkeycore.minigamemanager.config.MessageType;
+import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
@@ -261,7 +262,11 @@ public final class DefaultRotation implements Rotation {
 			for (Bonus bonus : minigame.getBonuses()) {
 				PlayerProfile.getPlayerProfile(bonus.getUUID()).deposit(bonus.getCurrency());
 				// TODO: Make config message
-				Bukkit.getPlayer(bonus.getUUID()).sendMessage(ChatColor.GREEN + "You were awarded $" + bonus.getCurrency() + " for " + bonus.getReason());
+				MinigameSettings settings = MinigameManager.getMinigameManager().getMinigameSettings();
+				if(settings.useCurrencyPrefix())
+					Bukkit.getPlayer(bonus.getUUID()).sendMessage(ChatColor.GREEN + "You were awarded " + settings.getCurrencyPrefix() + bonus.getCurrency() + " for " + bonus.getReason());
+				else
+					Bukkit.getPlayer(bonus.getUUID()).sendMessage(ChatColor.GREEN + "You were awarded " + bonus.getCurrency() + settings.getCurrencySuffix() + " for " + bonus.getReason());
 			}
 		}
 		// stop everything with an optional error, then restart the countdown
