@@ -26,17 +26,16 @@ import net.milkbowl.vault.economy.Economy;
  * TODO:
  * - stuff to make minigames EASIER to make
  * - beta test at some point
+ * - MySQL support
  * - future: create entire minigame from config or lua/python
- * - gems:
+ * - currency:
  * * rename-able
  * * minigames can customize amounts after each game per player
  * * config:
  * # format ($x, x gems)
- * # boolean: use vault currency as gems
  * - scoreboard:
  * * lobby scoreboard
  * - commands to edit locations
- * - ELO rating system
  * - multiserver support
  * - multilanguage support
  */

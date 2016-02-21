@@ -5,6 +5,7 @@ import static me.donkeycore.minigamemanager.api.nms.ReflectionAPI.getNMSClass;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +64,10 @@ public abstract class Minigame {
 	 * Mapinfo variables
 	 */
 	private final String mapName, mapAuthors;
+	/**
+	 * Bonuses to award players for reasons other than winning
+	 */
+	private final List<Bonus> bonuses = new ArrayList<>();
 	
 	/**
 	 * Initialize the minigame WITHOUT mapinfo
@@ -183,6 +188,26 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Register a bonus to be awarded to a player
+	 * 
+	 * @param uuid UUID of the player to award
+	 * @param currency Amount to award
+	 * @param reason Reason for awarding the currency
+	 */
+	public final void awardBonus(UUID uuid, int bonus, String reason) {
+		bonuses.add(new Bonus(uuid, bonus, reason));
+	}
+	
+	/**
+	 * Get the list of bonuses that will be awarded to players
+	 * 
+	 * @return The list of bonuses
+	 */
+	public final List<Bonus> getBonuses() {
+		return bonuses;
+	}
+	
+	/**
 	 * Get the attributes belonging to this minigame
 	 * 
 	 * @return An instance of {@link MinigameAttributes}, or null if the
@@ -208,7 +233,7 @@ public abstract class Minigame {
 	 * Get the spawn location for the beginning of the minigame for a player
 	 * 
 	 * @param player The player being teleported
-	 * 			
+	 * 
 	 * @return The spawn location, can be random
 	 */
 	public abstract Location getStartingLocation(Player player);
@@ -217,7 +242,7 @@ public abstract class Minigame {
 	 * Determine whether the specified player is playing in the minigame
 	 * 
 	 * @param player The player to check
-	 * 			
+	 * 
 	 * @return Whether the player is playing in this minigame
 	 */
 	public boolean isPlaying(Player player) {
@@ -228,7 +253,7 @@ public abstract class Minigame {
 	 * Determine whether the specified player is playing in the minigame
 	 * 
 	 * @param player The player to check
-	 * 			
+	 * 
 	 * @return Whether the player is playing in this minigame
 	 */
 	public boolean isPlaying(UUID player) {
@@ -253,7 +278,7 @@ public abstract class Minigame {
 	 * Get a player from their UUID
 	 * 
 	 * @param uuid The UUID of the player
-	 * 			
+	 * 
 	 * @return The player object
 	 */
 	public Player getPlayer(UUID uuid) {
@@ -316,7 +341,7 @@ public abstract class Minigame {
 	 * certain chatcolor
 	 * 
 	 * @param color The ChatColor to color the names
-	 * 			
+	 * 
 	 * @return An array of strings of the player names, prefixed with
 	 *         \u00a7 and the color
 	 */
@@ -347,7 +372,7 @@ public abstract class Minigame {
 	 * Determine whether the specified player is alive
 	 * 
 	 * @param player THe player to check
-	 * 			
+	 * 
 	 * @return Whether the player is marked as alive
 	 */
 	public boolean isAlive(Player player) {
@@ -358,7 +383,7 @@ public abstract class Minigame {
 	 * Determine whether the specified player is alive
 	 * 
 	 * @param player THe player to check
-	 * 			
+	 * 
 	 * @return Whether the player is marked as alive
 	 */
 	public boolean isAlive(UUID player) {
@@ -415,7 +440,7 @@ public abstract class Minigame {
 	 * certain chatcolor
 	 * 
 	 * @param color The ChatColor to color the names
-	 * 			
+	 * 
 	 * @return An array of strings of the player names, prefixed with
 	 *         \u00a7 and the color
 	 */
@@ -458,7 +483,7 @@ public abstract class Minigame {
 	 *            a pair
 	 *            of itemstack to give to that player and the slot (-1 for any
 	 *            available slot)
-	 * 			
+	 * 
 	 * @see #giveAll(ItemStackSupplier, PlayerConsumer)
 	 */
 	public void giveAll(ItemStackSupplier supplier) {
@@ -506,7 +531,7 @@ public abstract class Minigame {
 	 * 
 	 * @param itemstack An {@link ItemStack} to give to each player
 	 * @param slot The slot number to put the item in
-	 * 			
+	 * 
 	 * @see #giveAll(ItemStackSupplier, PlayerConsumer)
 	 */
 	public void giveAll(ItemStack itemstack, int slot) {
@@ -766,7 +791,7 @@ public abstract class Minigame {
 	 * 
 	 * @param player The player to display the message to
 	 * @param message The message to send
-	 * 			
+	 * 
 	 * @return Whether the function finished successfully
 	 */
 	public boolean sendActionBarMessage(Player player, String message) {
@@ -796,7 +821,7 @@ public abstract class Minigame {
 	 * @param fadeIn The amount of time in ticks it takes to fade in
 	 * @param stay The amount of time in ticks the message stays
 	 * @param fadeOut The amount of time in ticks it takes to fade out
-	 * 			
+	 * 
 	 * @return Whether the function finished successfully
 	 */
 	public boolean sendTitleMessage(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
@@ -880,7 +905,7 @@ public abstract class Minigame {
 	 * Get a friendly display of a time
 	 * 
 	 * @param seconds The number of seconds
-	 * 			
+	 * 
 	 * @return A user-friendly string
 	 */
 	public String getTime(int seconds) {
@@ -922,10 +947,71 @@ public abstract class Minigame {
 	public static interface ItemStackSupplier extends Function<Player, Tuple<ItemStack, Integer>> {}
 	
 	/**
+	 * Represents a bonus that is awarded to a player after the game ends for a
+	 * reason other than winning
+	 */
+	public static class Bonus {
+		
+		/**
+		 * UUID of the player
+		 */
+		private final UUID uuid;
+		/**
+		 * Amount to award
+		 */
+		private final int currency;
+		/**
+		 * Reason for awarding the currency
+		 */
+		private final String reason;
+		
+		/**
+		 * Create a new bonus
+		 * 
+		 * @param uuid UUID of the player to award
+		 * @param currency Amount to award
+		 * @param reason Reason for awarding the currency
+		 */
+		private Bonus(UUID uuid, int currency, String reason) {
+			this.uuid = uuid;
+			this.currency = currency;
+			this.reason = reason;
+		}
+		
+		/**
+		 * Get the UUID of the player being awarded
+		 * 
+		 * @return The UUID of the player
+		 */
+		public UUID getUUID() {
+			return uuid;
+		}
+		
+		/**
+		 * Get the amount of currency to be awarded
+		 * 
+		 * @return The amount of currency
+		 */
+		public int getCurrency() {
+			return currency;
+		}
+		
+		/**
+		 * Get the reason for awarding the currency to the player
+		 * 
+		 * @return The reason
+		 */
+		public String getReason() {
+			return reason;
+		}
+		
+	}
+	
+	/**
 	 * Represents two values in one object
 	 * 
 	 * @author DonkeyCore
-	 * 		
+	 * 
 	 * @param <L> Type on the left
 	 * @param <R> Type on the right
 	 */
@@ -952,7 +1038,7 @@ public abstract class Minigame {
 		 * @param <R> The object to be on the right
 		 * @param l The object on the left
 		 * @param r The object on the right
-		 * 			
+		 * 
 		 * @return A new immutable tuple
 		 */
 		public static <L, R> Tuple<L, R> of(L l, R r) {
@@ -965,7 +1051,7 @@ public abstract class Minigame {
 	 * Tuple that cannot be changed
 	 * 
 	 * @author DonkeyCore
-	 * 		
+	 * 
 	 * @param <L> Type on the left
 	 * @param <R> Type on the right
 	 */
@@ -1007,7 +1093,7 @@ public abstract class Minigame {
 	 * Tuple that can be changed
 	 * 
 	 * @author DonkeyCore
-	 * 		
+	 * 
 	 * @param <L> Type on the left
 	 * @param <R> Type on the right
 	 */
@@ -1108,7 +1194,7 @@ public abstract class Minigame {
 		 * Apply T and get some value back
 		 * 
 		 * @param t The object to apply
-		 * 			
+		 * 
 		 * @return Some instance of R
 		 */
 		public R apply(T t);
@@ -1127,7 +1213,7 @@ public abstract class Minigame {
 		 * Apply an array of T and get some values back
 		 * 
 		 * @param ts The objects to apply
-		 * 			
+		 * 
 		 * @return An array of instances of R
 		 */
 		public R[] apply(T[] ts);

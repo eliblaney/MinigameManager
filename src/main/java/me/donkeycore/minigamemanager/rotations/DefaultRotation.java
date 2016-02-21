@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.Scoreboard;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.Minigame.Bonus;
 import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
 import me.donkeycore.minigamemanager.api.player.PlayerProfile;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
@@ -206,6 +207,7 @@ public final class DefaultRotation implements Rotation {
 			for (UUID uuid : inGame)
 				PlayerProfile.getPlayerProfile(uuid).playedGame();
 			if (winners != null) {
+				// TODO: Make config message
 				minigame.titleAll(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + winners.getFirstPlaceName() + " won!", null, 5, 20, 5);
 				if (MinigameManager.getMinigameManager().getMinigameSettings().eloEnabled()) {
 					UUID[] first = winners.getFirstPlace();
@@ -251,9 +253,15 @@ public final class DefaultRotation implements Rotation {
 							for (UUID u : inGame)
 								p.loseELO(PlayerProfile.getPlayerProfile(u).getData().getELO());
 						}
+						// TODO: Make config message
 						((Player) p.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + p.getData().getELO());
 					}
 				}
+			}
+			for (Bonus bonus : minigame.getBonuses()) {
+				PlayerProfile.getPlayerProfile(bonus.getUUID()).deposit(bonus.getCurrency());
+				// TODO: Make config message
+				Bukkit.getPlayer(bonus.getUUID()).sendMessage(ChatColor.GREEN + "You were awarded $" + bonus.getCurrency() + " for " + bonus.getReason());
 			}
 		}
 		// stop everything with an optional error, then restart the countdown
