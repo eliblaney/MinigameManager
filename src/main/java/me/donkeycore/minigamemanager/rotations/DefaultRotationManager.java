@@ -195,7 +195,7 @@ public final class DefaultRotationManager implements RotationManager {
 				}
 				if (minigame == null) {
 					// No minigame found most likely because not enough players
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
+					r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
 					// Wait for more players to join
 				} else {
 					r.setState(RotationState.COUNTDOWN);

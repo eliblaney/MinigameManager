@@ -25,11 +25,127 @@ next-minigame: "&eThe next minigame will be &l%minigame%&e!"
 # When the countdown timer is ticking [Available variables: %minigame%, %time%]
 countdown: "&e%minigame% will start in &l%time%&e!"
 
+### Commands ###
+
+## Player commands ##
+
+# Used for when commands are disabled
+command-disabled: "&cThis command is disabled"
+# When console executes player-only commands
+only-players: "&cOnly players can run this command!"
+# Too many arguments are supplied
+too-many-arguments: "&cToo many arguments!"
+# Not a valid number has been supplied (e.g. abc, 4a2)
+not-valid-number: "&cThat is not a valid number!"
+# Not a valid rotation id (Valid rotations IDs are 1 through the max num of rotations)
+not-valid-rotation-id: "&cThat is not a valid rotation ID! Available rotations: %rotations%"
+# Like the message above but also lists available rotations
+# Variables:
+# %rotations% - Maximum number of rotations
+not-valid-rotation-id-list: "&cThat is not a valid rotation ID! Available rotations: %rotations%"
+
+## Admin commands ##
+
+# Reload configs
+config-reloaded: "&aThe configs have been reloaded!"
+# Display the list of minigames that are enabled
+# Variables:
+# %minigames% - List of minigames that are enabled
+enabled-minigames: "&eEnabled minigames: %minigames%"
+# Admin starts a rotation
+# Variables:
+# %id% - ID of rotation
+started-rotation: "&eStarted rotation #%id%"
+# Admin tries to start a rotation, but it has been already started
+# Variables:
+# %id% - ID of rotation
+already-running: "&cRotation is already running!"
+# Admin stops a rotation
+# Variables:
+# %id% - ID of rotation
+stopped-rotation: "&aStopped rotation #%id%"
+# Admin tries to stop a rotation, but it has been already stopped
+# Variables:
+# %id% - ID of rotation
+already-stopped: "&cRotation is already stopped!"
+# Admin forces a rotation to begin the countdown
+# Variables:
+# %id% - ID of rotation
+forced-rotation: "&aForced rotation #%id% to start the countdown"
+# Admin tries to force a countdown, but it's not in the lobby
+# Variables:
+# %id% - ID of rotation
+not-in-lobby: "&cRotation #%id% is not currently in the lobby."
+# View the status of a rotation
+# Variables:
+# %id% - ID of rotation
+# %state% - State of rotation
+# %minigame% - Current minigame being played
+# %ingamesize% - Number of players in-game
+# %ingame% - List of ingame players
+# %playersize% - Number of players in the rotation
+# %players% - List of players
+# Specials:
+# <minigame></minigame> - Only execute if currently in a minigame
+rotation-status: |
+  &e===<&6Rotation Information&e>===
+  &e> ID: &6%id%
+  &e> State: &6%state%
+  <minigame>
+  &e> Minigame: &6%minigame%
+  &e> Ingame: &6%ingamesize%
+  </minigame>
+  &e> Players (%playersize%):
+  &6  > %players%
+  &e===<&6Rotation Information&e>===
+# View the info about a minigame
+# Variables:
+# %name% - Name of minigame
+# %authors% - List of authors
+# %type% - Type of minigame
+# Specials:
+# <author></author> - Only execute if an author exists
+minigame-info: |
+  &e===<&6Minigame Information&e>===
+  &e> Name: &6%name%
+  <author>
+  &e> Author(s): &6%authors%
+  </author>
+  &e> Type: &6%type%
+  &e===<&6Minigame Information&e>===
+# A minigame doesn't exist
+# Variables:
+# %name% - Name supplied that doesn't exist as a minigame
+couldnt-find-minigame: "&cCould not find minigame with name: &4%name%"
+# Couldn't set the next minigame because the rotation is in a conflicting state
+error-next: "&cRotation state must either be stopped or already ingame to set the next minigame"
+# Admin sets the next minigame
+# Variables:
+# %id% - ID of the rotation
+# %minigame% - Name of the minigame that will be played next
+set-next: "&aNext minigame for rotation &2#%id% &ehas been set to &2%minigame%"
+
 ### Minigames ###
 
 # How the map information is to be displayed if available. More info in locations.yml
+# Variables:
+# %name% - Name of map
+# %author% - Author of map
 mapinfo: |
   &e&m-----------------------------------
   &e> Now playing on &6%name%
   &e> by &6%author%
   &e&m-----------------------------------
+# After a minigame, a player may be awarded bonus money
+# Variables:
+# %currency% - Amount to award (with prefix/suffix)
+# %reason% - Reason for being awarded money
+awarded-bonus: "&aYou were awarded &2%currency% &afor %reason%"
+# After a minigame, notify the player about their updated ELO rating
+# Variables:
+# %elo% - The player's new ELO rating
+updated-elo: "&aYour updated ELO rating is: &2%elo%"
+# Announce who won after a minigame (using titles)
+# Variables:
+# %winner% - The winner(s) of the minigame
+announce-winner: "&2&l%winner% won!"

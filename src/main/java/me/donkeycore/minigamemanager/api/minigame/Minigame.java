@@ -117,7 +117,7 @@ public abstract class Minigame {
 	 */
 	public final void mapinfo() {
 		if (mapName != null && mapAuthors != null)
-			announce(ChatColor.translateAlternateColorCodes('&', getMinigameManager().getMessages().getMessage(MessageType.MAPINFO)).replace("%name%", mapName).replace("%author%", mapAuthors));
+			announce(getMinigameManager().getMessages().getMessage(MessageType.MAPINFO).replace("%name%", mapName).replace("%author%", mapAuthors));
 	}
 	
 	/**

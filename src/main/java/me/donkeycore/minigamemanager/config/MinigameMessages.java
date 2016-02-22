@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.donkeycore.minigamemanager.core.MinigameManager;
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * Class for getting the correct messages for languages
@@ -113,7 +114,7 @@ public class MinigameMessages {
 	 */
 	public String getMessage(MessageType type) {
 		Validate.notNull(type, "Key cannot be empty");
-		return getConfig().getString(type.toString());
+		return ChatColor.translateAlternateColorCodes('&', getConfig().getString(type.toString()));
 	}
 	
 }

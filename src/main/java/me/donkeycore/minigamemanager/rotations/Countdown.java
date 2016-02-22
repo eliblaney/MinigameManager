@@ -1,6 +1,5 @@
 package me.donkeycore.minigamemanager.rotations;
 
-import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
@@ -47,13 +46,13 @@ public class Countdown implements Runnable {
 	
 	public void run() {
 		if (!force && r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame.getClass())) {
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
+			r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
 			if (bt != null)
 				bt.cancel();
 			return;
 		}
 		if (r.getState() == RotationState.STOPPED) { // abandon ship!
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.ROTATION_STOPPED)));
+			r.announce(manager.getMessages().getMessage(MessageType.ROTATION_STOPPED));
 			if (bt != null)
 				bt.cancel();
 			return;
@@ -64,7 +63,7 @@ public class Countdown implements Runnable {
 			rm.start(r, minigame);
 			// Announce to all players that a game is starting every 10 seconds
 		} else if (secondsLeft % 10 == 0 || secondsLeft <= 5)
-			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName().replace("_", " ")).replace("%time%", getTimeLeft(secondsLeft--))));
+			r.announce(manager.getMessages().getMessage(MessageType.COUNTDOWN).replace("%minigame%", minigame.getName().replace("_", " ")).replace("%time%", getTimeLeft(secondsLeft--)));
 		else
 			secondsLeft--;
 	}

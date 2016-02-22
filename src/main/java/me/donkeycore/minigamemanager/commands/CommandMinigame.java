@@ -1,6 +1,7 @@
 package me.donkeycore.minigamemanager.commands;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,6 +15,8 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameErrors;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
+import me.donkeycore.minigamemanager.config.MessageType;
+import me.donkeycore.minigamemanager.config.MinigameMessages;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
@@ -31,6 +34,7 @@ public class CommandMinigame implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		MinigameMessages messages = MinigameManager.getMinigameManager().getMessages();
 		if (cmd.getName().equalsIgnoreCase("minigamemanager")) {
 			if (args.length == 0) {
 				sender.sendMessage(ChatColor.YELLOW + "========================");
@@ -52,10 +56,11 @@ public class CommandMinigame implements CommandExecutor {
 					sender.sendMessage(ChatColor.YELLOW + "> " + ChatColor.GOLD + "===<" + ChatColor.GOLD + "MinigameManager Help" + ChatColor.YELLOW + ">===");
 				} else if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("minigamemanager.admin.reload")) {
 					MinigameManager.getPlugin().reloadConfig();
-					MinigameManager.getMinigameManager().getMinigameSettings().reloadConfig();
-					MinigameManager.getMinigameManager().getDefaultMinigameLocations().reloadConfig();
+					manager.getMinigameSettings().reloadConfig();
+					manager.getMessages().reloadConfig();
+					manager.getPlayerProfileConfig().reloadConfig();
 					MinigameManager.getPlugin().loadDefaultMinigames();
-					sender.sendMessage(ChatColor.GREEN + "The configs have been reloaded!");
+					sender.sendMessage(messages.getMessage(MessageType.CONFIG_RELOADED));
 				} else if (args[0].equalsIgnoreCase("list") && sender.hasPermission("minigamemanager.admin.list")) {
 					String minigames = "";
 					for (Class<? extends Minigame> mclazz : manager.getMinigames()) {
@@ -64,10 +69,11 @@ public class CommandMinigame implements CommandExecutor {
 							continue;
 						minigames += ChatColor.YELLOW + ", " + ChatColor.GOLD + attr.name();
 					}
+					String enabled = messages.getMessage(MessageType.ENABLED_MINIGAMES);
 					if (minigames.length() > 4)
-						sender.sendMessage(ChatColor.YELLOW + "Enabled minigames: " + minigames.substring(4));
+						sender.sendMessage(enabled.replace("%minigames%", minigames.substring(4)));
 					else
-						sender.sendMessage(ChatColor.YELLOW + "Enabled minigames: " + ChatColor.RED + "(none)");
+						sender.sendMessage(enabled.replace("%minigames%", ChatColor.RED + "(none)"));
 				} else
 					return false;
 			} else if (args.length == 2) {
@@ -80,55 +86,64 @@ public class CommandMinigame implements CommandExecutor {
 				Rotation r = valid ? rm.getRotation(id - 1) : null;
 				if (args[0].equalsIgnoreCase("start") && sender.hasPermission("minigamemanager.admin.start")) {
 					if (!valid)
-						sender.sendMessage(ChatColor.RED + "That is not a valid rotation id!");
+						sender.sendMessage(messages.getMessage(MessageType.NOT_VALID_ROTATION_ID));
 					else {
 						if (r.getState() == RotationState.STOPPED) {
 							r.resume();
-							sender.sendMessage(ChatColor.GREEN + "Started rotation #" + id);
+							sender.sendMessage(messages.getMessage(MessageType.STARTED_ROTATION).replace("%id%", id + ""));
 						} else
-							sender.sendMessage(ChatColor.RED + "Rotation is already running");
+							sender.sendMessage(messages.getMessage(MessageType.ALREADY_RUNNING));
 					}
 				} else if (args[0].equalsIgnoreCase("stop") && sender.hasPermission("minigamemanager.admin.stop")) {
 					if (!valid)
-						sender.sendMessage(ChatColor.RED + "That is not a valid rotation id!");
+						sender.sendMessage(messages.getMessage(MessageType.NOT_VALID_ROTATION_ID));
 					else {
 						if (r.getState() == RotationState.STOPPED)
-							sender.sendMessage(ChatColor.RED + "Rotation is already stopped");
+							sender.sendMessage(messages.getMessage(MessageType.ALREADY_STOPPED));
 						else {
 							r.stop(MinigameErrors.INTERRUPT);
-							sender.sendMessage(ChatColor.GREEN + "Stopped rotation #" + id);
+							sender.sendMessage(messages.getMessage(MessageType.STOPPED_ROTATION).replace("%id%", id + ""));
 						}
 					}
 				} else if (args[0].equalsIgnoreCase("force") && sender.hasPermission("minigamemanager.admin.force")) {
 					if (!valid)
-						sender.sendMessage(ChatColor.RED + "That is not a valid rotation id!");
+						sender.sendMessage(messages.getMessage(MessageType.NOT_VALID_ROTATION_ID));
 					else {
 						if (r.getState() == RotationState.LOBBY) {
 							rm.force(r);
-							sender.sendMessage(ChatColor.GREEN + "Forced rotation #" + id + " to start the countdown");
+							sender.sendMessage(messages.getMessage(MessageType.FORCED_ROTATION).replace("%id%", id + ""));
 						} else
-							sender.sendMessage(ChatColor.RED + "Rotation #" + id + " is not currently in the lobby.");
+							sender.sendMessage(messages.getMessage(MessageType.NOT_IN_LOBBY));
 					}
 				} else if (args[0].equalsIgnoreCase("status") && sender.hasPermission("minigamemanager.admin.status")) {
 					if (!valid)
-						sender.sendMessage(ChatColor.YELLOW + "That is not a valid rotation id!");
+						sender.sendMessage(messages.getMessage(MessageType.NOT_VALID_ROTATION_ID));
 					else {
-						sender.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Rotation Information" + ChatColor.YELLOW + ">===");
-						sender.sendMessage(ChatColor.YELLOW + "> ID: " + ChatColor.GOLD + id);
-						sender.sendMessage(ChatColor.YELLOW + "> State: " + r.getState().toColoredString());
+						String status = messages.getMessage(MessageType.ROTATION_STATUS);
+						status = status.replace("%id%", id + "");
+						status = status.replace("%state%", r.getState().toColoredString());
+						status = status.replace("%playersize%", r.getPlayers().size() + "");
 						if (r.getState() == RotationState.INGAME) {
-							sender.sendMessage(ChatColor.YELLOW + "> Minigame: " + ChatColor.GOLD + r.getCurrentMinigame().getName().replace("_", ""));
-							sender.sendMessage(ChatColor.YELLOW + "> Ingame: " + ChatColor.GOLD + r.getInGame().size());
-						}
-						sender.sendMessage(ChatColor.YELLOW + "> Players (" + r.getPlayers().size() + "):");
+							status = status.replace("%minigame%", r.getCurrentMinigame().getName().replace('_', ' '));
+							status = status.replace("%ingamesize%", r.getInGame().size() + "");
+							if (r.getInGame().size() > 0) {
+								String players = "";
+								for (UUID u : r.getPlayers())
+									players += ", " + Bukkit.getPlayer(u).getName();
+								status = status.replace("%ingame%", players.substring(2));
+							} else
+								status = status.replace("%ingame%", ChatColor.RED + "(none)");
+						} else
+							status = Pattern.compile("<minigame>.*</minigame>", Pattern.DOTALL).matcher(status).replaceAll("");
+						status = status.replaceAll("</?minigame>", "");
 						if (r.getPlayers().size() > 0) {
 							String players = "";
 							for (UUID u : r.getPlayers())
 								players += ", " + Bukkit.getPlayer(u).getName();
-							sender.sendMessage("  " + ChatColor.GOLD + "> " + players.substring(2));
+							status = status.replace("%players%", players.substring(2));
 						} else
-							sender.sendMessage("  " + ChatColor.GOLD + "> " + ChatColor.YELLOW + "(none)");
-						sender.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Rotation Information" + ChatColor.YELLOW + ">===");
+							status = status.replace("%players%", ChatColor.RED + "(none)");
+						sender.sendMessage(status);
 					}
 				} else if (args[0].equalsIgnoreCase("info")) {
 					for (Class<? extends Minigame> mclazz : manager.getMinigames()) {
@@ -136,8 +151,8 @@ public class CommandMinigame implements CommandExecutor {
 						if (attr == null)
 							continue;
 						if (args[1].replace(" ", "").replace("_", "").replace("-", "").equalsIgnoreCase(attr.name().replace(" ", "").replace("_", "").replace("-", ""))) {
-							sender.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Minigame Information" + ChatColor.YELLOW + ">===");
-							sender.sendMessage(ChatColor.YELLOW + "> Name: " + ChatColor.GOLD + attr.name().replace("_", " "));
+							String info = messages.getMessage(MessageType.MINIGAME_INFO);
+							info = info.replace("%name%", attr.name().replace('_', ' '));
 							String[] _authors = attr.authors();
 							String authors = "";
 							if (_authors.length > 0) {
@@ -148,14 +163,16 @@ public class CommandMinigame implements CommandExecutor {
 									for (String a : _authors)
 										authors += ", " + a;
 								}
-								sender.sendMessage(ChatColor.YELLOW + "> Author(s): " + ChatColor.GOLD + authors.substring(2));
-							}
-							sender.sendMessage(ChatColor.YELLOW + "> Type: " + ChatColor.GOLD + attr.type().toString());
-							sender.sendMessage(ChatColor.YELLOW + "===<" + ChatColor.GOLD + "Minigame Information" + ChatColor.YELLOW + ">===");
+								info = info.replace("%authors%", authors.substring(2));
+							} else
+								info = Pattern.compile("<author>.*</author>", Pattern.DOTALL).matcher(info).replaceAll("");
+							info = info.replaceAll("</?author>", "");
+							info = info.replace("%type%", attr.type().toString());
+							sender.sendMessage(info);
 							return true;
 						}
 					}
-					sender.sendMessage(ChatColor.RED + "Could not find minigame with name: " + ChatColor.DARK_RED + args[1]);
+					sender.sendMessage(messages.getMessage(MessageType.COULDNT_FIND_MINIGAME).replace("%name%", args[1]));
 				} else
 					return false;
 			} else if (args.length == 3) {
@@ -168,11 +185,11 @@ public class CommandMinigame implements CommandExecutor {
 				Rotation r = valid ? rm.getRotation(id - 1) : null;
 				if (args[0].equalsIgnoreCase("next") && sender.hasPermission("minigamemanager.admin.next")) {
 					if (!valid) {
-						sender.sendMessage(ChatColor.RED + "That is not a valid rotation id!");
+						sender.sendMessage(messages.getMessage(MessageType.NOT_VALID_ROTATION_ID));
 						return true;
 					}
-					if(r.getState() != RotationState.STOPPED && r.getState() != RotationState.INGAME) {
-						sender.sendMessage(ChatColor.RED + "Rotation state must either be stopped or already ingame to set the next minigame");
+					if (r.getState() != RotationState.STOPPED && r.getState() != RotationState.INGAME) {
+						sender.sendMessage(messages.getMessage(MessageType.ERROR_NEXT));
 						return true;
 					}
 					for (Class<? extends Minigame> mclazz : manager.getMinigames()) {
@@ -181,11 +198,11 @@ public class CommandMinigame implements CommandExecutor {
 							continue;
 						if (args[2].replace(" ", "").replace("_", "").replace("-", "").equalsIgnoreCase(attr.name().replace(" ", "").replace("_", "").replace("-", ""))) {
 							rm.setNext(mclazz);
-							sender.sendMessage(ChatColor.GREEN + "Next minigame for rotation " + ChatColor.DARK_GREEN + "#" + id + ChatColor.GREEN + " has been set to: " + ChatColor.DARK_GREEN + attr.name());
+							sender.sendMessage(messages.getMessage(MessageType.SET_NEXT).replace("%id%", id + "").replace("%minigame%", attr.name().replace('_', ' ')));
 							return true;
 						}
 					}
-					sender.sendMessage(ChatColor.RED + "Could not find minigame with name: " + ChatColor.DARK_RED + args[2]);
+					sender.sendMessage(messages.getMessage(MessageType.COULDNT_FIND_MINIGAME).replace("%name%", args[2]));
 				} else
 					return false;
 			} else

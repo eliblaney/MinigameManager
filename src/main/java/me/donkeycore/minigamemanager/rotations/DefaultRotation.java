@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -22,6 +21,7 @@ import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
 import me.donkeycore.minigamemanager.api.winner.WinnerList;
 import me.donkeycore.minigamemanager.config.MessageType;
+import me.donkeycore.minigamemanager.config.MinigameMessages;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -94,10 +94,10 @@ public final class DefaultRotation implements Rotation {
 			players.add(uuid);
 			p.teleport(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("lobby"));
 			p.getInventory().clear();
-			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1))));
+			p.sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1)));
 			// send a sorry message if the rotation is in-game
 			if (getState() == RotationState.INGAME)
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1))));
+				p.sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1)));
 			// heal them
 			p.setHealth(p.getMaxHealth());
 			p.setFoodLevel(20);
@@ -135,7 +135,7 @@ public final class DefaultRotation implements Rotation {
 				p.setScoreboard(blankScoreboard);
 				p.teleport(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("spawn"));
 				p.setGameMode(GameMode.ADVENTURE);
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMessages().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
+				p.sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE));
 			}
 			// sad, sad times
 			if (inGame.size() < 2 && state != RotationState.LOBBY && state != RotationState.STOPPED) {
@@ -205,11 +205,11 @@ public final class DefaultRotation implements Rotation {
 	@Override
 	public void finish(int error, WinnerList winners) {
 		if (error == MinigameErrors.SUCCESS) {
+			MinigameMessages messages = MinigameManager.getMinigameManager().getMessages();
 			for (UUID uuid : inGame)
 				PlayerProfile.getPlayerProfile(uuid).playedGame();
 			if (winners != null) {
-				// TODO: Make config message
-				minigame.titleAll(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + winners.getFirstPlaceName() + " won!", null, 5, 20, 5);
+				minigame.titleAll(messages.getMessage(MessageType.ANNOUNCE_WINNER).replace("%winner%", winners.getFirstPlaceName()), null, 5, 20, 5);
 				if (MinigameManager.getMinigameManager().getMinigameSettings().eloEnabled()) {
 					UUID[] first = winners.getFirstPlace();
 					UUID[] second = winners.getSecondPlace();
@@ -254,19 +254,19 @@ public final class DefaultRotation implements Rotation {
 							for (UUID u : inGame)
 								p.loseELO(PlayerProfile.getPlayerProfile(u).getData().getELO());
 						}
-						// TODO: Make config message
-						((Player) p.getPlayer()).sendMessage(ChatColor.GREEN + "Your updated ELO rating is: " + ChatColor.DARK_GREEN + p.getData().getELO());
+						((Player) p.getPlayer()).sendMessage(messages.getMessage(MessageType.UPDATED_ELO).replace("%elo%", p.getData().getELO() + ""));
 					}
 				}
 			}
 			for (Bonus bonus : minigame.getBonuses()) {
 				PlayerProfile.getPlayerProfile(bonus.getUUID()).deposit(bonus.getCurrency());
-				// TODO: Make config message
 				MinigameSettings settings = MinigameManager.getMinigameManager().getMinigameSettings();
-				if(settings.useCurrencyPrefix())
-					Bukkit.getPlayer(bonus.getUUID()).sendMessage(ChatColor.GREEN + "You were awarded " + settings.getCurrencyPrefix() + bonus.getCurrency() + " for " + bonus.getReason());
+				String currency = bonus.getCurrency() + "";
+				if (settings.useCurrencyPrefix())
+					currency = settings.getCurrencyPrefix() + currency;
 				else
-					Bukkit.getPlayer(bonus.getUUID()).sendMessage(ChatColor.GREEN + "You were awarded " + bonus.getCurrency() + settings.getCurrencySuffix() + " for " + bonus.getReason());
+					currency = currency + settings.getCurrencySuffix();
+				Bukkit.getPlayer(bonus.getUUID()).sendMessage(messages.getMessage(MessageType.AWARDED_BONUS).replace("%currency%", currency).replace("%reason%", bonus.getReason()));
 			}
 		}
 		// stop everything with an optional error, then restart the countdown

@@ -3,7 +3,7 @@
 #              by DonkeyCore             #
 ##########################################
 
-# Language to use for messages
+# Language to use for messages (must reload plugin to take effect)
 language: en_US
 
 # Everything to do with rotations and the rotation lobby

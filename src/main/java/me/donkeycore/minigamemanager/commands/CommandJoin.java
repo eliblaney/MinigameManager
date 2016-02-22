@@ -1,7 +1,6 @@
 package me.donkeycore.minigamemanager.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MessageType;
+import me.donkeycore.minigamemanager.config.MinigameMessages;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 import me.donkeycore.minigamemanager.events.rotation.RotationJoinEvent;
 
@@ -27,37 +27,39 @@ public class CommandJoin implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		MinigameMessages messages = MinigameManager.getMinigameManager().getMessages();
 		if (cmd.getName().equalsIgnoreCase("join")) {
-			if(manager.getMinigameSettings().entireServer()) {
-				sender.sendMessage(ChatColor.RED + "This command is disabled.");
+			if (manager.getMinigameSettings().entireServer()) {
+				sender.sendMessage(messages.getMessage(MessageType.COMMAND_DISABLED));
 				return true;
 			}
 			if (!(sender instanceof Player)) {
-				sender.sendMessage(ChatColor.RED + "Only players can run this command!");
+				sender.sendMessage(messages.getMessage(MessageType.ONLY_PLAYERS));
 				return true;
 			}
 			if (args.length > 1) {
-				sender.sendMessage(ChatColor.RED + "Too many arguments!");
+				sender.sendMessage(messages.getMessage(MessageType.TOO_MANY_ARGUMENTS));
 				return false;
 			}
 			Player player = (Player) sender;
-			if(manager.getRotationManager().getRotation(player) != null) {
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.ALREADY_IN_ROTATION)));
+			if (manager.getRotationManager().getRotation(player) != null) {
+				player.sendMessage(messages.getMessage(MessageType.ALREADY_IN_ROTATION));
 				return true;
 			}
 			int rotation;
 			try {
 				rotation = args.length == 1 ? Integer.parseInt(args[0]) : Integer.MIN_VALUE;
 			} catch (NumberFormatException e) {
-				player.sendMessage(ChatColor.RED + "That is not a valid number!");
+				player.sendMessage(messages.getMessage(MessageType.NOT_VALID_NUMBER));
 				return true;
 			}
 			int maxRotations = manager.getMinigameSettings().getNumberOfRotations();
 			if ((rotation < 1 && args.length == 1) || rotation > maxRotations) {
-				String error = ChatColor.RED + "That is not a valid rotation ID! Available rotations: 1";
+				String error = messages.getMessage(MessageType.NOT_VALID_ROTATION_ID_LIST);
+				String rotations = "1";
 				if (maxRotations > 1)
-					error += "-" + maxRotations;
-				player.sendMessage(error);
+					rotations += "-" + maxRotations;
+				player.sendMessage(error.replace("%rotations%", rotations));
 				return true;
 			}
 			RotationManager rm = manager.getRotationManager();
@@ -65,12 +67,12 @@ public class CommandJoin implements CommandExecutor {
 				if (rm.join(player))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.FULL_ROTATIONS)));
+					player.sendMessage(messages.getMessage(MessageType.FULL_ROTATIONS));
 			} else {
 				if (rm.join(player, rotation - 1))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.FULL_ROTATION)));
+					player.sendMessage(messages.getMessage(MessageType.FULL_ROTATION));
 			}
 			return true;
 		} else
