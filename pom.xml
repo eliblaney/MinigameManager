@@ -18,12 +18,16 @@
 		</plugins>
 		<resources>
 			<resource>
+				<directory>languages</directory>
+				<targetPath>languages</targetPath>
+				<includes>
+					<include>*.yml</include>
+				</includes>
+			</resource>
+			<resource>
 				<directory></directory>
 				<includes>
-					<include>plugin.yml</include>
-					<include>config.yml</include>
-					<include>locations.yml</include>
-					<include>profiles.yml</include>
+					<include>*.yml</include>
 				</includes>
 			</resource>
 		</resources>

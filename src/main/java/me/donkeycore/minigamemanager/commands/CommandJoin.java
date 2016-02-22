@@ -42,7 +42,7 @@ public class CommandJoin implements CommandExecutor {
 			}
 			Player player = (Player) sender;
 			if(manager.getRotationManager().getRotation(player) != null) {
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.ALREADY_IN_ROTATION)));
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.ALREADY_IN_ROTATION)));
 				return true;
 			}
 			int rotation;
@@ -65,12 +65,12 @@ public class CommandJoin implements CommandExecutor {
 				if (rm.join(player))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.FULL_ROTATIONS)));
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.FULL_ROTATIONS)));
 			} else {
 				if (rm.join(player, rotation - 1))
 					Bukkit.getPluginManager().callEvent(new RotationJoinEvent(rm.getRotation(player), player));
 				else
-					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.FULL_ROTATION)));
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.FULL_ROTATION)));
 			}
 			return true;
 		} else

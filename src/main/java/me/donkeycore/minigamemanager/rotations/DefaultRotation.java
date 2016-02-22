@@ -94,10 +94,10 @@ public final class DefaultRotation implements Rotation {
 			players.add(uuid);
 			p.teleport(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("lobby"));
 			p.getInventory().clear();
-			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameSettings().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1))));
+			p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1))));
 			// send a sorry message if the rotation is in-game
 			if (getState() == RotationState.INGAME)
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameSettings().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1))));
+				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1))));
 			// heal them
 			p.setHealth(p.getMaxHealth());
 			p.setFoodLevel(20);
@@ -135,7 +135,7 @@ public final class DefaultRotation implements Rotation {
 				p.setScoreboard(blankScoreboard);
 				p.teleport(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("spawn"));
 				p.setGameMode(GameMode.ADVENTURE);
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMinigameSettings().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
+				p.sendMessage(ChatColor.translateAlternateColorCodes('&', MinigameManager.getMinigameManager().getMessages().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE)));
 			}
 			// sad, sad times
 			if (inGame.size() < 2 && state != RotationState.LOBBY && state != RotationState.STOPPED) {

@@ -195,12 +195,12 @@ public final class DefaultRotationManager implements RotationManager {
 				}
 				if (minigame == null) {
 					// No minigame found most likely because not enough players
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
+					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS)));
 					// Wait for more players to join
 				} else {
 					r.setState(RotationState.COUNTDOWN);
 					// Announce next minigame
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMinigameSettings().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
+					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
 					// Async countdown timer
 					Countdown countdown = new Countdown(manager, rm, r, minigame, force);
 					force = false;
@@ -222,7 +222,7 @@ public final class DefaultRotationManager implements RotationManager {
 		Validate.notNull(minigame, "Minigame cannot be null!");
 		// Set the rotation minigame and copy current players to another list OR end the process if failed
 		if (!r.beginMinigame(minigame)) {
-			r.announce(manager.getMinigameSettings().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
+			r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
 			r.setState(RotationState.LOBBY);
 			r.teleportAll(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
 			start(r);

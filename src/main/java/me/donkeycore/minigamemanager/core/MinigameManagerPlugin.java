@@ -21,6 +21,7 @@ import me.donkeycore.minigamemanager.commands.CommandJoin;
 import me.donkeycore.minigamemanager.commands.CommandLeave;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
+import me.donkeycore.minigamemanager.config.MinigameMessages;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.config.PlayerProfileConfiguration;
 import me.donkeycore.minigamemanager.listeners.JoinQuitListener;
@@ -84,12 +85,14 @@ public class MinigameManagerPlugin extends JavaPlugin {
 			e.printStackTrace();
 			getLogger().severe("Failed to inject plugin manager! EVENTS WILL NOT WORK PROPERLY!");
 		}
-		getLogger().info("Initializing config... (Part 1: General)");
+		getLogger().info("Initializing config... (Part 1/4: General)");
 		saveDefaultConfig();
 		manager.config = new MinigameSettings();
-		getLogger().info("Initializing config... (Part 2: Locations)");
+		getLogger().info("Initializing config... (Part 2/4: Languages)");
+		manager.messages = new MinigameMessages();
+		getLogger().info("Initializing config... (Part 3/4: Locations)");
 		manager.locations = new MinigameLocations();
-		getLogger().info("Initializing config... (Part 3: Profiles)");
+		getLogger().info("Initializing config... (Part 4/4: Profiles)");
 		manager.profileConf = new PlayerProfileConfiguration();
 		// Optional Vault economy support
 		if (manager.config.getConfig().getConfigurationSection("profiles").getBoolean("vault")) {

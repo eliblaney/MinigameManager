@@ -1,0 +1,35 @@
+### Rotations ###
+
+# When a player joins a rotation [Available variables: %rotation%]
+join: "&aYou have joined rotation %rotation%!"
+# When a player leaves a rotation (using /leave or quitting the game)
+leave: "&cYou have left the rotation!"
+# When a player is kicked from a rotation (kicked by admin or during shutdown)
+kick: "&cYou have been kicked from the rotation!"
+# A player joins, but a minigame has already started
+join-after-start: "&eThere is a minigame currently running right now. You can play when it ends, so please wait!"
+# When a player tries to join a rotation, but they are all full
+full-rotations: "&cThere are no available rotations! Try again later."
+# When a player tries to join a SPECIFIC rotation, but it is full
+full-rotation: "&cThat rotation is full! Try a different one."
+# When a player tries to join a rotation already is in one
+already-in-rotation: "&cYou are already in a rotation!"
+# When a player tries to leave a rotation, but they aren't in one
+not-in-rotation: "&cYou are not currently in a rotation!"
+# When there isn't enough players to start a minigame
+not-enough-players: "&cNot enough players!"
+# When an admin stops a rotation (using /mm stop) OR plugin is being disabled (reload, shutdown)
+rotation-stopped: "&cAn admin has stopped the rotation. Please be patient!"
+# When the rotation announces the next minigame [Available variables: %minigame%]
+next-minigame: "&eThe next minigame will be &l%minigame%&e!"
+# When the countdown timer is ticking [Available variables: %minigame%, %time%]
+countdown: "&e%minigame% will start in &l%time%&e!"
+
+### Minigames ###
+
+# How the map information is to be displayed if available. More info in locations.yml
+mapinfo: |
+  &e&m-----------------------------------
+  &e> Now playing on &6%name%
+  &e> by &6%author%
+  &e&m-----------------------------------

@@ -16,6 +16,7 @@ import me.donkeycore.minigamemanager.api.minigame.Minigame.EventListener;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
+import me.donkeycore.minigamemanager.config.MinigameMessages;
 import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.config.PlayerProfileConfiguration;
 import me.donkeycore.minigamemanager.events.minigame.MinigameRegisterEvent;
@@ -36,7 +37,6 @@ import net.milkbowl.vault.economy.Economy;
  * * lobby scoreboard
  * - commands to edit locations
  * - multiserver support
- * - multilanguage support
  */
 /**
  * Main MinigameManager plugin class with API methods
@@ -58,6 +58,10 @@ public final class MinigameManager {
 	 * The config for MinigameManager
 	 */
 	MinigameSettings config;
+	/**
+	 * All messages, translated in correct languages
+	 */
+	MinigameMessages messages;
 	/**
 	 * The locations for lobbies, spawn, and minigame spawns
 	 */
@@ -162,6 +166,15 @@ public final class MinigameManager {
 	 */
 	public MinigameSettings getMinigameSettings() {
 		return config;
+	}
+	
+	/**
+	 * Get the configuration for messages translated to other languages
+	 * 
+	 * @return An instance of {@link MinigameMessages}
+	 */
+	public MinigameMessages getMessages() {
+		return messages;
 	}
 	
 	/**

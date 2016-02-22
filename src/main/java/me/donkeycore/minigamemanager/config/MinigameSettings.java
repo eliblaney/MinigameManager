@@ -38,11 +38,20 @@ public class MinigameSettings {
 	 * Get a message based on its type
 	 * 
 	 * @param type The type of message to retrieve
-	 * 			
+	 * 
 	 * @return The message
-	 */
+	 *//*
 	public String getMessage(MessageType type) {
 		return getConfig().getConfigurationSection("messages").getString(type.toString());
+	}*/
+	
+	/**
+	 * Get the language to be used for messages
+	 * 
+	 * @return The language
+	 */
+	public String getLanguage() {
+		return getConfig().getString("language");
 	}
 	
 	// Configuration section: Rotations
@@ -94,7 +103,8 @@ public class MinigameSettings {
 	}
 	
 	/**
-	 * Whether to have players join a rotation when the join the server and leave on quit
+	 * Whether to have players join a rotation when the join the server and
+	 * leave on quit
 	 * 
 	 * @return Whether to automatically assign players a rotation
 	 */
@@ -145,7 +155,7 @@ public class MinigameSettings {
 	 * Get the minimum number of players for a minigame
 	 * 
 	 * @param minigame The minigame
-	 * 			
+	 * 
 	 * @return The minimum number of players
 	 */
 	public int getMinimumForMinigame(String minigame) {
