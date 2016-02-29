@@ -38,9 +38,7 @@ minigames:
         # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
         minimum-players: 5
       One_In_The_Quiver:
-        # Should this minigame be in the rotation? (takes effect after next minigame finishes or reload)
         enabled: true
-        # Minimum players required to start, the more the merrier! (takes effect after next minigame finishes or reload)
         minimum-players: 5
 
 # Configuration for currency awarded after games
