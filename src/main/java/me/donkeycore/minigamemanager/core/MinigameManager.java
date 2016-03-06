@@ -27,7 +27,6 @@ import net.milkbowl.vault.economy.Economy;
  * TODO:
  * before release:
  * - MySQL support
- * - lobby scoreboard
  * - commands to edit locations
  * - multiserver support
  * future:

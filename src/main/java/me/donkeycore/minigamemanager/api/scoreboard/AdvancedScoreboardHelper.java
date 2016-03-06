@@ -11,32 +11,76 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
-public class ScoreboardHelper {
+public class AdvancedScoreboardHelper {
 	
+	/**
+	 * Bukkit scoreboard being used
+	 */
 	private final Scoreboard scoreboard;
-	private Player[] recipients;
-	private BukkitTask timer;
+	/**
+	 * Bukkit objective being used
+	 */
 	private Objective objective;
+	/**
+	 * Recipients for repeated updates
+	 */
+	private Player[] recipients;
+	/**
+	 * Repeated tasks for updates
+	 */
+	private BukkitTask timer;
 	
-	public ScoreboardHelper(Scoreboard scoreboard, Objective objective) {
+	/**
+	 * Create an advanced scoreboard helper
+	 * 
+	 * @param scoreboard The Bukkit scoreboard to use
+	 * @param objective The Bukkit objective to use
+	 */
+	public AdvancedScoreboardHelper(Scoreboard scoreboard, Objective objective) {
 		this.scoreboard = scoreboard;
 		this.objective = objective;
 	}
 	
+	/**
+	 * Get the Bukkit instance of the scoreboard
+	 * 
+	 * @return The Bukkit scoreboard
+	 */
 	public Scoreboard getScoreboard() {
 		return scoreboard;
 	}
 	
+	/**
+	 * Get the objective of the scoreboard
+	 * 
+	 * @return The Bukkit objective
+	 */
 	public Objective getObjective() {
 		return objective;
 	}
 	
-	public ScoreboardHelper setRecipients(Player... recipients) {
+	/**
+	 * Set the recipients of the scoreboard that will be used for repeating
+	 * tasks
+	 * 
+	 * @param recipients The new recipients for the scoreboard
+	 * 
+	 * @return The helper instance
+	 */
+	public AdvancedScoreboardHelper setRecipients(Player... recipients) {
 		this.recipients = recipients;
 		return this;
 	}
 	
-	public ScoreboardHelper setUpdateInterval(int tickDelay, final Runnable onUpdate) {
+	/**
+	 * Start a repeating task
+	 * 
+	 * @param tickDelay The time to wait in between executions
+	 * @param onUpdate What to execute
+	 * 
+	 * @return The helper instance
+	 */
+	public AdvancedScoreboardHelper setUpdateInterval(int tickDelay, final Runnable onUpdate) {
 		stopUpdating();
 		timer = new BukkitRunnable() {
 			
@@ -52,7 +96,12 @@ public class ScoreboardHelper {
 		return this;
 	}
 	
-	public ScoreboardHelper stopUpdating() {
+	/**
+	 * Stop the scheduler from updating
+	 * 
+	 * @return The helper instance
+	 */
+	public AdvancedScoreboardHelper stopUpdating() {
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
@@ -67,7 +116,7 @@ public class ScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public ScoreboardHelper setOrderedLines(String... lines) {
+	public AdvancedScoreboardHelper setOrderedLines(String... lines) {
 		clear();
 		int n = lines.length;
 		for (String str : lines)
@@ -82,7 +131,7 @@ public class ScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public ScoreboardHelper setLines(String... lines) {
+	public AdvancedScoreboardHelper setLines(String... lines) {
 		clear();
 		for (String str : lines)
 			objective.getScore(str).setScore(0);
@@ -96,10 +145,11 @@ public class ScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public ScoreboardHelper setLines(Map<String, Integer> scores) {
+	public AdvancedScoreboardHelper setLines(Map<String, Integer> scores) {
 		clear();
-		for (Entry<String, Integer> e : scores.entrySet())
+		for (Entry<String, Integer> e : scores.entrySet()) {
 			objective.getScore(e.getKey()).setScore(e.getValue());
+		}
 		return this;
 	}
 	
@@ -108,7 +158,7 @@ public class ScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public ScoreboardHelper clear() {
+	public AdvancedScoreboardHelper clear() {
 		for (String str : scoreboard.getEntries())
 			scoreboard.resetScores(str);
 		return this;

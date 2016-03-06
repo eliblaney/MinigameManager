@@ -24,6 +24,15 @@ rotations:
   # When somebody joins the server, automatically assign them to a rotation and let them leave on quit
   entire-server: false
 
+# Configuration for when players join the lobby
+lobby:
+  # Whether players can take damage in the lobby
+  damage: false
+  # Whether players can lose hunger in the lobby
+  hunger: false
+  # Whether to display the lobby scoreboard
+  scoreboard: true
+
 # Minigame-specific configuration
 minigames:
   # Configure the default minigames

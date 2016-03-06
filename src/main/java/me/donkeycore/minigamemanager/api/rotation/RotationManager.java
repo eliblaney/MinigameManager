@@ -84,8 +84,9 @@ public interface RotationManager {
 	/**
 	 * Set the next minigame to be played
 	 * 
+	 * @param id The ID of the rotation to change the next minigame for
 	 * @param mclazz The class of the next minigame
 	 */
-	void setNext(Class<? extends Minigame> mclazz);
+	void setNext(int id, Class<? extends Minigame> mclazz);
 	
 }

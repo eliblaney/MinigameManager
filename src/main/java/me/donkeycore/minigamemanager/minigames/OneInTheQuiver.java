@@ -27,7 +27,7 @@ import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
-import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardHelper;
+import me.donkeycore.minigamemanager.api.scoreboard.AdvancedScoreboardHelper;
 import me.donkeycore.minigamemanager.api.winner.SingleWinnerList;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -49,7 +49,7 @@ public class OneInTheQuiver extends Minigame {
 	/**
 	 * Scoreboard helper to help with the timer
 	 */
-	private ScoreboardHelper scoreboardHelper;
+	private AdvancedScoreboardHelper scoreboardHelper;
 	/**
 	 * Time left (default 5 minutes)
 	 */
@@ -151,7 +151,7 @@ public class OneInTheQuiver extends Minigame {
 		// build a scoreboard with a display name of "Kills" in red, listing the alive player names in green with their kills
 		ScoreboardBuilder sb = new ScoreboardBuilder("oitq" + getId() + "_kills", ChatColor.GOLD + "" + ChatColor.BOLD + time + ChatColor.YELLOW + ChatColor.BOLD + " seconds left").setLines(kills);
 		// we don't actually need to complete the build, we just need the helper to set the update interval
-		scoreboardHelper = sb.getHelper();
+		scoreboardHelper = sb.getAdvanced();
 		// all the players get updates
 		scoreboardHelper.setRecipients(getPlayers());
 		// every 20 ticks (1 second), drop the timer down by 1 and end the game if it reaches 0

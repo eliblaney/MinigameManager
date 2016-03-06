@@ -14,7 +14,7 @@ import org.bukkit.scoreboard.Scoreboard;
  */
 public class ScoreboardBuilder {
 	
-	private final ScoreboardHelper helper;
+	private final AdvancedScoreboardHelper advanced;
 	
 	/**
 	 * Create an instance of the scoreboard builder
@@ -37,7 +37,7 @@ public class ScoreboardBuilder {
 		Objective o = s.getObjective(objective);
 		o.setDisplaySlot(DisplaySlot.SIDEBAR);
 		o.setDisplayName(displayName);
-		helper = new ScoreboardHelper(s, o);
+		advanced = new AdvancedScoreboardHelper(s, o);
 	}
 	
 	/**
@@ -46,16 +46,16 @@ public class ScoreboardBuilder {
 	 * @return The scoreboard
 	 */
 	public Scoreboard build() {
-		return helper.getScoreboard();
+		return advanced.getScoreboard();
 	}
 	
 	/**
-	 * Get the scoreboard helper being used to create the scoreboard
+	 * Get the advanced scoreboard settings
 	 * 
-	 * @return The scoreboard helper
+	 * @return The advanced scoreboard settings
 	 */
-	public ScoreboardHelper getHelper() {
-		return helper;
+	public AdvancedScoreboardHelper getAdvanced() {
+		return advanced;
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder setOrderedLines(String... lines) {
-		helper.setOrderedLines(lines);
+		advanced.setOrderedLines(lines);
 		return this;
 	}
 	
@@ -78,7 +78,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder setLines(String... lines) {
-		helper.setLines(lines);
+		advanced.setLines(lines);
 		return this;
 	}
 	
@@ -90,7 +90,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder setLines(Map<String, Integer> scores) {
-		helper.setLines(scores);
+		advanced.setLines(scores);
 		return this;
 	}
 	
@@ -100,7 +100,7 @@ public class ScoreboardBuilder {
 	 * @return The builder instance
 	 */
 	public ScoreboardBuilder clear() {
-		helper.clear();
+		advanced.clear();
 		return this;
 	}
 	

@@ -47,14 +47,18 @@ public class Countdown implements Runnable {
 	public void run() {
 		if (!force && r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame.getClass())) {
 			r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
-			if (bt != null)
+			if (bt != null) {
+				r.setLobbyScoreboard();
 				bt.cancel();
+			}
 			return;
 		}
 		if (r.getState() == RotationState.STOPPED) { // abandon ship!
 			r.announce(manager.getMessages().getMessage(MessageType.ROTATION_STOPPED));
-			if (bt != null)
+			if (bt != null) {
+				r.setMinigame(null);
 				bt.cancel();
+			}
 			return;
 		}
 		// Start when timer hits 0

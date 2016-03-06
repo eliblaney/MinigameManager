@@ -112,6 +112,35 @@ public class MinigameSettings {
 		return getConfig().getConfigurationSection("rotations").getBoolean("entire-server");
 	}
 	
+	// Configuration section: Lobby
+	
+	/**
+	 * Whether players can take damage in the lobby
+	 * 
+	 * @return Whether players can take damage in the lobby
+	 */
+	public boolean lobbyDamage() {
+		return getConfig().getConfigurationSection("lobby").getBoolean("damage");
+	}
+	
+	/**
+	 * Whether players can lose hunger in the lobby
+	 * 
+	 * @return Whether players can lose hunger in the lobby
+	 */
+	public boolean lobbyHunger() {
+		return getConfig().getConfigurationSection("lobby").getBoolean("hunger");
+	}
+	
+	/**
+	 * Whether to show a scoreboard to players in the lobby, as specified in the language configuration file
+	 * 
+	 * @return Whether to show a scoreboard to players in the lobby
+	 */
+	public boolean lobbyScoreboard() {
+		return getConfig().getConfigurationSection("lobby").getBoolean("scoreboard");
+	}
+	
 	// Configuration section: Minigames
 	
 	/**

@@ -57,7 +57,7 @@ public final class DefaultRotationManager implements RotationManager {
 	/**
 	 * The next minigame to be played if told
 	 */
-	private Class<? extends Minigame> next;
+	private Map<Integer, Class<? extends Minigame>> next = new HashMap<>();
 	
 	/**
 	 * Create a new default rotation manager
@@ -84,6 +84,7 @@ public final class DefaultRotationManager implements RotationManager {
 		Bukkit.getPluginManager().callEvent(new RotationJoinEvent(r, player));
 		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameSettings().getMinimumPlayers())
 			start(r);
+		r.setLobbyScoreboard();
 		return true;
 	}
 	
@@ -177,38 +178,36 @@ public final class DefaultRotationManager implements RotationManager {
 		if (rotation.getState() != RotationState.LOBBY)
 			return;
 		final DefaultRotationManager rm = this;
-		Bukkit.getScheduler().runTask(MinigameManager.getPlugin(), new Runnable() {
-			public void run() {
-				Minigame minigame = null;
-				if (next != null) {
-					try {
-						// Attempt to create a new instance of the minigame
-						minigame = next.getConstructor(Rotation.class).newInstance(r);
-					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {}
-					next = null;
-				} else {
-					int tries = 10;
-					// Try 10 times to get a random minigame before giving up
-					do
-						minigame = getRandomMinigame(r, r.getLastMinigame());
-					while (--tries > 0 && minigame == null);
-				}
-				if (minigame == null) {
-					// No minigame found most likely because not enough players
-					r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
-					// Wait for more players to join
-				} else {
-					r.setState(RotationState.COUNTDOWN);
-					// Announce next minigame
-					r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
-					// Async countdown timer
-					Countdown countdown = new Countdown(manager, rm, r, minigame, force);
-					force = false;
-					BukkitTask bt = Bukkit.getScheduler().runTaskTimer(MinigameManager.getPlugin(), countdown, 20L, 20L);
-					countdown.setTask(bt);
-				}
-			}
-		});
+		Minigame minigame = null;
+		if (next.containsKey(r.getId())) {
+			try {
+				// Attempt to create a new instance of the minigame
+				minigame = next.get(r.getId()).getConstructor(Rotation.class).newInstance(r);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {}
+			next = null;
+		} else {
+			int tries = 10;
+			// Try 10 times to get a random minigame before giving up
+			do
+				minigame = getRandomMinigame(r, r.getLastMinigame());
+			while (--tries > 0 && minigame == null);
+		}
+		if (minigame == null) {
+			// No minigame found most likely because not enough players
+			r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
+			// Wait for more players to join
+		} else {
+			r.setState(RotationState.COUNTDOWN);
+			// Announce next minigame
+			r.announce(ChatColor.translateAlternateColorCodes('&', manager.getMessages().getMessage(MessageType.NEXT_MINIGAME).replace("%minigame%", minigame.getName().replace("_", " "))));
+			// Tell the rotation about the new minigame
+			r.setMinigame(minigame);
+			// Async countdown timer
+			Countdown countdown = new Countdown(manager, rm, r, minigame, force);
+			force = false;
+			BukkitTask bt = Bukkit.getScheduler().runTaskTimer(MinigameManager.getPlugin(), countdown, 20L, 20L);
+			countdown.setTask(bt);
+		}
 	}
 	
 	/**
@@ -260,8 +259,10 @@ public final class DefaultRotationManager implements RotationManager {
 	}
 	
 	@Override
-	public void setNext(Class<? extends Minigame> clazz) {
-		this.next = clazz;
+	public void setNext(int id, Class<? extends Minigame> clazz) {
+		Validate.notNull(clazz, "Minigame cannot be null!");
+		Validate.isTrue(id >= 0 && id < rotations.size(), id + " is not a valid rotation ID! Current number of rotations: " + rotations.size());
+		this.next.put(id, clazz);
 	}
 	
 	@SuppressWarnings("unchecked")

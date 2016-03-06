@@ -19,6 +19,7 @@ import me.donkeycore.minigamemanager.api.player.PlayerProfile;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.RotationState;
+import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.api.winner.WinnerList;
 import me.donkeycore.minigamemanager.config.MessageType;
 import me.donkeycore.minigamemanager.config.MinigameMessages;
@@ -92,12 +93,13 @@ public final class DefaultRotation implements Rotation {
 				throw new IllegalArgumentException("Player was already in rotation!");
 			// add them and teleport to lobby with a welcoming message
 			players.add(uuid);
-			p.teleport(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("lobby"));
+			MinigameManager manager = MinigameManager.getMinigameManager();
+			p.teleport(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
 			p.getInventory().clear();
-			p.sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1)));
+			p.sendMessage(manager.getMessages().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1)));
 			// send a sorry message if the rotation is in-game
 			if (getState() == RotationState.INGAME)
-				p.sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1)));
+				p.sendMessage(manager.getMessages().getMessage(MessageType.JOIN_AFTER_START).replace("%rotation%", "" + (id + 1)));
 			// heal them
 			p.setHealth(p.getMaxHealth());
 			p.setFoodLevel(20);
@@ -133,9 +135,10 @@ public final class DefaultRotation implements Rotation {
 				p.setFireTicks(0);
 				p.getInventory().clear();
 				p.setScoreboard(blankScoreboard);
-				p.teleport(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("spawn"));
+				MinigameManager manager = MinigameManager.getMinigameManager();
+				p.teleport(manager.getDefaultMinigameLocations().getRotationLocation("spawn"));
 				p.setGameMode(GameMode.ADVENTURE);
-				p.sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE));
+				p.sendMessage(manager.getMessages().getMessage(kicked ? MessageType.KICK : MessageType.LEAVE));
 			}
 			// sad, sad times
 			if (inGame.size() < 2 && state != RotationState.LOBBY && state != RotationState.STOPPED) {
@@ -187,7 +190,7 @@ public final class DefaultRotation implements Rotation {
 		// players must always be at least 1 for testing, and at least 2 for releases
 		if (players.size() < 1 || (players.size() < 2 && MinigameManager.isRelease()))
 			return false;
-		this.minigame = minigame;
+		setMinigame(minigame); // Just in case
 		// set state, add all players to ingame list, set default gamemode, and start the fun!
 		setState(RotationState.INGAME);
 		inGame.addAll(players);
@@ -200,6 +203,10 @@ public final class DefaultRotation implements Rotation {
 			minigame.setAlive(player, true);
 		}
 		return true;
+	}
+	
+	protected void setMinigame(Minigame minigame) {
+		this.minigame = minigame;
 	}
 	
 	@Override
@@ -293,6 +300,7 @@ public final class DefaultRotation implements Rotation {
 	
 	@Override
 	public void stop(int error) {
+		MinigameManager manager = MinigameManager.getMinigameManager();
 		// don't stop several times in a row
 		if (getState() == RotationState.STOPPED)
 			throw new IllegalStateException("Cannot stop if already stopped!");
@@ -300,7 +308,7 @@ public final class DefaultRotation implements Rotation {
 		// stop any minigames if they're going
 		if (minigame != null) {
 			minigame.onEnd(error);
-			MinigameManager.getMinigameManager().clearListeners(minigame);
+			manager.clearListeners(minigame);
 			lastMinigame = minigame.getClass();
 			minigame = null;
 		}
@@ -315,7 +323,43 @@ public final class DefaultRotation implements Rotation {
 			player.setGameMode(GameMode.ADVENTURE);
 		}
 		inGame.clear();
-		teleportAll(MinigameManager.getMinigameManager().getDefaultMinigameLocations().getRotationLocation("lobby"));
+		teleportAll(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
+		setLobbyScoreboard();
+	}
+	
+	void setLobbyScoreboard() {
+		for (UUID u : players)
+			setLobbyScoreboard(u);
+	}
+	
+	void setLobbyScoreboard(UUID u) {
+		MinigameManager manager = MinigameManager.getMinigameManager();
+		if (state != RotationState.INGAME && manager.getMinigameSettings().lobbyScoreboard()) {
+			MinigameMessages m = manager.getMessages();
+			Player player = Bukkit.getPlayer(u);
+			ScoreboardBuilder lobby = new ScoreboardBuilder("lobby" + id, m.getMessage(MessageType.LOBBY_SCOREBOARD__TITLE).replace("%id%", "" + (id + 1)).replace("%display%", player.getDisplayName()).replace("%name%", player.getName()));
+			String lines = m.getMessage(MessageType.LOBBY_SCOREBOARD__CONTENTS);
+			lines = lines.replace("%id%", "" + (id + 1)).replace("%display%", player.getDisplayName()).replace("%name%", player.getName());
+			MinigameSettings s = manager.getMinigameSettings();
+			lines = lines.replace("%players%", "" + players.size()).replace("%maxplayers%", "" + s.getMaximumPlayers());
+			lines = lines.replace("%moneyname%", s.getCurrencyName());
+			if (s.useCurrencyPrefix())
+				lines = lines.replace("%money%", s.getCurrencyPrefix() + PlayerProfile.getPlayerProfile(u).getData().getCurrency());
+			else
+				lines = lines.replace("%money%", PlayerProfile.getPlayerProfile(u).getData().getCurrency() + s.getCurrencySuffix());
+			if (state == RotationState.STOPPED) {
+				lines = lines.replace("%statusmessage%", m.getMessage(MessageType.LOBBY_SCOREBOARD__STATUS_MESSAGE));
+				lines = lines.replace("%status%", m.getMessage(MessageType.LOBBY_SCOREBOARD__STATUS_STOPPED));
+			} else if (state == RotationState.LOBBY) {
+				lines = lines.replace("%statusmessage%", m.getMessage(MessageType.LOBBY_SCOREBOARD__STATUS_MESSAGE));
+				lines = lines.replace("%status%", m.getMessage(MessageType.LOBBY_SCOREBOARD__STATUS_WAITING));
+			} else if (state == RotationState.COUNTDOWN) { // Can be assumed but present for readability
+				lines = lines.replace("%statusmessage%", m.getMessage(MessageType.LOBBY_SCOREBOARD__NEXT_MINIGAME));
+				lines = lines.replace("%status%", minigame.getName().replace('_', ' '));
+			}
+			lobby.setOrderedLines(lines.split("\n"));
+			player.setScoreboard(lobby.build());
+		}
 	}
 	
 	@Override
@@ -326,6 +370,7 @@ public final class DefaultRotation implements Rotation {
 		// set state to lobby and start the countdown via RotationManager implementation
 		setState(RotationState.LOBBY);
 		rm.start(this);
+		setLobbyScoreboard();
 	}
 	
 	@Override

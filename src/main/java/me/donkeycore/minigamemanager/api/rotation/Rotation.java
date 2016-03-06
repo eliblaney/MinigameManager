@@ -91,7 +91,8 @@ public interface Rotation {
 	void resume();
 	
 	/**
-	 * Stop the rotation, return players to the lobby, but do NOT start a new minigame
+	 * Stop the rotation, return players to the lobby, but do NOT start a new
+	 * minigame
 	 * 
 	 * @param error The error code (0 = no error)
 	 */

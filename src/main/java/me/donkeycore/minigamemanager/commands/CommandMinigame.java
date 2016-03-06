@@ -197,7 +197,7 @@ public class CommandMinigame implements CommandExecutor {
 						if (attr == null)
 							continue;
 						if (args[2].replace(" ", "").replace("_", "").replace("-", "").equalsIgnoreCase(attr.name().replace(" ", "").replace("_", "").replace("-", ""))) {
-							rm.setNext(mclazz);
+							rm.setNext(id - 1, mclazz);
 							sender.sendMessage(messages.getMessage(MessageType.SET_NEXT).replace("%id%", id + "").replace("%minigame%", attr.name().replace('_', ' ')));
 							return true;
 						}
