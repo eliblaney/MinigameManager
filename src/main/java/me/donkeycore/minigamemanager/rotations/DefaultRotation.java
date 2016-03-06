@@ -344,7 +344,7 @@ public final class DefaultRotation implements Rotation {
 			lines = lines.replace("%players%", "" + players.size()).replace("%maxplayers%", "" + s.getMaximumPlayers());
 			lines = lines.replace("%moneyname%", s.getCurrencyName());
 			if (s.useCurrencyPrefix())
-				lines = lines.replace("%money%", s.getCurrencyPrefix() + PlayerProfile.getPlayerProfile(u).getData().getCurrency());
+				lines = lines.replace("%money%", s.getCurrencyPrefix() + PlayerProfile.getPlayerProfile(u).getCurrency());
 			else
 				lines = lines.replace("%money%", PlayerProfile.getPlayerProfile(u).getData().getCurrency() + s.getCurrencySuffix());
 			if (state == RotationState.STOPPED) {

@@ -151,7 +151,7 @@ public class PlayerProfile {
 	 */
 	public void deposit(double money) {
 		MinigameManager manager = MinigameManager.getMinigameManager();
-		if (manager.useVaultEcon())
+		if (manager.useVaultEconomy())
 			manager.getVaultEconomy().depositPlayer(getPlayer(), money);
 		else
 			data.setCurrency(data.getCurrency() + money);
@@ -166,17 +166,13 @@ public class PlayerProfile {
 	 *         have enough
 	 */
 	public boolean withdraw(double money) {
+		if (!canAfford(money))
+			return false;
 		MinigameManager manager = MinigameManager.getMinigameManager();
-		if (manager.useVaultEcon()) {
-			if (!manager.getVaultEconomy().has(getPlayer(), money))
-				return false;
+		if (manager.useVaultEconomy())
 			manager.getVaultEconomy().withdrawPlayer(getPlayer(), money);
-		} else {
-			double currency = data.getCurrency();
-			if (!canAfford(money))
-				return false;
-			data.setCurrency(currency - money);
-		}
+		else
+			data.setCurrency(data.getCurrency() - money);
 		return true;
 	}
 	
@@ -188,7 +184,24 @@ public class PlayerProfile {
 	 * @return Whether the player can afford it
 	 */
 	public boolean canAfford(double money) {
-		return data.getCurrency() - money >= 0;
+		MinigameManager manager = MinigameManager.getMinigameManager();
+		if (manager.useVaultEconomy())
+			return manager.getVaultEconomy().has(getPlayer(), money);
+		else
+			return data.getCurrency() - money >= 0;
+	}
+	
+	/**
+	 * Get the amount of money a player has
+	 * 
+	 * @return The player's balance
+	 */
+	public double getCurrency() {
+		MinigameManager manager = MinigameManager.getMinigameManager();
+		if (manager.useVaultEconomy())
+			return manager.getVaultEconomy().getBalance(getPlayer());
+		else
+			return data.getCurrency();
 	}
 	
 	/**

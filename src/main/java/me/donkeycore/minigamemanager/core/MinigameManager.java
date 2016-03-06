@@ -146,11 +146,11 @@ public final class MinigameManager {
 	}
 	
 	/**
-	 * Whether to use Vault econ or not
+	 * Whether to use Vault economy or not
 	 * 
-	 * @return Whether to use Vault econ
+	 * @return Whether to use Vault economy
 	 */
-	public boolean useVaultEcon() {
+	public boolean useVaultEconomy() {
 		return vaultEcon;
 	}
 	
