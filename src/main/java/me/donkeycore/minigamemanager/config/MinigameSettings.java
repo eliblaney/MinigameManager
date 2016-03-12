@@ -2,6 +2,7 @@ package me.donkeycore.minigamemanager.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -41,9 +42,12 @@ public class MinigameSettings {
 	 * 
 	 * @return The message
 	 *//*
-	public String getMessage(MessageType type) {
-		return getConfig().getConfigurationSection("messages").getString(type.toString());
-	}*/
+		 * public String getMessage(MessageType type) {
+		 * return
+		 * getConfig().getConfigurationSection("messages").getString(type.
+		 * toString());
+		 * }
+		 */
 	
 	/**
 	 * Get the language to be used for messages
@@ -133,7 +137,8 @@ public class MinigameSettings {
 	}
 	
 	/**
-	 * Whether to show a scoreboard to players in the lobby, as specified in the language configuration file
+	 * Whether to show a scoreboard to players in the lobby, as specified in the
+	 * language configuration file
 	 * 
 	 * @return Whether to show a scoreboard to players in the lobby
 	 */
@@ -256,6 +261,74 @@ public class MinigameSettings {
 	 */
 	public boolean vaultEnabled() {
 		return getConfig().getConfigurationSection("profiles").getBoolean("vault") && MinigameManager.getMinigameManager().useVaultEconomy();
+	}
+	
+	// Configuration Section: MySQL
+	
+	/**
+	 * Get whether MySQL is enabled for this server
+	 * 
+	 * @return Whether MySQL is enabled
+	 */
+	public boolean mysqlEnabled() {
+		return getConfig().getConfigurationSection("mysql").getBoolean("enabled");
+	}
+	
+	/**
+	 * Get the IP to be used for connecting to the MySQL database
+	 * 
+	 * @return The database IP
+	 */
+	public String mysqlIP() {
+		return getConfig().getConfigurationSection("mysql").getString("ip");
+	}
+	
+	/**
+	 * Get the port to be used for connecting to the MySQL database
+	 * 
+	 * @return The database port
+	 */
+	public int mysqlPort() {
+		return getConfig().getConfigurationSection("mysql").getInt("port");
+	}
+	
+	/**
+	 * Get the database to connect to
+	 * 
+	 * @return The database name
+	 */
+	public String mysqlDatabase() {
+		return getConfig().getConfigurationSection("mysql").getString("database");
+	}
+	
+	/**
+	 * Get the username to use when connecting to the database
+	 * 
+	 * @return The database username
+	 */
+	public String mysqlUsername() {
+		return getConfig().getConfigurationSection("mysql").getString("username");
+	}
+	
+	/**
+	 * Get the password to use when connecting to the database
+	 * 
+	 * @return The database password
+	 */
+	public String mysqlPassword() {
+		String pass = getConfig().getConfigurationSection("mysql").getString("password");
+		if (pass == null || pass.trim().isEmpty())
+			return null;
+		return pass;
+	}
+	
+	/**
+	 * Get a map of strings to objects of table names
+	 * 
+	 * @return A map of table names
+	 */
+	public Map<String, Object> mysqlTables() {
+		return getConfig().getConfigurationSection("mysql").getConfigurationSection("tables").getValues(false);
 	}
 	
 }

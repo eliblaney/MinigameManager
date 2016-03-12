@@ -1,5 +1,7 @@
-package me.donkeycore.minigamemanager.api.player;
+package me.donkeycore.minigamemanager.api.profile;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +11,7 @@ import org.bukkit.OfflinePlayer;
 
 import me.donkeycore.minigamemanager.api.util.ELO;
 import me.donkeycore.minigamemanager.api.util.ELO.GameResult;
+import me.donkeycore.minigamemanager.config.MinigameSettings;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 public class PlayerProfile {
@@ -25,6 +28,24 @@ public class PlayerProfile {
 	 * All active player profiles - only 1 per player
 	 */
 	private static final List<PlayerProfile> profiles = new ArrayList<>();
+	
+	/**
+	 * Create a new PlayerProfile from the given UUID and ProfileData. WARNING:
+	 * This overwrites any existing profile for the given UUID, so it is not
+	 * recommended to use
+	 * 
+	 * @param uuid The player's UUID
+	 * @param data The data to use for this profile
+	 */
+	private PlayerProfile(UUID uuid, ProfileData data) {
+		this.uuid = uuid;
+		this.data = data;
+		for (PlayerProfile p : profiles) {
+			if (p.getUUID().equals(uuid))
+				profiles.remove(p);
+		}
+		profiles.add(this);
+	}
 	
 	/**
 	 * Create a new PlayerProfile
@@ -48,6 +69,19 @@ public class PlayerProfile {
 		for (PlayerProfile profile : profiles) {
 			if (profile.getUUID().equals(uuid))
 				return profile;
+		}
+		MinigameSettings s = MinigameManager.getMinigameManager().getMinigameSettings();
+		if (s.mysqlEnabled()) {
+			try {
+				ProfileDatabase pdb = new ProfileDatabase(s.mysqlIP(), s.mysqlPort(), s.mysqlDatabase(), s.mysqlUsername(), s.mysqlPassword());
+				PlayerProfile p = pdb.getProfile(uuid);
+				if(p == null)
+					p = new PlayerProfile(uuid);
+				pdb.close();
+				return p;
+			} catch (SQLException | IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return new PlayerProfile(uuid);
 	}
@@ -205,10 +239,21 @@ public class PlayerProfile {
 	}
 	
 	/**
-	 * Save the player's profile to the config
+	 * Save the player's profile to the config or MySQL database
 	 */
 	public void saveProfile() {
-		MinigameManager.getMinigameManager().getPlayerProfileConfig().saveProfile(this);
+		MinigameManager manager = MinigameManager.getMinigameManager();
+		MinigameSettings s = manager.getMinigameSettings();
+		if (s.mysqlEnabled()) {
+			try {
+				ProfileDatabase pdb = new ProfileDatabase(s.mysqlIP(), s.mysqlPort(), s.mysqlDatabase(), s.mysqlUsername(), s.mysqlPassword());
+				pdb.saveProfile(this);
+				pdb.close();
+			} catch (SQLException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+		manager.getPlayerProfileConfig().saveProfile(this);
 	}
 	
 }

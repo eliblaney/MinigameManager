@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import me.donkeycore.minigamemanager.api.player.PlayerProfile;
+import me.donkeycore.minigamemanager.api.profile.PlayerProfile;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**

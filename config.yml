@@ -61,6 +61,7 @@ currency:
   # How the currency will be referred to in scoreboards and such
   name: "Money"
 
+# Profiles for all players that play minigames
 profiles:
   # Configuration for the ELO ranking system that places
   # players in rotations with players of similar experience
@@ -73,3 +74,22 @@ profiles:
   # Whether to enable Vault economy instead of the internal one
   # If true, Vault needs to be installed (duh!)
   vault: false
+
+# Optional MySQL configuration
+mysql:
+  # Whether to use config files or a MySQL database
+  enabled: false
+  # IP of the database
+  ip: "127.0.0.1"
+  # Port of the database
+  port: 3306
+  # Database name
+  database: "minigamemanager"
+  # Username for the database
+  username: "root"
+  # Password for the database (leave blank if none, but that's not recommended)
+  password: ""
+  # Names of tables
+  tables:
+    # Name for the table that contains all the profiles of players
+    profiles: "profiles"

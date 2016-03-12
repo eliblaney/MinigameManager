@@ -27,7 +27,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.Scoreboard;
 
-import me.donkeycore.minigamemanager.api.nms.ReflectionAPI;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.teams.Team;
 import me.donkeycore.minigamemanager.api.winner.WinnerList;
@@ -800,11 +799,7 @@ public abstract class Minigame {
 	 */
 	public boolean sendActionBarMessage(Player player, String message) {
 		try {
-			Object chatSerializer;
-			if (ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R2") || ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R3"))
-				chatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class).invoke(null, "{'text': '" + message + "'}");
-			else
-				chatSerializer = getNMSClass("ChatSerializer").getMethod("a", String.class).invoke(null, "{'text': '" + message + "'}");
+			Object chatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class).invoke(null, "{\"text\":\"" + message + "\"}");
 			Object playChat = getNMSClass("PacketPlayOutChat").getConstructor(getNMSClass("IChatBaseComponent"), Byte.TYPE).newInstance(chatSerializer, (byte) 2);
 			Object handle = player.getClass().getMethod("getHandle", (Class<?>[]) new Class[0]).invoke(player, new Object[0]);
 			Object connection = handle.getClass().getField("playerConnection").get(handle);
@@ -830,17 +825,10 @@ public abstract class Minigame {
 	 */
 	public boolean sendTitleMessage(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
 		try {
-			Method chatSerializerA;
-			Class<?> enumTitleAction;
-			if (ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R2") || ReflectionAPI.getVersion().equalsIgnoreCase("v1_8_R3")) {
-				chatSerializerA = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class);
-				enumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
-			} else {
-				chatSerializerA = getNMSClass("ChatSerializer").getMethod("a", String.class);
-				enumTitleAction = getNMSClass("EnumTitleAction");
-			}
-			Object chatSerializerTitle = chatSerializerA.invoke(null, "{'text': '" + title + "'}");
-			Object chatSerializerSubtitle = chatSerializerA.invoke(null, "{'text': '" + subtitle + "'}");
+			Method chatSerializerA = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class);
+			Class<?> enumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
+			Object chatSerializerTitle = chatSerializerA.invoke(null, "{\"text\":\"" + title + "\"}");
+			Object chatSerializerSubtitle = chatSerializerA.invoke(null, "{\"text\":\"" + subtitle + "\"}");
 			Object enumTitle = enumTitleAction.getField("TITLE").get(null);
 			Object enumSubtitle = enumTitleAction.getField("SUBTITLE").get(null);
 			Object playTitle = getNMSClass("PacketPlayOutTitle").getConstructor(getNMSClass("PacketPlayOutTitle$EnumTitleAction"), getNMSClass("IChatBaseComponent")).newInstance(enumTitle, chatSerializerTitle);

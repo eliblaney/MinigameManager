@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import me.donkeycore.minigamemanager.api.player.PlayerProfile;
+import me.donkeycore.minigamemanager.api.profile.PlayerProfile;
 
 public final class ELO {
 	

@@ -1,4 +1,4 @@
-package me.donkeycore.minigamemanager.api.player;
+package me.donkeycore.minigamemanager.api.profile;
 
 public class ProfileData {
 	

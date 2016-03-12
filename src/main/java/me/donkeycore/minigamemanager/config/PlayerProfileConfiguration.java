@@ -3,8 +3,8 @@ package me.donkeycore.minigamemanager.config;
 import org.bukkit.configuration.ConfigurationSection;
 
 import me.donkeycore.minigamemanager.api.config.CustomConfig;
-import me.donkeycore.minigamemanager.api.player.PlayerProfile;
-import me.donkeycore.minigamemanager.api.player.ProfileData;
+import me.donkeycore.minigamemanager.api.profile.PlayerProfile;
+import me.donkeycore.minigamemanager.api.profile.ProfileData;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**

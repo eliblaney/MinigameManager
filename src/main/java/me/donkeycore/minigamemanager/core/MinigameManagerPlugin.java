@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
-import me.donkeycore.minigamemanager.api.player.PlayerProfile;
+import me.donkeycore.minigamemanager.api.profile.PlayerProfile;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.SubstitutionHandler;
