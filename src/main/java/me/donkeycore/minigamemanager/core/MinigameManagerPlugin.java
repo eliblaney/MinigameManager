@@ -19,6 +19,7 @@ import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.api.rotation.SubstitutionHandler;
 import me.donkeycore.minigamemanager.commands.CommandJoin;
 import me.donkeycore.minigamemanager.commands.CommandLeave;
+import me.donkeycore.minigamemanager.commands.CommandLocation;
 import me.donkeycore.minigamemanager.commands.CommandMinigame;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameMessages;
@@ -113,6 +114,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		getCommand("minigamemanager").setExecutor(new CommandMinigame(manager));
 		getCommand("join").setExecutor(new CommandJoin(manager));
 		getCommand("leave").setExecutor(new CommandLeave(manager));
+		getCommand("location").setExecutor(new CommandLocation(manager));
 		getLogger().info("Registering listeners...");
 		Bukkit.getPluginManager().registerEvents(new JoinQuitListener(manager), this);
 		Bukkit.getPluginManager().registerEvents(new MinigameListener(manager), this);
@@ -154,7 +156,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 		manager.rotationManager.shutdown();
 		// Save everybody's profiles
 		getLogger().info("Saving player profiles...");
-		for(Player player : Bukkit.getOnlinePlayers())
+		for (Player player : Bukkit.getOnlinePlayers())
 			PlayerProfile.getPlayerProfile(player.getUniqueId()).saveProfile();
 		getLogger().info(getDescription().getName() + " v" + getDescription().getVersion() + " by DonkeyCore has been disabled!");
 	}
@@ -189,7 +191,7 @@ public class MinigameManagerPlugin extends JavaPlugin {
 					continue;
 				}
 				// all minigames must be a subclass of Minigame
-				if (clazz.getSuperclass() != Minigame.class) {
+				if (!clazz.getSuperclass().equals(Minigame.class)) {
 					getLogger().warning(minigameStr + " is not a minigame. Skipping!");
 					continue;
 				}

@@ -60,12 +60,12 @@ lobby-scoreboard:
   contents: |
     &lWelcome,
     %name%!
-    
+
     &a&lPlayers:
     &2%players%&a/&2%maxplayers%
-     
+
     &a&l%moneyname%: &2%money%
-      
+
     %statusmessage%
     &6%status%
   # Used to introduce the next minigame if everything is going smoothly
@@ -79,7 +79,7 @@ lobby-scoreboard:
 
 ### Commands ###
 
-## Player commands ##
+## General ##
 
 # Used for when commands are disabled
 command-disabled: "&cThis command is disabled"
@@ -87,6 +87,8 @@ command-disabled: "&cThis command is disabled"
 only-players: "&cOnly players can run this command!"
 # Too many arguments are supplied
 too-many-arguments: "&cToo many arguments!"
+# Too little arguments are supplied
+too-little-arguments: "&cToo little arguments!"
 # Not a valid number has been supplied (e.g. abc, 4a2)
 not-valid-number: "&cThat is not a valid number!"
 # Not a valid rotation id (Valid rotations IDs are 1 through the max num of rotations)
@@ -96,7 +98,7 @@ not-valid-rotation-id: "&cThat is not a valid rotation ID! Available rotations: 
 # %rotations% - Maximum number of rotations
 not-valid-rotation-id-list: "&cThat is not a valid rotation ID! Available rotations: %rotations%"
 
-## Admin commands ##
+## Admin ##
 
 # Reload configs
 config-reloaded: "&aThe configs have been reloaded!"
@@ -176,6 +178,36 @@ error-next: "&cRotation state must either be stopped or already ingame to set th
 # %id% - ID of the rotation
 # %minigame% - Name of the minigame that will be played next
 set-next: "&aNext minigame for rotation &2#%id% &ehas been set to &2%minigame%"
+# Admin sets a location
+# Variables:
+# %for% - Name of what is being set
+# %loc% - The location that has been set
+location-set: "&aLocation for %for% has been set to %loc%"
+# Admin deletes a location
+# Variables:
+# %for% - Name of what is being deleted
+location-delete: "&eLocation for %for% has been &cdeleted&e!"
+# View a location for a particular place
+# Variables:
+# %name% - Name of the location
+# %pitch% - Pitch of the location
+# %x% - X of the location
+# %y% - Y of the location
+# %yaw% - Yaw of the location
+# %z% - Z of the location
+location-view: |
+  &e===<&6%name%&e>===
+  &e> X:     &6%x%
+  &e> Y:     &6%y%
+  &e> Z:     &6%z%
+  &e> Yaw:   &6%yaw%
+  &e> Pitch: &6%pitch%
+  &e===<&6%name%&e>===
+# Admin sets mapinfo for a map
+# Variables:
+# %key% - Key that was set (name, author)
+# %value% - What the key was set to
+mapinfo-set: "&aMapinfo updated, %key%: %value%"
 
 ### Minigames ###
 

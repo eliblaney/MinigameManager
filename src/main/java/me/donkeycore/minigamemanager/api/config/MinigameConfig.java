@@ -7,8 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
+
+import me.donkeycore.minigamemanager.api.minigame.Minigame;
+import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.core.MinigameManager;
 
 /**
  * Configuration file for minigames
@@ -18,49 +20,27 @@ import org.bukkit.plugin.Plugin;
 public class MinigameConfig extends CustomConfig {
 	
 	/**
-	 * Create a new instance of MinigameConfig for an existing FileConfiguration
-	 * 
-	 * @param plugin The plugin that owns this config
-	 * @param config The FileConfiguration to be used
-	 * @param resourceFolder The location of the config in the JAR
-	 * @param fileName The file to be saved as
+	 * Name of the resource folder and the folder on disk
 	 */
-	public MinigameConfig(Plugin plugin, FileConfiguration config, String resourceFolder, File folder, String fileName) {
-		super(plugin, config, resourceFolder, folder, fileName);
-	}
+	private static final String folderName = "minigame_configs";
 	
 	/**
-	 * Create a new instance of MinigameConfig
-	 * 
-	 * @param plugin The plugin that owns this config
-	 * @param resourceFolder The location of the config in the JAR
-	 * @param fileName The file to be saved as
+	 * The class of the minigame that owns this config
 	 */
-	public MinigameConfig(Plugin plugin, String resourceFolder, File folder, String fileName) {
-		super(plugin, resourceFolder, folder, fileName);
-	}
+	private final Class<? extends Minigame> minigame;
 	
 	/**
-	 * Create a new instance of MinigameConfig for an existing FileConfiguration
+	 * Create a new instance of MinigameConfig for a specified Minigame
 	 * 
-	 * @param plugin The plugin that owns this config
-	 * @param folder The folder to put the config in
-	 * @param config The FileConfiguration to be used
-	 * @param fileName The file to be saved as
+	 * @param minigame The class of the minigame that owns this config
 	 */
-	public MinigameConfig(Plugin plugin, File folder, FileConfiguration config, String fileName) {
-		super(plugin, config, folder, fileName);
+	public MinigameConfig(Class<? extends Minigame> minigame) {
+		super(MinigameManager.getPlugin(), folderName + File.separator + "configTemplate.yml", true, new File(MinigameManager.getPlugin().getDataFolder() + File.separator + folderName), minigame.getAnnotation(MinigameAttributes.class).name().replace(' ', '_') + ".yml");
+		this.minigame = minigame;
 	}
 	
-	/**
-	 * Create a new instance of MinigameConfig
-	 * 
-	 * @param plugin The plugin that owns this config
-	 * @param folder the Folder to put the config in
-	 * @param fileName The file to be saved as
-	 */
-	public MinigameConfig(Plugin plugin, File folder, String fileName) {
-		super(plugin, folder, fileName);
+	public Class<? extends Minigame> getMinigame() {
+		return minigame;
 	}
 	
 	/**

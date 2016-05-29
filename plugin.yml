@@ -18,6 +18,11 @@ commands:
     permission: minigamemanager.admin
     usage: "§cUsage: /<command> [help|list|info minigame|<start|stop|force|status> <rotation>|next <rotation> <minigame>|reload]"
     aliases: [minigame, mm]
+  location:
+    description: "Modify locations for minigames"
+    permission: minigamemanager.admin.location
+    usage: "§cUsage: /<command> <<set|view> <lobby|spawn|<minigame> <map> <name>>>|mapinfo <minigame> <map> <name|author> <value>>"
+    aliases: [loc]
 permissions:
   minigamemanager.*:
     description: "Gives access to all MinigameManager commands"
@@ -38,6 +43,7 @@ permissions:
       minigamemanager.admin.status: true
       minigamemanager.admin.info: true
       minigamemanager.admin.next: true
+      minigamemanager.admin.location: true
   minigamemanager.admin.help:
     description: "Allow player to view the help page"
     default: op
@@ -61,6 +67,9 @@ permissions:
     default: op
   minigamemanager.admin.next:
     description: "Allow player to set the next minigame in a rotation"
+    default: op
+  minigamemanager.admin.location:
+    description: "Allow player to modify locations"
     default: op
   minigamemanager.join:
     description: "Allow player to join games"

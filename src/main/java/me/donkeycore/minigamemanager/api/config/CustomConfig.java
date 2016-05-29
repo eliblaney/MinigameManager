@@ -2,6 +2,7 @@ package me.donkeycore.minigamemanager.api.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -13,6 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import me.donkeycore.minigamemanager.core.MinigameManager;
+import me.donkeycore.minigamemanager.core.MinigameManagerPlugin;
 
 public class CustomConfig {
 	
@@ -33,43 +35,50 @@ public class CustomConfig {
 	 */
 	private final String fileName;
 	/**
-	 * Where the config is saved in the JAR
+	 * Where the config is saved in the JAR, or the template if specified
 	 */
-	private final String resourceFolder;
+	private final String resources;
+	/**
+	 * Whether the resources variable is actually a reference to a template
+	 * config
+	 */
+	private final boolean template;
 	/**
 	 * Plugin that owns the config
 	 */
 	private final Plugin plugin;
 	
 	public CustomConfig(Plugin plugin, FileConfiguration config, File folder, String fileName) {
-		this(plugin, config, "", folder, fileName);
+		this(plugin, config, "", false, folder, fileName);
 	}
 	
 	public CustomConfig(Plugin plugin, File folder, String fileName) {
-		this(plugin, "", folder, fileName);
+		this(plugin, "", false, folder, fileName);
 	}
 	
-	public CustomConfig(Plugin plugin, FileConfiguration config, String resourceFolder, File folder, String fileName) {
+	public CustomConfig(Plugin plugin, FileConfiguration config, String resources, boolean template, File folder, String fileName) {
 		Validate.notNull(plugin, "Plugin cannot be null");
 		Validate.notNull(config, "Configuration cannot be null");
-		Validate.notNull(resourceFolder, "Resource folder cannot be null");
+		Validate.notNull(resources, "Resource folder cannot be null");
 		Validate.notNull(folder, "Folder cannot be null");
 		Validate.notEmpty(fileName, "File name cannot be null");
 		this.plugin = plugin;
 		this.config = config;
-		this.resourceFolder = resourceFolder;
+		this.resources = resources;
+		this.template = template;
 		this.folder = folder;
 		this.fileName = fileName;
 		this.configFile = new File(folder, fileName);
 	}
 	
-	public CustomConfig(Plugin plugin, String resourceFolder, File folder, String fileName) {
+	public CustomConfig(Plugin plugin, String resoures, boolean template, File folder, String fileName) {
 		Validate.notNull(plugin, "Plugin cannot be null");
-		Validate.notNull(resourceFolder, "Resource folder cannot be null");
+		Validate.notNull(resoures, "Resource folder cannot be null");
 		Validate.notNull(folder, "Folder cannot be null");
 		Validate.notEmpty(fileName, "File name cannot be null");
 		this.plugin = plugin;
-		this.resourceFolder = resourceFolder;
+		this.resources = resoures;
+		this.template = template;
 		this.folder = folder;
 		this.fileName = fileName;
 		this.configFile = new File(folder, fileName);
@@ -97,7 +106,14 @@ public class CustomConfig {
 		config = YamlConfiguration.loadConfiguration(new File(folder, fileName));
 		Reader defConfigStream = null;
 		try {
-			defConfigStream = new InputStreamReader(MinigameManager.getPlugin().getResource(resourceFolder + fileName), "UTF8");
+			InputStream resource = null;
+			if (template)
+				resource = MinigameManager.getPlugin().getResource(resources);
+			else
+				resource = MinigameManager.getPlugin().getResource(resources + fileName);
+			if (resource == null)
+				return true; // no template config
+			defConfigStream = new InputStreamReader(resource, "UTF8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -129,7 +145,10 @@ public class CustomConfig {
 		try {
 			getConfig().save(configFile);
 		} catch (IOException ex) {
-			plugin.getLogger().log(Level.SEVERE, "[MinigameManager] [Config] Could not save config to " + configFile, ex);
+			if (plugin instanceof MinigameManagerPlugin)
+				plugin.getLogger().log(Level.SEVERE, "[Config] Could not save config to " + configFile, ex);
+			else
+				plugin.getLogger().log(Level.SEVERE, "[MinigameManager] [Config] Could not save config to " + configFile, ex);
 		}
 	}
 	
@@ -145,11 +164,18 @@ public class CustomConfig {
 		}
 		if (!configFile.exists()) {
 			try {
-				plugin.saveResource(resourceFolder + fileName, false);
-			} catch(Throwable t) {
+				if (template) {
+					plugin.saveResource(resources, false);
+					String templateName = new File(resources).getName();
+					String path = folder + File.separator;
+					new File(path + templateName).renameTo(new File(path + fileName));
+				} else
+					plugin.saveResource(resources + fileName, false);
+			} catch (Throwable t) {
+				t.printStackTrace();
 				try {
 					configFile.createNewFile();
-				} catch(Throwable t2) {
+				} catch (Throwable t2) {
 					return false;
 				}
 			}

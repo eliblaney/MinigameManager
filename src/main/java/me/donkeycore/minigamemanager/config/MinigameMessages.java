@@ -28,7 +28,7 @@ public class MinigameMessages extends CustomConfig {
 	 * Create a new instance of MinigameLocations
 	 */
 	public MinigameMessages() {
-		super(MinigameManager.getPlugin(), languagesSubFolder, new File(languagesFolder), MinigameManager.getMinigameManager().getMinigameSettings().getLanguage() + ".yml");
+		super(MinigameManager.getPlugin(), languagesSubFolder, false, new File(languagesFolder), MinigameManager.getMinigameManager().getMinigameSettings().getLanguage() + ".yml");
 	}
 	
 	/**

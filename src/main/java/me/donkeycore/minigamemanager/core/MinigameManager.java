@@ -5,15 +5,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
+import me.donkeycore.minigamemanager.api.config.MinigameConfig;
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.Minigame.EventListener;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
+import me.donkeycore.minigamemanager.api.minigame.MinigameData;
 import me.donkeycore.minigamemanager.api.rotation.RotationManager;
 import me.donkeycore.minigamemanager.config.MinigameLocations;
 import me.donkeycore.minigamemanager.config.MinigameMessages;
@@ -25,12 +28,10 @@ import net.milkbowl.vault.economy.Economy;
 
 /*
  * TODO:
- * before release:
- * - commands to edit locations
- * - multiserver support
- * future:
+ * - Achievement API (includes saving to playerprofiles and such)
  * - create entire minigame from config or lua/python
- * - more things that make minigames easier to make
+ * - multiserver support
+ * - more things that make minigames easier
  */
 /**
  * Main MinigameManager plugin class with API methods
@@ -81,9 +82,13 @@ public final class MinigameManager {
 	 */
 	private static MinigameManagerPlugin plugin;
 	/**
-	 * The list of minigames as well as their minimum player requirement
+	 * The list of minigames as well as their data
 	 */
-	private final Map<Class<? extends Minigame>, Integer> minigames = new HashMap<>();
+	private final Map<Class<? extends Minigame>, MinigameData> minigames = new HashMap<>();
+	/**
+	 * The list of MinigameConfigs
+	 */
+	private final List<MinigameConfig> minigameConfigs = new ArrayList<>();
 	
 	/**
 	 * Create a new instance of MinigameManager
@@ -93,6 +98,7 @@ public final class MinigameManager {
 	MinigameManager(MinigameManagerPlugin plugin) {
 		if (instance != null)
 			throw new IllegalStateException("MinigameManager has already been initialized!");
+		Validate.notNull(plugin, "Plugin must not be null");
 		MinigameManager.plugin = plugin;
 		MinigameManager.instance = this;
 	}
@@ -124,6 +130,21 @@ public final class MinigameManager {
 	 */
 	public static boolean isRelease() {
 		return false;
+	}
+	
+	/**
+	 * Get a minigame based on the name specified in its MinigameAttributes
+	 * 
+	 * @param name The name of the minigame
+	 * @return The minigame's class
+	 */
+	public Class<? extends Minigame> getMinigame(String name) {
+		Validate.notEmpty(name, "Name cannot be empty");
+		for (Class<? extends Minigame> m : minigames.keySet()) {
+			if (m.getAnnotation(MinigameAttributes.class).name().replace(" ", "").replace("_", "").replace("-", "").equalsIgnoreCase(name.replace(" ", "").replace("_", "").replace("-", "")))
+				return m;
+		}
+		return null;
 	}
 	
 	/**
@@ -202,8 +223,11 @@ public final class MinigameManager {
 	public void registerMinigame(Class<? extends Minigame> minigame, int minimumPlayers) {
 		Validate.notNull(minigame, "Minigame must not be null");
 		Validate.isTrue(minimumPlayers > 0, "Minimum players must be above 0");
-		Validate.notNull(minigame.getAnnotation(MinigameAttributes.class), "Minigame must have a @MinigameAttributes annotation");
-		this.minigames.put(minigame, minimumPlayers);
+		MinigameAttributes attr = minigame.getAnnotation(MinigameAttributes.class);
+		Validate.notNull(attr, "Minigame must have a @MinigameAttributes annotation");
+		if (!attr.isDefault())
+			this.minigameConfigs.add(new MinigameConfig(minigame));
+		this.minigames.put(minigame, new MinigameData(minimumPlayers, attr.isDefault() ? null : new MinigameConfig(minigame)));
 		Bukkit.getPluginManager().callEvent(new MinigameRegisterEvent(minigame, minimumPlayers));
 		plugin.getLogger().info("Registered: " + minigame.getSimpleName());
 	}
@@ -216,13 +240,31 @@ public final class MinigameManager {
 	 * @return Whether the minigame was removed
 	 */
 	public boolean unregisterMinigame(Class<? extends Minigame> minigame) {
-		Validate.notNull(minigame);
+		Validate.notNull(minigame, "Minigame must not be null");
 		boolean b = this.minigames.remove(minigame) != null;
+		MinigameConfig c = getMinigameConfig(minigame);
 		if (b) {
+			if (c != null)
+				this.minigameConfigs.remove(c);
 			Bukkit.getPluginManager().callEvent(new MinigameUnregisterEvent(minigame));
 			plugin.getLogger().info("Unregistered: " + minigame.getSimpleName());
 		}
 		return b;
+	}
+	
+	/**
+	 * Get the MinigameConfig for the specified minigame class
+	 * 
+	 * @param minigame The class of the minigame owning the config
+	 * @return The associated MinigameConfig object
+	 */
+	public MinigameConfig getMinigameConfig(Class<? extends Minigame> minigame) {
+		Validate.notNull(minigame, "Minigame must not be null");
+		for (MinigameConfig c : minigameConfigs) {
+			if (c.getMinigame().equals(minigame))
+				return c;
+		}
+		return null;
 	}
 	
 	/**
@@ -233,9 +275,9 @@ public final class MinigameManager {
 	 * @param listener What to do when the event happens
 	 */
 	public void addListener(Minigame minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
-		Validate.notNull(minigame, "Minigame may not be null!");
-		Validate.notNull(event, "Event may not be null!");
-		Validate.notNull(listener, "Listener may not be null!");
+		Validate.notNull(minigame, "Minigame must not be null");
+		Validate.notNull(event, "Event must not be null");
+		Validate.notNull(listener, "Listener must not be null");
 		listeners.add(new ListenerEntry(minigame, event, listener));
 	}
 	
@@ -245,12 +287,23 @@ public final class MinigameManager {
 	 * @param minigame The minigame to clear listeners forO
 	 */
 	public void clearListeners(Minigame minigame) {
+		Validate.notNull(minigame, "Minigame must not be null");
 		Iterator<ListenerEntry> it = listeners.iterator();
 		while (it.hasNext()) {
 			ListenerEntry e = it.next();
 			if (e.minigame.equals(minigame))
 				it.remove();
 		}
+	}
+	
+	/**
+	 * Get the MinigameData for a specified Minigame
+	 *
+	 * @param minigame The minigame to search for
+	 * @return The corresponding MinigameData
+	 */
+	public MinigameData getData(Class<? extends Minigame> minigame) {
+		return minigames.get(minigame);
 	}
 	
 	/**
@@ -271,7 +324,8 @@ public final class MinigameManager {
 	 */
 	public Map<Class<? extends Minigame>, Integer> getMinigamesWithMinimums() {
 		Map<Class<? extends Minigame>, Integer> m = new HashMap<>();
-		m.putAll(minigames);
+		for (Entry<Class<? extends Minigame>, MinigameData> e : minigames.entrySet())
+			m.put(e.getKey(), e.getValue().getMinimumPlayers());
 		return m;
 	}
 	

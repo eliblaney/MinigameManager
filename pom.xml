@@ -25,6 +25,13 @@
 				</includes>
 			</resource>
 			<resource>
+				<directory>minigame_configs</directory>
+				<targetPath>minigame_configs</targetPath>
+				<includes>
+					<include>*.yml</include>
+				</includes>
+			</resource>
+			<resource>
 				<directory></directory>
 				<includes>
 					<include>*.yml</include>
