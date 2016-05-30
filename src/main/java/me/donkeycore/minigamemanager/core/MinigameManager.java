@@ -29,7 +29,7 @@ import net.milkbowl.vault.economy.Economy;
 /*
  * TODO:
  * - Achievement API (includes saving to playerprofiles and such)
- * - create entire minigame from config or lua/python
+ * - create entire minigame from external script (probably lua and/or config)
  * - multiserver support
  * - more things that make minigames easier
  */

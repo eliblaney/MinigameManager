@@ -10,7 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import me.donkeycore.minigamemanager.api.config.MinigameConfig;
+import me.donkeycore.minigamemanager.api.config.CustomConfig;
 import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.config.MessageType;
@@ -84,8 +84,8 @@ public class CommandLocation implements CommandExecutor {
 					o = getMap(m, config);
 					if (o instanceof ConfigurationSection)
 						map = (ConfigurationSection) o;
-					else if (o instanceof MinigameConfig)
-						map = ((MinigameConfig) o).getConfig();
+					else if (o instanceof CustomConfig)
+						map = ((CustomConfig) o).getConfig();
 				}
 				if (args[0].equalsIgnoreCase("set")) {
 					if (!map.contains(args[2])) {
@@ -95,10 +95,10 @@ public class CommandLocation implements CommandExecutor {
 						map.getConfigurationSection(args[2]).getConfigurationSection("mapinfo").set("author", "the Server Admins");
 						map.getConfigurationSection(args[2]).createSection("spawns");
 					}
-					if(args[3].equalsIgnoreCase("none") || args[3].equalsIgnoreCase("null") || args[3].equalsIgnoreCase("delete")) {
+					if (args[3].equalsIgnoreCase("none") || args[3].equalsIgnoreCase("null") || args[3].equalsIgnoreCase("delete")) {
 						map.set(args[2], null);
-						if (o != null && o instanceof MinigameConfig)
-							((MinigameConfig) o).saveConfig();
+						if (o != null && o instanceof CustomConfig)
+							((CustomConfig) o).saveConfig();
 						else
 							locs.saveConfig();
 						player.sendMessage(messages.getMessage(MessageType.LOCATION_DELETE).replace("%for%", args[2]));
@@ -110,16 +110,16 @@ public class CommandLocation implements CommandExecutor {
 					ConfigurationSection name = map.getConfigurationSection(args[3]);
 					if (args.length > 4 && (args[4].equalsIgnoreCase("none") || args[4].equalsIgnoreCase("null") || args[4].equalsIgnoreCase("delete"))) {
 						setLocation(name, null);
-						if (o != null && o instanceof MinigameConfig)
-							((MinigameConfig) o).saveConfig();
+						if (o != null && o instanceof CustomConfig)
+							((CustomConfig) o).saveConfig();
 						else
 							locs.saveConfig();
 						player.sendMessage(messages.getMessage(MessageType.LOCATION_DELETE).replace("%for%", args[3]));
 						return true;
 					}
 					setLocation(name, loc);
-					if (o != null && o instanceof MinigameConfig)
-						((MinigameConfig) o).saveConfig();
+					if (o != null && o instanceof CustomConfig)
+						((CustomConfig) o).saveConfig();
 					else
 						locs.saveConfig();
 					player.sendMessage(messages.getMessage(MessageType.LOCATION_SET).replace("%for%", args[1]).replace("%loc%", locStr));
@@ -148,8 +148,8 @@ public class CommandLocation implements CommandExecutor {
 						o = getMap(m, config);
 						if (o instanceof ConfigurationSection)
 							map = (ConfigurationSection) o;
-						else if (o instanceof MinigameConfig)
-							map = ((MinigameConfig) o).getConfig();
+						else if (o instanceof CustomConfig)
+							map = ((CustomConfig) o).getConfig();
 					}
 					if (!map.contains(args[2]) || !map.getConfigurationSection(args[2]).contains("mapinfo"))
 						return false;
@@ -164,8 +164,8 @@ public class CommandLocation implements CommandExecutor {
 						map.set("author", value);
 					else
 						return false;
-					if (o != null && o instanceof MinigameConfig)
-						((MinigameConfig) o).saveConfig();
+					if (o != null && o instanceof CustomConfig)
+						((CustomConfig) o).saveConfig();
 					else
 						locs.saveConfig();
 					player.sendMessage(messages.getMessage(MessageType.MAPINFO_SET).replace("%key%", args[3].toLowerCase()).replace("%value%", value));

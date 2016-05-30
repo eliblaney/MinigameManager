@@ -26,8 +26,8 @@ import me.donkeycore.minigamemanager.api.minigame.Minigame;
 import me.donkeycore.minigamemanager.api.minigame.MinigameAttributes;
 import me.donkeycore.minigamemanager.api.minigame.MinigameType;
 import me.donkeycore.minigamemanager.api.rotation.Rotation;
-import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.api.scoreboard.AdvancedScoreboardHelper;
+import me.donkeycore.minigamemanager.api.scoreboard.ScoreboardBuilder;
 import me.donkeycore.minigamemanager.api.winner.SingleWinnerList;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 
@@ -56,12 +56,8 @@ public class OneInTheQuiver extends Minigame {
 	private int time = 5 * 60;
 	
 	public OneInTheQuiver(Rotation r) {
-		super(r, "map1", getMapinfo("map1")[0], getMapinfo("map1")[1]);
+		super(r);
 		kills = new HashMap<String, Integer>();
-	}
-	
-	private static String[] getMapinfo(String map) {
-		return getMinigameManager().getDefaultMinigameLocations().getMapInfo(OneInTheQuiver.class.getAnnotation(MinigameAttributes.class).name(), map);
 	}
 	
 	@Override

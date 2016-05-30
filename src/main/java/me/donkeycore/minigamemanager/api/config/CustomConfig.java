@@ -16,6 +16,11 @@ import org.bukkit.plugin.Plugin;
 import me.donkeycore.minigamemanager.core.MinigameManager;
 import me.donkeycore.minigamemanager.core.MinigameManagerPlugin;
 
+/**
+ * Represents a configuration file
+ * 
+ * @author DonkeyCore
+ */
 public class CustomConfig {
 	
 	/**
@@ -48,14 +53,41 @@ public class CustomConfig {
 	 */
 	private final Plugin plugin;
 	
+	/**
+	 * Load an existing configuration
+	 * 
+	 * @param plugin The plugin that owns this config
+	 * @param config The existing config
+	 * @param folder The folder that the config is saved in
+	 * @param fileName The name of the config file
+	 */
 	public CustomConfig(Plugin plugin, FileConfiguration config, File folder, String fileName) {
 		this(plugin, config, "", false, folder, fileName);
 	}
 	
+	/**
+	 * Create a new configuration
+	 * 
+	 * @param plugin The plugin that owns this config
+	 * @param folder The folder that the config is saved in
+	 * @param fileName The name of the config file
+	 */
 	public CustomConfig(Plugin plugin, File folder, String fileName) {
 		this(plugin, "", false, folder, fileName);
 	}
 	
+	/**
+	 * Load an existing configuration
+	 * 
+	 * @param plugin The plugin that owns this config
+	 * @param config The existing config
+	 * @param resources Where the config is saved in the JAR, or the template if
+	 *            specified
+	 * @param template Whether the resources variable is actually a reference to
+	 *            a template config
+	 * @param folder The folder that the config is saved in
+	 * @param fileName The name of the config file
+	 */
 	public CustomConfig(Plugin plugin, FileConfiguration config, String resources, boolean template, File folder, String fileName) {
 		Validate.notNull(plugin, "Plugin cannot be null");
 		Validate.notNull(config, "Configuration cannot be null");
@@ -71,6 +103,17 @@ public class CustomConfig {
 		this.configFile = new File(folder, fileName);
 	}
 	
+	/**
+	 * Create a new configuration
+	 * 
+	 * @param plugin The plugin that owns this config
+	 * @param resoures Where the config is saved in the JAR, or the template if
+	 *            specified
+	 * @param template Whether the resources variable is actually a reference to
+	 *            a tepmlate config
+	 * @param folder The folder that the config is saved in
+	 * @param fileName The name of the config file
+	 */
 	public CustomConfig(Plugin plugin, String resoures, boolean template, File folder, String fileName) {
 		Validate.notNull(plugin, "Plugin cannot be null");
 		Validate.notNull(resoures, "Resource folder cannot be null");

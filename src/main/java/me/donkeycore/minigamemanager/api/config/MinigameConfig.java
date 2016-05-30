@@ -39,6 +39,11 @@ public class MinigameConfig extends CustomConfig {
 		this.minigame = minigame;
 	}
 	
+	/**
+	 * Get the class of the minigame that owns this config
+	 * 
+	 * @return The minigame class
+	 */
 	public Class<? extends Minigame> getMinigame() {
 		return minigame;
 	}

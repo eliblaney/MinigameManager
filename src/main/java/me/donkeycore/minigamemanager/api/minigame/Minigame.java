@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
@@ -20,6 +21,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -70,13 +72,23 @@ public abstract class Minigame {
 	private final List<Bonus> bonuses = new ArrayList<>();
 	
 	/**
-	 * Initialize the minigame WITHOUT mapinfo
+	 * Initialize the minigame, automatically generating a map
 	 * 
 	 * @param r The rotation that the minigame is in
-	 * @param map The map that the players will be playing in
 	 */
-	public Minigame(Rotation r, String map) {
-		this(r, map, null, null);
+	public Minigame(Rotation r) {
+		this(r, randomMap());
+	}
+	
+	/**
+	 * Initialize the minigame using a helper MapInfo class
+	 * 
+	 * @param r The rotation that the minigame is in
+	 * @param map The MapInfo class, containing the name of the map in the
+	 *            config, the map's display name, and authors
+	 */
+	public Minigame(Rotation r, MapInfo map) {
+		this(r, map.getConfigName(), map.getName(), map.getAuthor());
 	}
 	
 	/**
@@ -90,14 +102,11 @@ public abstract class Minigame {
 	public Minigame(Rotation r, String map, String mapName, String mapAuthors) {
 		this.r = r;
 		this.alive = new LinkedList<>();
-		/*
-		 * get the spawns for default minigames
-		 * 
-		 * if the minigame isn't default, the dev has to specify the spawns or
-		 * get it from a config
-		 */
+		// set default spawn locations
 		if (isDefault())
 			this.spawns = getMinigameManager().getDefaultMinigameLocations().getMinigameSpawns(getName(), map);
+		else
+			this.spawns = getMinigameManager().getMinigameConfig(getClass()).getMinigameSpawns(map);
 		this.mapName = mapName;
 		this.mapAuthors = mapAuthors;
 	}
@@ -112,11 +121,43 @@ public abstract class Minigame {
 	}
 	
 	/**
-	 * Send all players the mapinfo
+	 * Send all players the mapinfo, if it exists
 	 */
-	public final void mapinfo() {
-		if (mapName != null && mapAuthors != null)
+	public final boolean mapinfo() {
+		if (mapName != null && mapAuthors != null) {
 			announce(getMinigameManager().getMessages().getMessage(MessageType.MAPINFO).replace("%name%", mapName).replace("%author%", mapAuthors));
+			return true;
+		} else
+			return false;
+	}
+	
+	/**
+	 * Get a random map for the specified minigame
+	 * 
+	 * @param minigame The minigame to get a random map for
+	 * 
+	 * @return An instance of MapInfo representing the map
+	 */
+	@SuppressWarnings("unchecked")
+	public static MapInfo randomMap() {
+		// Get own class
+		Class<?> clazz = new Object().getClass().getEnclosingClass();
+		Class<? extends Minigame> minigame = null;
+		try {
+			minigame = (Class<? extends Minigame>) clazz;
+		} catch(ClassCastException e) {
+			throw new RuntimeException("This minigame class is apparently not a minigame class");
+		}
+		MinigameAttributes attr = minigame.getAnnotation(MinigameAttributes.class);
+		ConfigurationSection s = null;
+		if (attr.isDefault())
+			s = getMinigameManager().getDefaultMinigameLocations().getConfig().getConfigurationSection("default-minigames").getConfigurationSection(attr.name());
+		else
+			s = getMinigameManager().getMinigameConfig(minigame).getConfig();
+		Set<String> maps = s.getKeys(false);
+		String map = maps.toArray(new String[maps.size()])[new Random().nextInt(maps.size())];
+		ConfigurationSection mapinfo = s.getConfigurationSection("mapinfo");
+		return new MapInfo(map, mapinfo.getString("name"), mapinfo.getString("author"));
 	}
 	
 	/**
@@ -939,8 +980,75 @@ public abstract class Minigame {
 	public static interface ItemStackSupplier extends Function<Player, Tuple<ItemStack, Integer>> {}
 	
 	/**
+	 * Represents a map for a minigame, containing its config name, display
+	 * name, and author
+	 * 
+	 * @author DonkeyCore
+	 */
+	public static class MapInfo {
+		
+		/**
+		 * Name of the map that can be found in the minigame's config file
+		 */
+		private final String configName;
+		/**
+		 * Name that is to be displayed to the players
+		 */
+		private final String name;
+		/**
+		 * Author(s) of the map, also displayed to the players
+		 */
+		private final String author;
+		
+		/**
+		 * Create an instanceof MapInfo
+		 * 
+		 * @param configName Name of the map that can be found in the minigame's
+		 *            config file
+		 * @param name Name that is to be displayed to the players
+		 * @param author Author(s) of the map, also displayed to the players
+		 */
+		public MapInfo(String configName, String name, String author) {
+			this.configName = configName;
+			this.name = name;
+			this.author = author;
+		}
+		
+		/**
+		 * Get the name of the map that can be found in the minigame's config
+		 * file
+		 * 
+		 * @return The config name
+		 */
+		public String getConfigName() {
+			return configName;
+		}
+		
+		/**
+		 * Get the name that is to be displayed to the players
+		 * 
+		 * @return The display name
+		 */
+		public String getName() {
+			return name;
+		}
+		
+		/**
+		 * Get the author(s) of the map (this will be displayed to the players)
+		 * 
+		 * @return The author(s)
+		 */
+		public String getAuthor() {
+			return author;
+		}
+		
+	}
+	
+	/**
 	 * Represents a bonus that is awarded to a player after the game ends for a
 	 * reason other than winning
+	 * 
+	 * @author DonkeyCore
 	 */
 	public static class Bonus {
 		
@@ -1148,6 +1256,8 @@ public abstract class Minigame {
 	
 	/**
 	 * Performs some operation for every player given
+	 * 
+	 * @author DonkeyCore
 	 */
 	public static interface PlayerConsumer {
 		
@@ -1162,6 +1272,8 @@ public abstract class Minigame {
 	
 	/**
 	 * Listens to events sent by MinigameListener
+	 * 
+	 * @author DonkeyCore
 	 */
 	public static interface EventListener<E extends Event> {
 		
@@ -1175,7 +1287,9 @@ public abstract class Minigame {
 	}
 	
 	/**
-	 * Represents a function; very useful for Java 8 plugins
+	 * Represents a function
+	 * 
+	 * @author DonkeyCore
 	 *
 	 * @param <T> Type to be passed in
 	 * @param <R> Type to be returned
@@ -1195,6 +1309,8 @@ public abstract class Minigame {
 	
 	/**
 	 * Represents a function that accepts multiple parameter types
+	 * 
+	 * @author DonkeyCore
 	 *
 	 * @param <T> Type to be passed in
 	 * @param <R> Type to be returned
