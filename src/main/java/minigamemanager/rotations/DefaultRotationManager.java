@@ -250,7 +250,8 @@ public final class DefaultRotationManager implements RotationManager {
 	public void shutdown() {
 		this.running = false;
 		for (DefaultRotation r : rotations) {
-			r.finish(MinigameErrors.INTERRUPT, null);
+			if (r.getState() != RotationState.STOPPED)
+				r.finish(MinigameErrors.INTERRUPT, null);
 			// Avoid ConcurrentModificationExcpetion
 			UUID[] uuids = r.getPlayers().toArray(new UUID[r.getPlayers().size()]);
 			for (UUID uuid : uuids)

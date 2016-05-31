@@ -14,7 +14,7 @@ import org.bukkit.scoreboard.Scoreboard;
  */
 public class ScoreboardBuilder {
 	
-	private final AdvancedScoreboardHelper advanced;
+	private final ScoreboardHelper advanced;
 	
 	/**
 	 * Create an instance of the scoreboard builder
@@ -37,7 +37,7 @@ public class ScoreboardBuilder {
 		Objective o = s.getObjective(objective);
 		o.setDisplaySlot(DisplaySlot.SIDEBAR);
 		o.setDisplayName(displayName);
-		advanced = new AdvancedScoreboardHelper(s, o);
+		advanced = new ScoreboardHelper(s, o);
 	}
 	
 	/**
@@ -54,7 +54,7 @@ public class ScoreboardBuilder {
 	 * 
 	 * @return The advanced scoreboard settings
 	 */
-	public AdvancedScoreboardHelper getAdvanced() {
+	public ScoreboardHelper getAdvanced() {
 		return advanced;
 	}
 	

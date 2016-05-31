@@ -96,11 +96,12 @@ public class ItemStackBuilder {
 	}
 	
 	/**
-	 * @deprecated
-	 * 			Set the data
+	 * Set the data
 	 * 
 	 * @param data The data to set
 	 * @return The builder instance
+	 * 
+	 * @deprecated {@link MaterialData#setData(byte)} is deprecated
 	 */
 	public ItemStackBuilder data(byte data) {
 		MaterialData md = i.getData();
@@ -137,8 +138,9 @@ public class ItemStackBuilder {
 	
 	/**
 	 * Add the 'Shiny I' enchantment<br>
-	 * If you make a call to {@link #lore(String...)} and want Shiny I, call
-	 * this method AFTER you call {@link #lore(String...)}
+	 * NOTE: This method automatically hides enchantment on the item. If you
+	 * make a call to {@link #lore(String...)} and want Shiny I, call this
+	 * method AFTER you call {@link #lore(String...)}
 	 * 
 	 * @return The builder instance
 	 */

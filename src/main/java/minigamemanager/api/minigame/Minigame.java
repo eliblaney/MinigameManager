@@ -498,6 +498,24 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Set armor for all players
+	 * 
+	 * @param helmet The helmet for each player
+	 * @param chestplate The chestplate for each player
+	 * @param leggings The leggings for each player
+	 * @param boots The boots for each player
+	 */
+	public void armorAll(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
+		for (Player player : getPlayers()) {
+			PlayerInventory i = player.getInventory();
+			i.setHelmet(helmet);
+			i.setChestplate(chestplate);
+			i.setLeggings(leggings);
+			i.setBoots(boots);
+		}
+	}
+	
+	/**
 	 * Give all the players an item. Equivalent to
 	 * 
 	 * <pre>

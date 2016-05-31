@@ -32,10 +32,11 @@ import minigamemanager.core.MinigameManager;
 @MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true, canDropItems = false, canPickUpItems = false, isDefault = true)
 public class Spleef extends Minigame {
 	
-	private ItemStack shovel;
+	private final ItemStack shovel;
 	private UUID secondPlace, thirdPlace;
 	
-	{
+	public Spleef(Rotation r) {
+		super(r, randomMap(Spleef.class));
 		ItemStackBuilder builder = ItemStackBuilder.fromMaterial(Material.DIAMOND_SPADE).unsafeEnchantment(Enchantment.DIG_SPEED, 10).unbreakable(true).lore("��� Diggy Diggy Hole").flags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS);
 		try {
 			builder.canDestroy("minecraft:snow");
@@ -44,10 +45,6 @@ public class Spleef extends Minigame {
 			e.printStackTrace();
 		}
 		shovel = builder.build();
-	}
-	
-	public Spleef(Rotation r) {
-		super(r, randomMap(Spleef.class));
 	}
 	
 	@Override
@@ -68,7 +65,7 @@ public class Spleef extends Minigame {
 			
 			@Override
 			public void onEvent(PlayerMoveEvent event) {
-				// filter only those who are playing and are alive
+				// filter only those who are alive
 				if (!isAlive(event.getPlayer()))
 					return;
 				Location l = event.getTo();

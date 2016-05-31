@@ -26,7 +26,7 @@ import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.MinigameAttributes;
 import minigamemanager.api.minigame.MinigameType;
 import minigamemanager.api.rotation.Rotation;
-import minigamemanager.api.scoreboard.AdvancedScoreboardHelper;
+import minigamemanager.api.scoreboard.ScoreboardHelper;
 import minigamemanager.api.scoreboard.ScoreboardBuilder;
 import minigamemanager.api.winner.SingleWinnerList;
 import minigamemanager.core.MinigameManager;
@@ -49,7 +49,7 @@ public class OneInTheQuiver extends Minigame {
 	/**
 	 * Scoreboard helper to help with the timer
 	 */
-	private AdvancedScoreboardHelper scoreboardHelper;
+	private ScoreboardHelper scoreboardHelper;
 	/**
 	 * Time left (default 5 minutes)
 	 */
@@ -62,6 +62,7 @@ public class OneInTheQuiver extends Minigame {
 	
 	@Override
 	public void onStart() {
+		armorAll(new ItemStack(Material.CHAINMAIL_HELMET), new ItemStack(Material.CHAINMAIL_CHESTPLATE), new ItemStack(Material.CHAINMAIL_LEGGINGS), new ItemStack(Material.CHAINMAIL_BOOTS));
 		giveAll(new ItemStackSupplier() {
 			
 			@Override
@@ -87,7 +88,7 @@ public class OneInTheQuiver extends Minigame {
 			
 			@Override
 			public void onEvent(EntityDamageByEntityEvent event) {
-				// filter only those who are playing and are alive
+				// filter only those who are alive
 				Entity entity = event.getEntity();
 				Entity damager = event.getDamager();
 				if (!(entity instanceof Player))
@@ -199,7 +200,7 @@ public class OneInTheQuiver extends Minigame {
 		player.setHealth(player.getMaxHealth());
 		// set them to dead
 		setAlive(player, false);
-		// reset all potion effects (to prevent a bug where resistence could not be applied if killed to quickly)
+		// reset all potion effects (to prevent a bug where resistance could not be applied if killed too quickly)
 		for (PotionEffect pe : player.getActivePotionEffects())
 			player.removePotionEffect(pe.getType());
 		// give resistance and blindness

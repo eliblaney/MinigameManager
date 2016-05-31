@@ -7,9 +7,15 @@ import java.util.Set;
 
 import org.bukkit.Server;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.EventExecutor;
@@ -20,6 +26,7 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.UnknownDependencyException;
+import org.bukkit.projectiles.ProjectileSource;
 
 import minigamemanager.core.MinigameManager.ListenerEntry;
 
@@ -53,6 +60,44 @@ public final class MinigamePluginManagerWrapper implements PluginManager {
 		for (ListenerEntry e : entries) {
 			try {
 				if (e.event.isInstance(event)) {
+					// make sure players are actually in the minigame
+					// manual checks to optimize
+					if (event instanceof PlayerEvent && !e.minigame.isPlaying(((PlayerEvent) event).getPlayer()))
+						continue;
+					// PlayerDeathEvent is not a PlayerEvent
+					if (event instanceof PlayerDeathEvent && !e.minigame.isPlaying(((PlayerDeathEvent) event).getEntity()))
+						continue;
+					// check shooters of projectiles
+					if(event instanceof ProjectileHitEvent) {
+						ProjectileSource entity = ((ProjectileHitEvent) event).getEntity().getShooter();
+						if(entity instanceof Player && !e.minigame.isPlaying((Player) entity))
+							continue;
+					}
+					if(event instanceof ProjectileLaunchEvent) {
+						ProjectileSource entity = ((ProjectileLaunchEvent) event).getEntity().getShooter();
+						if(entity instanceof Player && !e.minigame.isPlaying((Player) entity))
+							continue;
+					}
+					// cover any other events that have players involved
+					try {
+						// does it have a getPlayer() method?
+						Method getPlayer = event.getClass().getMethod("getPlayer");
+						getPlayer.setAccessible(true);
+						// if the player is not in the minigame, skip it
+						if (!e.minigame.isPlaying((Player) getPlayer.invoke(event)))
+							continue;
+					} catch (Exception ex) {}
+					try {
+						// does it have a getEntity() method?
+						Method getPlayer = event.getClass().getMethod("getEntity");
+						getPlayer.setAccessible(true);
+						// is the entity a player?
+						Entity entity = (Entity) getPlayer.invoke(event);
+						// if the player is not in the minigame, skip it
+						if (entity instanceof Player && !e.minigame.isPlaying((Player) entity))
+							continue;
+					} catch (Exception ex) {}
+					// event is compatible with minigame; send to listener
 					Method onEvent = e.listener.getClass().getDeclaredMethod("onEvent", e.event);
 					onEvent.setAccessible(true);
 					onEvent.invoke(e.listener, e.event.cast(event));

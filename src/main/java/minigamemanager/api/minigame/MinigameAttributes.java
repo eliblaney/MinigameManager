@@ -65,7 +65,7 @@ public @interface MinigameAttributes {
 	
 	/**
 	 * Whether the minigame is a default minigame that came with
-	 * MinigameManager. Most likely false.
+	 * MinigameManager. Setting this to true breaks things if you're lying.
 	 * 
 	 * @return Whether the minigame is a default minigame
 	 */

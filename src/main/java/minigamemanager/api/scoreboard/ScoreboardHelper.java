@@ -11,7 +11,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import minigamemanager.core.MinigameManager;
 
-public class AdvancedScoreboardHelper {
+public class ScoreboardHelper {
 	
 	/**
 	 * Bukkit scoreboard being used
@@ -36,7 +36,7 @@ public class AdvancedScoreboardHelper {
 	 * @param scoreboard The Bukkit scoreboard to use
 	 * @param objective The Bukkit objective to use
 	 */
-	public AdvancedScoreboardHelper(Scoreboard scoreboard, Objective objective) {
+	public ScoreboardHelper(Scoreboard scoreboard, Objective objective) {
 		this.scoreboard = scoreboard;
 		this.objective = objective;
 	}
@@ -67,7 +67,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper setRecipients(Player... recipients) {
+	public ScoreboardHelper setRecipients(Player... recipients) {
 		this.recipients = recipients;
 		return this;
 	}
@@ -80,7 +80,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper setUpdateInterval(int tickDelay, final Runnable onUpdate) {
+	public ScoreboardHelper setUpdateInterval(int tickDelay, final Runnable onUpdate) {
 		stopUpdating();
 		timer = new BukkitRunnable() {
 			
@@ -101,7 +101,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper stopUpdating() {
+	public ScoreboardHelper stopUpdating() {
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
@@ -116,7 +116,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper setOrderedLines(String... lines) {
+	public ScoreboardHelper setOrderedLines(String... lines) {
 		clear();
 		int n = lines.length;
 		for (String str : lines)
@@ -131,7 +131,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper setLines(String... lines) {
+	public ScoreboardHelper setLines(String... lines) {
 		clear();
 		for (String str : lines)
 			objective.getScore(str).setScore(0);
@@ -145,7 +145,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper setLines(Map<String, Integer> scores) {
+	public ScoreboardHelper setLines(Map<String, Integer> scores) {
 		clear();
 		for (Entry<String, Integer> e : scores.entrySet()) {
 			objective.getScore(e.getKey()).setScore(e.getValue());
@@ -158,7 +158,7 @@ public class AdvancedScoreboardHelper {
 	 * 
 	 * @return The helper instance
 	 */
-	public AdvancedScoreboardHelper clear() {
+	public ScoreboardHelper clear() {
 		for (String str : scoreboard.getEntries())
 			scoreboard.resetScores(str);
 		return this;

@@ -321,6 +321,8 @@ public final class DefaultRotation implements Rotation {
 			player.getInventory().clear();
 			player.setScoreboard(blankScoreboard);
 			player.setGameMode(GameMode.ADVENTURE);
+			player.setAllowFlight(false);
+			player.setFlying(false);
 		}
 		inGame.clear();
 		teleportAll(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
