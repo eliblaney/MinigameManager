@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+
+import minigamemanager.api.config.MinigameConfig;
+import minigamemanager.api.minigame.Minigame;
+import minigamemanager.config.MinigameLocations;
+import minigamemanager.core.MinigameManager;
 
 public class ChestRandomizer {
 	
@@ -27,6 +34,30 @@ public class ChestRandomizer {
 	 */
 	public ChestRandomizer(RandomizedChest... chests) {
 		this.chests = chests;
+	}
+	
+	/**
+	 * Create an instance of ChestRandomizer, automatically finding chests from
+	 * config files
+	 * 
+	 * @param minigame The minigame that supplies the randomized chests
+	 */
+	public ChestRandomizer(Minigame minigame) {
+		final List<String> chestStrings;
+		if (minigame.isDefault()) {
+			MinigameLocations ml = MinigameManager.getMinigameManager().getDefaultMinigameLocations();
+			chestStrings = ml.getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame.getName().replace(' ', '_')).getConfigurationSection(minigame.getMap()).getStringList("chests");
+		} else {
+			MinigameConfig c = MinigameManager.getMinigameManager().getMinigameConfig(minigame.getClass());
+			chestStrings = c.getConfig().getConfigurationSection(minigame.getMap()).getStringList("chests");
+		}
+		this.chests = new RandomizedChest[chestStrings.size()];
+		for(int i = 0; i < chests.length; i++) {
+			String str = chestStrings.get(i);
+			String[] arr = str.split(",");
+			Location l = new Location(Bukkit.getWorld(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), Integer.parseInt(arr[4]));
+			chests[i] = new RandomizedChest(l, Integer.parseInt(arr[0]));
+		}
 	}
 	
 	/**

@@ -5,21 +5,22 @@ map1:
     # Generic arena name and author for example
     name: Arena
     author: the Server Admins
-  # Spleef spawn locations
+  chests: []
+  # Spawn locations
   spawns:
     # The spawns can be named anything to help keep yourself organized
-    not_center:
+    center:
       # The world, x, y, z, yaw, and pitch to be spawned at. Typically, world is identical for all of these.
+      world: world
+      x: 0
+      y: 90
+      z: 0
+      yaw: 0
+      pitch: 0
+    not_center:
       world: world
       x: 10
       y: 90
       z: 10
-      yaw: 0
-      pitch: 0
-    a_bit_farther:
-      world: world
-      x: 20
-      y: 90
-      z: 20
       yaw: 0
       pitch: 0

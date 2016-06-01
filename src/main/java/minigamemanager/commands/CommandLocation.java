@@ -1,5 +1,8 @@
 package minigamemanager.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -90,10 +93,32 @@ public class CommandLocation implements CommandExecutor {
 				if (args[0].equalsIgnoreCase("set")) {
 					if (!map.contains(args[2])) {
 						map.createSection(args[2]);
-						map.getConfigurationSection(args[2]).createSection("mapinfo");
-						map.getConfigurationSection(args[2]).getConfigurationSection("mapinfo").set("name", "Arena");
-						map.getConfigurationSection(args[2]).getConfigurationSection("mapinfo").set("author", "the Server Admins");
-						map.getConfigurationSection(args[2]).createSection("spawns");
+						ConfigurationSection inside = map.getConfigurationSection(args[2]);
+						inside.createSection("mapinfo");
+						inside.getConfigurationSection("mapinfo").set("name", "Arena");
+						inside.getConfigurationSection("mapinfo").set("author", "the Server Admins");
+						inside.createSection("spawns");
+						inside.set("chests", new ArrayList<String>());
+					}
+					if(args.length > 4 && args[3].equalsIgnoreCase("chest")) {
+						int tier = 0;
+						try {
+							tier = Integer.parseInt(args[4]);
+							// tier must be positive
+							if(tier < 0)
+								throw new Exception();
+						} catch(Exception e) {
+							player.sendMessage(messages.getMessage(MessageType.NOT_VALID_NUMBER));
+							return false;
+						}
+						List<String> chests = map.getStringList("chests");
+						chests.add(tier + "," + loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
+						map.set("chests", chests);
+						if (o != null && o instanceof CustomConfig)
+							((CustomConfig) o).saveConfig();
+						else
+							locs.saveConfig();
+						return true;
 					}
 					if (args[3].equalsIgnoreCase("none") || args[3].equalsIgnoreCase("null") || args[3].equalsIgnoreCase("delete")) {
 						map.set(args[2], null);

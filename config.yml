@@ -49,6 +49,9 @@ minigames:
       One_In_The_Quiver:
         enabled: true
         minimum-players: 5
+      Survival_Games:
+        enabled: true
+        minimum-players: 5
 
 # Configuration for currency awarded after games
 currency:

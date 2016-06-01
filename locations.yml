@@ -64,3 +64,23 @@ default-minigames:
           z: 20
           yaw: 0
           pitch: 0
+  Survival_Games:
+    map1:
+      mapinfo:
+        name: OITQ Arena
+        author: the Server Admins
+      spawns:
+        not_center:
+          world: world
+          x: 10
+          y: 90
+          z: 10
+          yaw: 0
+          pitch: 0
+        a_bit_farther:
+          world: world
+          x: 20
+          y: 90
+          z: 20
+          yaw: 0
+          pitch: 0
