@@ -1,5 +1,7 @@
 package minigamemanager.api.items;
 
+import java.util.Random;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +27,9 @@ public class ItemParser {
 			 * replaceAll(";.*", "") -> get rid of possible junk
 			 */
 			if (properties.length > 1)
-				b.amount(Integer.parseInt(properties[1].replaceAll(";.*", "")));
+				b.amount(parseInteger(properties[1].replaceAll(";.*", "")));
 			if (properties.length > 2)
-				b.durability(Short.parseShort(properties[2].replaceAll(";.*", "")));
+				b.durability((short) parseInteger(properties[2].replaceAll(";.*", "")));
 			String[] enchants = item.split(";");
 			/**
 			 * enchants[0] = material (+ maybe amount, durability)
@@ -44,7 +46,7 @@ public class ItemParser {
 				if (properties.length == 1)
 					b.unsafeEnchantment(Enchantment.getByName(enchantName), 1);
 				else
-					b.unsafeEnchantment(Enchantment.getByName(enchantName), Integer.parseInt(properties[1]));
+					b.unsafeEnchantment(Enchantment.getByName(enchantName), parseInteger(properties[1]));
 			}
 			return b.build();
 		} catch (Throwable t) {
@@ -59,12 +61,24 @@ public class ItemParser {
 		return is;
 	}
 	
+	private static int parseInteger(String str) {
+		if (str.contains("-")) {
+			String[] bounds = str.split("-");
+			int min = Integer.parseInt(bounds[0]);
+			int max = Integer.parseInt(bounds[1]);
+			// random number between min and max, inclusive
+			return new Random().nextInt(max - min + 1) + min;
+		} else
+			return Integer.parseInt(str);
+	}
+	
 	/**
 	 * Replaces common enchantment names with their Bukkit versions
-	 *  
+	 * 
 	 * @param e An enchantment string containing common names of enchantments
 	 * 
-	 * @return The string with the common names replaced with their Bukkit versions
+	 * @return The string with the common names replaced with their Bukkit
+	 *         versions
 	 */
 	private static String enchantAliases(String e) {
 		return e.toLowerCase().replaceAll("protection$", "protection environmental").replaceAll("protection(\\S)", "protection environmental").replace("feather falling", "protection fall").replace("blast protection", "protection explosions").replace("sharpness", "damage all").replace("smite", "damage undead").replace("bane of arthropods", "damage arthropods").replace("respiration", "oxygen").replace("aqua affinity", "water worker").replace("looting", "loot bonus mobs").replace("efficiency", "dig speed").replace("unbreaking", "durability").replace("power", "arrow damage").replace("punch", "arrow knockback").replace("infinity", "arrow infinite").replace("flame", "arrow fire");
