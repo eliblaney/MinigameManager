@@ -338,4 +338,9 @@ public class ItemStackBuilder {
 		return i;
 	}
 	
+	@Override
+	public String toString() {
+		return i.toString();
+	}
+	
 }

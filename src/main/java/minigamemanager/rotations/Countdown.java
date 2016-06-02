@@ -46,7 +46,7 @@ public class Countdown implements Runnable {
 	
 	public void run() {
 		if (!force && r.getPlayers().size() < manager.getMinigamesWithMinimums().get(minigame.getClass())) {
-			r.announce(manager.getMessages().getMessage(MessageType.NOT_ENOUGH_PLAYERS));
+			// we don't need to send a message about not enough players since it will happen automatically
 			if (bt != null) {
 				r.setLobbyScoreboard();
 				bt.cancel();

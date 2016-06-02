@@ -52,6 +52,51 @@ minigames:
       Survival_Games:
         enabled: true
         minimum-players: 5
+        # Customize the random items in chests
+        chests:
+            # Tier number
+            1:
+            # Items for tier 1 chests
+            # Format: name[,count][,damage][;enchantment[:level]...]
+            - apple,2
+            - wood sword
+            - leather helmet
+            - leather chestplate
+            - leather leggings
+            - leather boots
+            - wood axe
+            - stick
+            - cobblestone,2
+            2:
+            - cooked chicken,2
+            - stone sword
+            - chainmail helmet
+            - chainmail chestplate
+            - chainmail leggings
+            - chainmail boots
+            - stone axe
+            - stick
+            - iron_ingot,2
+            4:
+            - cooked beef,2
+            - iron sword
+            - iron helmet
+            - iron chestplate
+            - iron leggings
+            - iron boots
+            - iron axe
+            - stick
+            - diamond,2
+            8:
+            - cooked beef,4
+            - golden apple
+            - diamond sword
+            - diamond helmet
+            - diamond chestplate
+            - diamond leggings
+            - diamond boots
+            - diamond axe
+            - exp bottle,4
 
 # Configuration for currency awarded after games
 currency:

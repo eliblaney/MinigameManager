@@ -9,9 +9,11 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import minigamemanager.api.config.MinigameConfig;
+import minigamemanager.api.items.ItemParser;
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.config.MinigameLocations;
 import minigamemanager.core.MinigameManager;
@@ -52,7 +54,7 @@ public class ChestRandomizer {
 			chestStrings = c.getConfig().getConfigurationSection(minigame.getMap()).getStringList("chests");
 		}
 		this.chests = new RandomizedChest[chestStrings.size()];
-		for(int i = 0; i < chests.length; i++) {
+		for (int i = 0; i < chests.length; i++) {
 			String str = chestStrings.get(i);
 			String[] arr = str.split(",");
 			Location l = new Location(Bukkit.getWorld(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), Integer.parseInt(arr[4]));
@@ -77,6 +79,23 @@ public class ChestRandomizer {
 	 */
 	public void setItems(int tier, ItemStack... items) {
 		this.items.put(tier, items);
+	}
+	
+	/**
+	 * Automatically create {@link ItemStack ItemStacks} and set items for each
+	 * tier based on a config
+	 * 
+	 * @param chests The {@link ConfigurationSection} where the item information
+	 *            can be found. Must contain String lists that are each named
+	 *            the tier that they belong to.
+	 */
+	public void setItems(ConfigurationSection chests) {
+		for(String key : chests.getKeys(false)) {
+			int tier = Integer.parseInt(key);
+			List<String> itemStrings = chests.getStringList(key);
+			ItemStack[] items = ItemParser.parseItems(itemStrings.toArray(new String[itemStrings.size()]));
+			setItems(tier, items);
+		}
 	}
 	
 	/**
