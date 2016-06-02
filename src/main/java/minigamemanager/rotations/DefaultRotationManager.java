@@ -78,14 +78,7 @@ public final class DefaultRotationManager implements RotationManager {
 		int id = findAvailableRotation();
 		if (id < 0)
 			return false;
-		DefaultRotation r = rotations.get(id);
-		r.join(player.getUniqueId());
-		players.put(player.getUniqueId(), r);
-		Bukkit.getPluginManager().callEvent(new RotationJoinEvent(r, player));
-		if (r.getState() == RotationState.LOBBY && r.getPlayers().size() >= manager.getMinigameSettings().getMinimumPlayers())
-			start(r);
-		r.setLobbyScoreboard();
-		return true;
+		return join(player, id);
 	}
 	
 	// find lobbies to join

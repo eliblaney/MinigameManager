@@ -96,7 +96,7 @@ public final class DefaultRotation implements Rotation {
 			players.add(uuid);
 			MinigameManager manager = MinigameManager.getMinigameManager();
 			p.teleport(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
-			p.getInventory().clear();
+			clean(p);
 			p.sendMessage(manager.getMessages().getMessage(MessageType.JOIN).replace("%rotation%", "" + (id + 1)));
 			// send a sorry message if the rotation is in-game
 			if (getState() == RotationState.INGAME)
@@ -193,10 +193,7 @@ public final class DefaultRotation implements Rotation {
 		inGame.addAll(players);
 		for (UUID u : getInGame()) {
 			Player player = Bukkit.getPlayer(u);
-			player.setGameMode(GameMode.ADVENTURE);
-			player.setHealth(player.getMaxHealth());
-			player.setFoodLevel(20);
-			player.getInventory().clear();
+			clean(player);
 			minigame.setAlive(player, true);
 		}
 		return true;
@@ -333,6 +330,17 @@ public final class DefaultRotation implements Rotation {
 	private void clean(final Player player) {
 		for (PotionEffect pe : player.getActivePotionEffects())
 			player.removePotionEffect(pe.getType());
+		quench(player);
+		player.getInventory().clear();
+		player.setScoreboard(blankScoreboard);
+		player.setGameMode(GameMode.ADVENTURE);
+		player.setHealth(player.getMaxHealth());
+		player.setFoodLevel(20);
+		player.setAllowFlight(false);
+		player.setFlying(false);
+	}
+	
+	private void quench(final Player player) {
 		// for some reason, it is required to make a delayed task to stop a player from being on fire
 		Bukkit.getScheduler().scheduleSyncDelayedTask(MinigameManager.getPlugin(), new Runnable() {
 			
@@ -341,11 +349,6 @@ public final class DefaultRotation implements Rotation {
 				player.setFireTicks(0);
 			}
 		});
-		player.getInventory().clear();
-		player.setScoreboard(blankScoreboard);
-		player.setGameMode(GameMode.ADVENTURE);
-		player.setAllowFlight(false);
-		player.setFlying(false);
 	}
 	
 	void setLobbyScoreboard() {
