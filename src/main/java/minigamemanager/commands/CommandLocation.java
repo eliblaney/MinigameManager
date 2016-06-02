@@ -67,11 +67,11 @@ public class CommandLocation implements CommandExecutor {
 					if (args[1].equalsIgnoreCase("lobby")) {
 						ConfigurationSection lobby = config.getConfigurationSection("rotations").getConfigurationSection("lobby");
 						loc = getLocation(lobby);
-						player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.LOCATION_VIEW).replace("%name%", "lobby"), loc));
+						player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.LOCATION_VIEW).replace("%name%", "lobby"), loc, true));
 					} else if (args[1].equalsIgnoreCase("spawn")) {
 						ConfigurationSection spawn = config.getConfigurationSection("rotations").getConfigurationSection("spawn");
 						loc = getLocation(spawn);
-						player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.LOCATION_VIEW).replace("%name%", "spawn"), loc));
+						player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.LOCATION_VIEW).replace("%name%", "spawn"), loc, true));
 					} else
 						return false;
 				} else
@@ -100,17 +100,18 @@ public class CommandLocation implements CommandExecutor {
 						inside.createSection("spawns");
 						inside.set("chests", new ArrayList<String>());
 					}
-					if(args.length > 4 && args[3].equalsIgnoreCase("chest")) {
+					if (args.length > 4 && args[3].equalsIgnoreCase("chest")) {
 						int tier = 0;
 						try {
 							tier = Integer.parseInt(args[4]);
 							// tier must be positive
-							if(tier < 0)
+							if (tier < 0)
 								throw new Exception();
-						} catch(Exception e) {
+						} catch (Exception e) {
 							player.sendMessage(messages.getMessage(MessageType.NOT_VALID_NUMBER));
 							return false;
 						}
+						map = map.getConfigurationSection(args[2]);
 						List<String> chests = map.getStringList("chests");
 						chests.add(tier + "," + loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
 						map.set("chests", chests);
@@ -118,6 +119,7 @@ public class CommandLocation implements CommandExecutor {
 							((CustomConfig) o).saveConfig();
 						else
 							locs.saveConfig();
+						player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.CHEST_SET).replace("%t%", "" + tier), loc, false));
 						return true;
 					}
 					if (args[3].equalsIgnoreCase("none") || args[3].equalsIgnoreCase("null") || args[3].equalsIgnoreCase("delete")) {
@@ -158,7 +160,7 @@ public class CommandLocation implements CommandExecutor {
 					if (map == null || !map.contains(args[3]))
 						return false;
 					loc = getLocation(map.getConfigurationSection(args[3]));
-					player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.LOCATION_VIEW).replace("%name%", args[1]), loc));
+					player.sendMessage(replaceLocationVars(messages.getMessage(MessageType.LOCATION_VIEW).replace("%name%", args[1]), loc, true));
 				} else
 					return false;
 			} else if (args.length > 4) {
@@ -208,7 +210,7 @@ public class CommandLocation implements CommandExecutor {
 		MinigameAttributes attr = m.getAnnotation(MinigameAttributes.class);
 		Object o;
 		if (attr.isDefault())
-			o = defaultConfig.getConfigurationSection("default-minigames").getConfigurationSection(attr.name());
+			o = defaultConfig.getConfigurationSection("default-minigames").getConfigurationSection(attr.name().replace(' ', '_'));
 		else {
 			o = manager.getData(m).getConfig();
 			if (o == null)
@@ -239,8 +241,11 @@ public class CommandLocation implements CommandExecutor {
 		return new Location(world, x, y, z, yaw, pitch);
 	}
 	
-	private String replaceLocationVars(String s, Location loc) {
-		return s.replace("%x%", "" + loc.getBlockX()).replace("%y%", "" + loc.getBlockY()).replace("%z%", "" + loc.getBlockZ()).replace("%yaw%", "" + ((int) loc.getYaw())).replace("%pitch%", "" + ((int) loc.getPitch()));
+	private String replaceLocationVars(String s, Location loc, boolean rotation) {
+		s = s.replace("%x%", "" + loc.getBlockX()).replace("%y%", "" + loc.getBlockY()).replace("%z%", "" + loc.getBlockZ());
+		if (rotation)
+			s = s.replace("%yaw%", "" + ((int) loc.getYaw())).replace("%pitch%", "" + ((int) loc.getPitch()));
+		return s;
 	}
 	
 }

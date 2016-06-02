@@ -89,7 +89,7 @@ public class ChestRandomizer {
 	public ItemStack[] getItems(int tier) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		for (Entry<Integer, ItemStack[]> e : this.items.entrySet()) {
-			if ((tier & e.getKey()) == 1)
+			if ((tier & e.getKey()) == e.getKey())
 				items.addAll(Arrays.asList(e.getValue()));
 		}
 		return items.toArray(new ItemStack[items.size()]);

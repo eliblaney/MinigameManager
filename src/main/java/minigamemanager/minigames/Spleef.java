@@ -49,17 +49,6 @@ public class Spleef extends Minigame {
 	
 	@Override
 	public void onStart() {
-		// give everybody a very efficient diamond shovel
-		giveAll(new ItemStackSupplier() {
-			
-			@Override
-			public Tuple<ItemStack, Integer> apply(Player player) {
-				// return itemstack to be put in the first slot of the hotbar
-				return Tuple.of(shovel, 0);
-			}
-		});
-		// create a scoreboard that lists everybody's names
-		updateScoreboard();
 		// listen to when the player moves
 		listenEvent(new EventListener<PlayerMoveEvent>() {
 			
@@ -77,6 +66,17 @@ public class Spleef extends Minigame {
 				}
 			}
 		});
+		// give everybody a very efficient diamond shovel
+		giveAll(new ItemStackSupplier() {
+			
+			@Override
+			public Tuple<ItemStack, Integer> apply(Player player) {
+				// return itemstack to be put in the first slot of the hotbar
+				return Tuple.of(shovel, 0);
+			}
+		});
+		// create a scoreboard that lists everybody's names
+		updateScoreboard();
 	}
 	
 	private void kill(Player player) {
@@ -101,7 +101,7 @@ public class Spleef extends Minigame {
 	
 	private void updateScoreboard() {
 		// build a scoreboard with a display name of "Alive" in aqua/bold, listing the alive player names in green
-		Scoreboard s = new ScoreboardBuilder("spleef" + getId() + "_alive", ChatColor.AQUA + "" + ChatColor.BOLD + "Alive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
+		Scoreboard s = new ScoreboardBuilder("splf" + getId() + "_alive", "&b&lAlive").setLines(getAliveNamesWithColor(ChatColor.GREEN)).build();
 		// update the scoreboard for everybody
 		setScoreboard(s);
 	}

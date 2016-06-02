@@ -21,7 +21,7 @@ commands:
   location:
     description: "Modify locations for minigames"
     permission: minigamemanager.admin.location
-    usage: "§cUsage: /<command> <<set|view> <lobby|spawn|<minigame> <map> <chest|name>>>|mapinfo <minigame> <map> <name|author> <value>>"
+    usage: "§cUsage: /<command> <<set|view> <lobby|spawn|<minigame> <map> <chest <tier>|name>>>|mapinfo <minigame> <map> <name|author> <value>>"
     aliases: [loc]
 permissions:
   minigamemanager.*:

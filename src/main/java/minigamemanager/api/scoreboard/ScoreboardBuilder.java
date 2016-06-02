@@ -3,6 +3,7 @@ package minigamemanager.api.scoreboard;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -36,7 +37,7 @@ public class ScoreboardBuilder {
 		s.registerNewObjective(objective, "dummy");
 		Objective o = s.getObjective(objective);
 		o.setDisplaySlot(DisplaySlot.SIDEBAR);
-		o.setDisplayName(displayName);
+		o.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
 		advanced = new ScoreboardHelper(s, o);
 	}
 	

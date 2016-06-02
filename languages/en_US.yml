@@ -208,6 +208,13 @@ location-view: |
 # %key% - Key that was set (name, author)
 # %value% - What the key was set to
 mapinfo-set: "&aMapinfo updated, %key%: %value%"
+# Admin sets a randomized chest for a map
+# Variables:
+# %t% - The tier of the chest
+# %x% - X coordinate of the chest
+# %y% - Y coordinate of the chest
+# %z% - Z coordinate of the chest
+chest-set: "&aChest with tier %t% set to %x% %y% %z%"
 
 ### Minigames ###
 

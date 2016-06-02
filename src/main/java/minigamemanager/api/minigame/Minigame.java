@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -24,9 +25,12 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 
 import minigamemanager.api.rotation.Rotation;
@@ -42,6 +46,10 @@ import minigamemanager.core.MinigameManager;
  */
 public abstract class Minigame {
 	
+	/**
+	 * The map currently being played
+	 */
+	private final String map;
 	/**
 	 * Array of spawn locations that players can appear at
 	 */
@@ -70,6 +78,18 @@ public abstract class Minigame {
 	 * Bonuses to award players for reasons other than winning
 	 */
 	private final List<Bonus> bonuses = new ArrayList<>();
+	/**
+	 * Listener to prevent players from moving
+	 */
+	private EventListener<PlayerMoveEvent> lockListener = null;
+	/**
+	 * The list of players that are prevented from moving
+	 */
+	private final Set<UUID> locked = new HashSet<>();
+	/**
+	 * List of BukkitTasks registered by this minigame
+	 */
+	private final List<BukkitTask> tasks = new ArrayList<>();
 	
 	/**
 	 * Initialize the minigame using a helper MapInfo class
@@ -93,6 +113,7 @@ public abstract class Minigame {
 	public Minigame(Rotation r, String map, String mapName, String mapAuthors) {
 		this.r = r;
 		this.alive = new LinkedList<>();
+		this.map = map;
 		// set default spawn locations
 		if (isDefault())
 			this.spawns = getMinigameManager().getDefaultMinigameLocations().getMinigameSpawns(getName(), map);
@@ -123,6 +144,15 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Get the map that is currently being played
+	 * 
+	 * @return The configuration key that identifies the map
+	 */
+	public String getMap() {
+		return map;
+	}
+	
+	/**
 	 * Get a random map for the specified minigame
 	 * 
 	 * @param minigame The minigame to get a random map for
@@ -133,10 +163,11 @@ public abstract class Minigame {
 		MinigameAttributes attr = minigame.getAnnotation(MinigameAttributes.class);
 		ConfigurationSection s = null;
 		if (attr.isDefault())
-			s = getMinigameManager().getDefaultMinigameLocations().getConfig().getConfigurationSection("default-minigames").getConfigurationSection(attr.name());
+			s = getMinigameManager().getDefaultMinigameLocations().getConfig().getConfigurationSection("default-minigames").getConfigurationSection(attr.name().replace(' ', '_'));
 		else
 			s = getMinigameManager().getMinigameConfig(minigame).getConfig();
 		Set<String> maps = s.getKeys(false);
+		maps.remove("chests"); // this is a list of chests, not a map
 		String map = maps.toArray(new String[maps.size()])[new Random().nextInt(maps.size())];
 		ConfigurationSection mapinfo = s.getConfigurationSection(map).getConfigurationSection("mapinfo");
 		return new MapInfo(map, mapinfo.getString("name"), mapinfo.getString("author"));
@@ -431,6 +462,112 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Hide a player from the rest of the players
+	 * 
+	 * @param player The player to hide
+	 */
+	public void hide(final Player player) {
+		Validate.notNull(player, "Player cannot be null");
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player p) {
+				if (!player.equals(p))
+					p.hidePlayer(player);
+			}
+		});
+	}
+	
+	/**
+	 * Hide every player from every other player
+	 */
+	public void hideAll() {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				hide(player);
+			}
+		});
+	}
+	
+	/**
+	 * Show a previously hidden player to the rest of the players
+	 * 
+	 * @param player The player to show
+	 */
+	public void show(final Player player) {
+		Validate.notNull(player, "Player cannot be null");
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player p) {
+				if (!player.equals(p))
+					p.showPlayer(player);
+			}
+		});
+	}
+	
+	/**
+	 * Show any previously hidden players to the rest of the players
+	 */
+	public void showAll() {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				show(player);
+			}
+		});
+	}
+	
+	/**
+	 * Prevent all players from moving
+	 */
+	public void lock() {
+		lock(getPlayerUUIDs());
+	}
+	
+	/**
+	 * Lock certain players, preventing them from moving
+	 * 
+	 * @param locked The UUIDs of players that should not be able to move
+	 */
+	public void lock(UUID... lock) {
+		locked.addAll(Arrays.asList(lock));
+		if (lockListener == null) {
+			lockListener = new EventListener<PlayerMoveEvent>() {
+				@Override
+				public void onEvent(PlayerMoveEvent event) {
+					if (locked.contains(event.getPlayer().getUniqueId())) {
+						Location from = event.getFrom();
+						Location to = event.getTo();
+						if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ())
+							event.setCancelled(true);
+					}
+				}
+			};
+			listenEvent(lockListener);
+		}
+	}
+	
+	/**
+	 * Unlock all locked players
+	 */
+	public void unlock() {
+		unlock(getLocked());
+	}
+	
+	/**
+	 * Unlock certain players, letting them move again
+	 * 
+	 * @param lock The UUIDs of players that should be allowed to move
+	 */
+	public void unlock(UUID... lock) {
+		locked.removeAll(Arrays.asList(lock));
+	}
+	
+	public UUID[] getLocked() {
+		return locked.toArray(new UUID[locked.size()]);
+	}
+	
+	/**
 	 * Get the UUIDs of players that are currently alive
 	 * 
 	 * @return An array of UUIDs that represent currently alive players
@@ -483,9 +620,13 @@ public abstract class Minigame {
 	 * @param supplier A {@link LocationSupplier} that, when given a player,
 	 *            returns the location to teleport that player.
 	 */
-	public void teleportAll(LocationSupplier supplier) {
-		for (Player player : getPlayers())
-			player.teleport(supplier.apply(player));
+	public void teleportAll(final LocationSupplier supplier) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				player.teleport(supplier.apply(player));
+			}
+		});
 	}
 	
 	/**
@@ -505,14 +646,17 @@ public abstract class Minigame {
 	 * @param leggings The leggings for each player
 	 * @param boots The boots for each player
 	 */
-	public void armorAll(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
-		for (Player player : getPlayers()) {
-			PlayerInventory i = player.getInventory();
-			i.setHelmet(helmet);
-			i.setChestplate(chestplate);
-			i.setLeggings(leggings);
-			i.setBoots(boots);
-		}
+	public void armorAll(final ItemStack helmet, final ItemStack chestplate, final ItemStack leggings, final ItemStack boots) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				PlayerInventory i = player.getInventory();
+				i.setHelmet(helmet);
+				i.setChestplate(chestplate);
+				i.setLeggings(leggings);
+				i.setBoots(boots);
+			}
+		});
 	}
 	
 	/**
@@ -546,24 +690,27 @@ public abstract class Minigame {
 	 *            in case the player can't receive the item (null
 	 *            to just ignore)
 	 */
-	public void giveAll(ItemStackSupplier supplier, PlayerConsumer backup) {
-		for (Player player : getPlayers()) {
-			Tuple<ItemStack, Integer> tuple = supplier.apply(player);
-			ItemStack itemstack = tuple.getLeft();
-			int slot = tuple.getRight();
-			PlayerInventory inv = player.getInventory();
-			if (slot == -1) {
-				HashMap<Integer, ItemStack> error = inv.addItem(itemstack);
-				if (error != null && !error.isEmpty())
-					backup.apply(player);
-			} else {
-				ItemStack i = inv.getItem(slot);
-				if (i == null)
-					inv.setItem(slot, itemstack);
-				else
-					backup.apply(player);
+	public void giveAll(final ItemStackSupplier supplier, final PlayerConsumer backup) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				Tuple<ItemStack, Integer> tuple = supplier.apply(player);
+				ItemStack itemstack = tuple.getLeft();
+				int slot = tuple.getRight();
+				PlayerInventory inv = player.getInventory();
+				if (slot == -1) {
+					HashMap<Integer, ItemStack> error = inv.addItem(itemstack);
+					if (error != null && !error.isEmpty())
+						backup.apply(player);
+				} else {
+					ItemStack i = inv.getItem(slot);
+					if (i == null)
+						inv.setItem(slot, itemstack);
+					else
+						backup.apply(player);
+				}
 			}
-		}
+		});
 	}
 	
 	/**
@@ -591,21 +738,24 @@ public abstract class Minigame {
 	 *            in case the player can't receive the item (null to just
 	 *            ignore)
 	 */
-	public void giveAll(ItemStack itemstack, int slot, PlayerConsumer backup) {
-		for (Player player : getPlayers()) {
-			PlayerInventory inv = player.getInventory();
-			if (slot == -1) {
-				HashMap<Integer, ItemStack> error = inv.addItem(itemstack);
-				if (error != null && !error.isEmpty())
-					backup.apply(player);
-			} else {
-				ItemStack i = inv.getItem(slot);
-				if (i == null)
-					inv.setItem(slot, itemstack);
-				else
-					backup.apply(player);
+	public void giveAll(final ItemStack itemstack, final int slot, final PlayerConsumer backup) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				PlayerInventory inv = player.getInventory();
+				if (slot == -1) {
+					HashMap<Integer, ItemStack> error = inv.addItem(itemstack);
+					if (error != null && !error.isEmpty())
+						backup.apply(player);
+				} else {
+					ItemStack i = inv.getItem(slot);
+					if (i == null)
+						inv.setItem(slot, itemstack);
+					else
+						backup.apply(player);
+				}
 			}
-		}
+		});
 	}
 	
 	/**
@@ -667,9 +817,13 @@ public abstract class Minigame {
 	 * 
 	 * @param message The message to send to each player
 	 */
-	public void announce(String message) {
-		for (Player player : getPlayers())
-			player.sendMessage(message);
+	public void announce(final String message) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+			}
+		});
 	}
 	
 	/**
@@ -772,9 +926,13 @@ public abstract class Minigame {
 	 * 
 	 * @param scoreboards The function to supply scoreboards
 	 */
-	public void setScoreboard(Function<Player, Scoreboard> scoreboards) {
-		for (Player player : getAlive())
-			player.setScoreboard(scoreboards.apply(player));
+	public void setScoreboard(final Function<Player, Scoreboard> scoreboards) {
+		applyAll(new PlayerConsumer() {
+			@Override
+			public void apply(Player player) {
+				player.setScoreboard(scoreboards.apply(player));
+			}
+		});
 	}
 	
 	/**
@@ -864,6 +1022,7 @@ public abstract class Minigame {
 	 * 
 	 * @return Whether the function finished successfully
 	 */
+	// TODO: Make use of a future Spigot API to do this
 	public boolean sendTitleMessage(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
 		try {
 			Method chatSerializerA = getNMSClass("IChatBaseComponent$ChatSerializer").getMethod("a", String.class);
@@ -935,6 +1094,56 @@ public abstract class Minigame {
 	}
 	
 	/**
+	 * Run something after a delay
+	 * 
+	 * @param r What to run
+	 * @param delay How long to wait before running
+	 * 
+	 * @return The task created by Bukkit
+	 */
+	public BukkitTask delayedTask(final Runnable r, long delay) {
+		BukkitTask t = new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				r.run();
+			}
+		}.runTaskLater(MinigameManager.getPlugin(), delay);
+		tasks.add(t);
+		return t;
+	}
+	
+	/**
+	 * Run something periodically after a certain period of time
+	 * 
+	 * @param r What to run
+	 * @param delay How long to initially wait before starting
+	 * @param period How long to wait between each run
+	 * 
+	 * @return The task created by Bukkit
+	 */
+	public BukkitTask repeatingTask(final Runnable r, long delay, long period) {
+		BukkitTask t = new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				r.run();
+			}
+		}.runTaskTimer(MinigameManager.getPlugin(), delay, period);
+		tasks.add(t);
+		return t;
+	}
+	
+	/**
+	 * Retrieve the list of tasks created to run after a delay or periodically
+	 * 
+	 * @return The list of {@link BukkitTask BukkitTasks}
+	 */
+	public List<BukkitTask> getTasks() {
+		return tasks;
+	}
+	
+	/**
 	 * Get a friendly display of a time
 	 * 
 	 * @param seconds The number of seconds
@@ -966,6 +1175,54 @@ public abstract class Minigame {
 					return "1 minute and 1 second";
 			}
 		}
+	}
+	
+	public class Countdown {
+		
+		private final long delay;
+		private final Runnable r;
+		private BukkitTask bt;
+		private long n = 0;
+		
+		public Countdown(final long from, long delay, final Consumer<Long> count, final Runnable finished) {
+			Validate.isTrue(from > 0, "There must be at least 1 second in the countdown");
+			if (delay < 0)
+				delay = 0;
+			Validate.notNull(finished, "Finished cannot be null");
+			this.n = from;
+			this.delay = delay;
+			this.r = new Runnable() {
+				
+				@Override
+				public void run() {
+					if (n-- > 0) {
+						if (count != null)
+							count.apply(n + 1);
+					} else {
+						finished.run();
+						if (bt != null)
+							bt.cancel();
+						bt = null;
+					}
+				};
+			};
+		}
+		
+		public void start() {
+			if (bt == null)
+				this.bt = repeatingTask(r, delay, 20);
+			else
+				throw new IllegalStateException("Task has already started");
+		}
+		
+		public void cancel() {
+			if (bt != null) {
+				bt.cancel();
+				bt = null;
+			} else
+				throw new IllegalStateException("Task has not started");
+		}
+		
 	}
 	
 	/**
@@ -1259,14 +1516,28 @@ public abstract class Minigame {
 	 * 
 	 * @author DonkeyCore
 	 */
-	public static interface PlayerConsumer {
+	public static interface PlayerConsumer extends Consumer<Player> {
+		
+		@Override
+		public void apply(Player player);
+		
+	}
+	
+	/**
+	 * Performs some operation for every object given
+	 * 
+	 * @author DonkeyCore
+	 *
+	 * @param <T> The object to be consumed
+	 */
+	public static interface Consumer<T> {
 		
 		/**
-		 * Perform an operation on a player
+		 * Perform some operation
 		 * 
-		 * @param player The {@link Player} to perform an operation on
+		 * @param t The object passed in
 		 */
-		public void apply(Player player);
+		public void apply(T t);
 		
 	}
 	

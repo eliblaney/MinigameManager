@@ -56,7 +56,7 @@ public class MinigameLocations extends CustomConfig {
 	 * @return An array of Location elements representing spawns
 	 */
 	public Location[] getMinigameSpawns(String minigame, String map) {
-		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame);
+		ConfigurationSection mcs = getConfig().getConfigurationSection("default-minigames").getConfigurationSection(minigame.replace(' ', '_'));
 		if (mcs == null)
 			throw new IllegalArgumentException(minigame + " is not a valid default minigame");
 		ConfigurationSection mapcs = mcs.getConfigurationSection(map);

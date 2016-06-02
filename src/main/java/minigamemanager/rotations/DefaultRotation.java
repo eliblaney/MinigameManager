@@ -10,6 +10,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 
 import minigamemanager.api.minigame.Minigame;
@@ -130,11 +131,7 @@ public final class DefaultRotation implements Rotation {
 			// clear the scoreboard, teleport to spawn, and send a message
 			Player p = Bukkit.getPlayer(uuid);
 			if (p != null) {
-				for (PotionEffect pe : p.getActivePotionEffects())
-					p.removePotionEffect(pe.getType());
-				p.setFireTicks(0);
-				p.getInventory().clear();
-				p.setScoreboard(blankScoreboard);
+				clean(p);
 				MinigameManager manager = MinigameManager.getMinigameManager();
 				p.teleport(manager.getDefaultMinigameLocations().getRotationLocation("spawn"));
 				p.setGameMode(GameMode.ADVENTURE);
@@ -308,25 +305,47 @@ public final class DefaultRotation implements Rotation {
 		// stop any minigames if they're going
 		if (minigame != null) {
 			minigame.onEnd(error);
+			// clear listeners and cancel tasks
 			manager.clearListeners(minigame);
+			for (BukkitTask bt : minigame.getTasks())
+				bt.cancel();
+			minigame.getTasks().clear();
+			// reset minigame variables
 			lastMinigame = minigame.getClass();
 			minigame = null;
 		}
 		// clear/reset everything, and teleport everybody to the lobby
-		for (UUID u : inGame) {
-			Player player = Bukkit.getPlayer(u);
-			for (PotionEffect pe : player.getActivePotionEffects())
-				player.removePotionEffect(pe.getType());
-			player.setFireTicks(0);
-			player.getInventory().clear();
-			player.setScoreboard(blankScoreboard);
-			player.setGameMode(GameMode.ADVENTURE);
-			player.setAllowFlight(false);
-			player.setFlying(false);
+		for (UUID u : inGame)
+			clean(Bukkit.getPlayer(u));
+		// show all players
+		for (UUID u : players) {
+			Player p = Bukkit.getPlayer(u);
+			for (UUID u2 : players) {
+				if (!u.equals(u2))
+					Bukkit.getPlayer(u2).showPlayer(p);
+			}
 		}
 		inGame.clear();
 		teleportAll(manager.getDefaultMinigameLocations().getRotationLocation("lobby"));
 		setLobbyScoreboard();
+	}
+	
+	private void clean(final Player player) {
+		for (PotionEffect pe : player.getActivePotionEffects())
+			player.removePotionEffect(pe.getType());
+		// for some reason, it is required to make a delayed task to stop a player from being on fire
+		Bukkit.getScheduler().scheduleSyncDelayedTask(MinigameManager.getPlugin(), new Runnable() {
+			
+			@Override
+			public void run() {
+				player.setFireTicks(0);
+			}
+		});
+		player.getInventory().clear();
+		player.setScoreboard(blankScoreboard);
+		player.setGameMode(GameMode.ADVENTURE);
+		player.setAllowFlight(false);
+		player.setFlying(false);
 	}
 	
 	void setLobbyScoreboard() {

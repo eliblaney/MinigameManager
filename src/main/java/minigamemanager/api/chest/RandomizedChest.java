@@ -8,6 +8,13 @@ import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Represents a chest that is filled with random items
+ *
+ * TODO: Add weight to certain items, customizable
+ * 
+ * @author DonkeyCore
+ */
 public class RandomizedChest {
 	
 	/**
@@ -90,6 +97,15 @@ public class RandomizedChest {
 	}
 	
 	/**
+	 * Get where the chest is located
+	 * 
+	 * @return The location of the chest
+	 */
+	public Location getLocation() {
+		return loc;
+	}
+	
+	/**
 	 * Fill the chest randomly with items
 	 * 
 	 * @param items The items to fill the chest with
@@ -101,11 +117,15 @@ public class RandomizedChest {
 		if (!active)
 			return true;
 		Block block = loc.getBlock();
+		int j = 0; // represents items stored, temporary solution for basic random selection
 		if (block != null && block.getState() instanceof Chest) {
 			Chest chest = (Chest) block.getState();
 			Inventory inv = chest.getBlockInventory();
 			inv.clear();
 			for (ItemStack i : items) {
+				// TODO: Add better random chance functionality, basic selection for now
+				if (r.nextInt(2) != 0 || j++ > r.nextInt(items.length / 3) + 2)
+					continue;
 				int slot = 0;
 				do {
 					if (inv.firstEmpty() == -1) // inventory full

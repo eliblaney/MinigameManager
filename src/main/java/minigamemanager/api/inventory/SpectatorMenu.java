@@ -34,7 +34,7 @@ public class SpectatorMenu extends PagedMenu {
 	public static ItemStack[] getHeadsForPlayers(String... players) {
 		ItemStack[] items = new ItemStack[players.length];
 		for (int i = 0; i < items.length; i++) {
-			ItemStack item = ItemStackBuilder.fromMaterial(Material.SKULL_ITEM).name("&6" + players[i]).build();
+			ItemStack item = ItemStackBuilder.fromMaterial(Material.SKULL_ITEM).name("&6" + players[i]).durability((short) 3).build();
 			SkullMeta im = (SkullMeta) item.getItemMeta();
 			im.setOwner(players[i]);
 			item.setItemMeta(im);
