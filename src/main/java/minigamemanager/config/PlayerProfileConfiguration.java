@@ -41,6 +41,7 @@ public class PlayerProfileConfiguration extends CustomConfig {
 		if (!settings.vaultEnabled())
 			data.setCurrency(cs.getDouble("currency"));
 		data.setGamesPlayed(cs.getLong("gamesPlayed"));
+		data.setAchievements(ProfileData.getAchievementsFromString(cs.getString("achievements")));
 		return data;
 	}
 	
@@ -62,6 +63,7 @@ public class PlayerProfileConfiguration extends CustomConfig {
 		if (!settings.vaultEnabled())
 			cs.set("currency", data.getCurrency());
 		cs.set("gamesPlayed", data.getGamesPlayed());
+		cs.set("achievements", data.getAchievementString());
 		saveConfig();
 	}
 	

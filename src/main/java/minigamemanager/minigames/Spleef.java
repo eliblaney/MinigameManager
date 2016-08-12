@@ -13,11 +13,13 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
 
+import minigamemanager.api.achivement.Achievement;
 import minigamemanager.api.items.ItemStackBuilder;
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.MinigameAttributes;
 import minigamemanager.api.minigame.MinigameErrors;
 import minigamemanager.api.minigame.MinigameType;
+import minigamemanager.api.profile.PlayerProfile;
 import minigamemanager.api.rotation.Rotation;
 import minigamemanager.api.scoreboard.ScoreboardBuilder;
 import minigamemanager.api.winner.SingleWinnerList;
@@ -32,6 +34,8 @@ import minigamemanager.core.MinigameManager;
 @MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true, canDropItems = false, canPickUpItems = false, isDefault = true)
 public class Spleef extends Minigame {
 	
+	public static final Achievement WIN = new Achievement(Spleef.class, "First win!", "Win your first game of spleef!");
+	
 	private final ItemStack shovel;
 	private UUID secondPlace, thirdPlace;
 	
@@ -45,6 +49,10 @@ public class Spleef extends Minigame {
 			e.printStackTrace();
 		}
 		shovel = builder.build();
+	}
+	
+	public static void onRegister(MinigameManager manager) {
+		manager.registerAchievements(WIN);
 	}
 	
 	@Override
@@ -88,10 +96,12 @@ public class Spleef extends Minigame {
 		// update the scoreboard without the player in the list
 		updateScoreboard();
 		// We have a winner!
-		if (getAliveAmount() == 1)
-			end(new SingleWinnerList(getAliveUUIDs()[0], secondPlace, thirdPlace));
+		if (getAliveAmount() == 1) {
+			UUID winner = getPlayerUUIDs()[0];
+			PlayerProfile.getPlayerProfile(winner).giveAchievement(WIN);
+			end(new SingleWinnerList(winner, secondPlace, thirdPlace));
 		// We're just testing with a single person, everything seemed to work fine
-		else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
+		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
 			announce(ChatColor.GREEN + "Finished!");
 			end(null);
 			// Just in case, end the game if there aren't any people left (though this case should never happen)

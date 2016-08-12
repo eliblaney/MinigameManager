@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import minigamemanager.api.achivement.Achievement;
 import minigamemanager.api.util.ELO;
 import minigamemanager.api.util.ELO.GameResult;
 import minigamemanager.config.MinigameSettings;
@@ -176,6 +177,87 @@ public class PlayerProfile {
 	 */
 	public boolean isPro() {
 		return ELO.isPro(data.getELO());
+	}
+	
+	/**
+	 * Give the player an achievement
+	 * 
+	 * @param achievement The achievement to give the player
+	 * @return Whether the operation was successful or if the player already had
+	 *         the achievement
+	 */
+	public boolean giveAchievement(Achievement achievement) {
+		verifyRegistered(achievement);
+		if(hasAchievement(achievement)) // make sure no duplicates
+			return false;
+		int hashCode = achievement.hashCode();
+		int[] old = data.getAchievements();
+		int[] achievements = new int[old.length + 1];
+		for (int i = 0; i < old.length; i++) {
+			if (hashCode == (achievements[i] = old[i])) // copy and compare, make sure no weird duplicates
+				return false;
+		}
+		achievements[old.length] = hashCode;
+		data.setAchievements(achievements);
+		Bukkit.getPlayer(uuid).sendMessage("\u00a7aYou unlocked the achievement: " + achievement);
+		return true;
+	}
+	
+	/**
+	 * Get an array of achievements that the player currently has
+	 * 
+	 * @return An array of achievements
+	 */
+	public Achievement[] getAchievements() {
+		int[] h = data.getAchievements();
+		Achievement[] a = new Achievement[h.length];
+		for (int i = 0; i < a.length; i++)
+			a[i] = getAchievement(h[i]);
+		return a;
+	}
+	
+	/**
+	 * Get an achievement instance from the hash code of the instance
+	 * 
+	 * @param hashCode The hash code of the desired achievement
+	 * 
+	 * @return A registered achievement with the given hash code, or null if not
+	 *         found
+	 */
+	private Achievement getAchievement(int hashCode) {
+		for (Achievement a : MinigameManager.getMinigameManager().getAchievements()) {
+			if (a.hashCode() == hashCode)
+				return a;
+		}
+		return null;
+	}
+	
+	/**
+	 * Verify that a given achievement is registered
+	 * 
+	 * @param achievement The achievement to test
+	 */
+	private void verifyRegistered(Achievement achievement) {
+		for (Achievement a : MinigameManager.getMinigameManager().getAchievements()) {
+			if (a.equals(achievement))
+				return;
+		}
+		throw new IllegalArgumentException(String.format("The achievement \"%s\" is invalid, make sure it is registered!", achievement.getName()));
+	}
+	
+	/**
+	 * Determine whether the player has the specified achievement
+	 * 
+	 * @param achievement The achievement to test for
+	 * 
+	 * @return Whether the player has the achievement
+	 */
+	public boolean hasAchievement(Achievement achievement) {
+		verifyRegistered(achievement);
+		for (Achievement a : getAchievements())
+			if (a.equals(achievement))
+				return true;
+		return false;
 	}
 	
 	/**

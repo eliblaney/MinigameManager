@@ -1,6 +1,9 @@
 package minigamemanager.core;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +15,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
+import minigamemanager.api.achivement.Achievement;
 import minigamemanager.api.config.MinigameConfig;
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.Minigame.EventListener;
@@ -89,6 +93,10 @@ public final class MinigameManager {
 	 * The list of MinigameConfigs
 	 */
 	private final List<MinigameConfig> minigameConfigs = new ArrayList<>();
+	/**
+	 * The list of Achievements
+	 */
+	private final List<Achievement> achievements = new ArrayList<>();
 	
 	/**
 	 * Create a new instance of MinigameManager
@@ -212,6 +220,24 @@ public final class MinigameManager {
 	}
 	
 	/**
+	 * Register one or more achievements
+	 * 
+	 * @param a The achievements to register
+	 */
+	public void registerAchievements(Achievement... a) {
+		achievements.addAll(Arrays.asList(a));
+	}
+	
+	/**
+	 * Get the list of registered achievements
+	 * 
+	 * @return An array of achievements
+	 */
+	public Achievement[] getAchievements() {
+		return achievements.toArray(new Achievement[achievements.size()]);
+	}
+	
+	/**
 	 * Register a minigame with MinigameManager and insert it into the rotations
 	 * <br>
 	 * <b>Note:</b> The class <i>must</i> have a {@link MinigameAttributes}
@@ -229,6 +255,15 @@ public final class MinigameManager {
 			this.minigameConfigs.add(new MinigameConfig(minigame));
 		this.minigames.put(minigame, new MinigameData(minimumPlayers, attr.isDefault() ? null : new MinigameConfig(minigame)));
 		Bukkit.getPluginManager().callEvent(new MinigameRegisterEvent(minigame, minimumPlayers));
+		try {
+			// optional onRegister method
+			Method onRegister = minigame.getMethod("onRegister", MinigameManager.class);
+			onRegister.invoke(null, this);
+		} catch (NoSuchMethodException e){
+			// The method is optional, no worries if it's not there
+		}catch(SecurityException |InvocationTargetException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		plugin.getLogger().info("Registered: " + minigame.getSimpleName());
 	}
 	

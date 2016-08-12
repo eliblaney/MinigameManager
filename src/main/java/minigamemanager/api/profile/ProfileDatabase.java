@@ -32,27 +32,28 @@ public class ProfileDatabase implements Closeable {
 	
 	private void create() throws SQLException {
 		MinigameSettings set = MinigameManager.getMinigameManager().getMinigameSettings();
-		String sql = "CREATE TABLE IF NOT EXISTS " + set.mysqlTables().get("profiles") + " (uuid VARCHAR(36) NOT NULL, " + "elo BIGINT, " + "currency DECIMAL, " + "gamesPlayed BIGINT, PRIMARY KEY(UUID));";
+		String sql = "CREATE TABLE IF NOT EXISTS " + set.mysqlTables().get("profiles") + " (uuid VARCHAR(36) NOT NULL, elo BIGINT, currency DECIMAL, gamesPlayed BIGINT, achievements VARCHAR(65536), PRIMARY KEY(UUID));";
 		s.executeUpdate(sql);
 	}
 	
 	public int saveProfile(PlayerProfile profile) throws SQLException {
 		synchronized (lock) {
 			ProfileData data = profile.getData();
-			String sql = "INSERT INTO " + MinigameManager.getMinigameManager().getMinigameSettings().mysqlTables().get("profiles") + " (uuid, elo, currency, gamesPlayed) VALUES (\"" + profile.getUUID() + "\", " + data.getELO() + ", " + data.getCurrency() + ", " + data.getGamesPlayed() + ") ON DUPLICATE KEY UPDATE elo=" + data.getELO() + ", currency=" + data.getCurrency() + ", gamesPlayed=" + data.getGamesPlayed() + ";";
+			String sql = "INSERT INTO " + MinigameManager.getMinigameManager().getMinigameSettings().mysqlTables().get("profiles") + " (uuid, elo, currency, gamesPlayed) VALUES (\"" + profile.getUUID() + "\", " + data.getELO() + ", " + data.getCurrency() + ", " + data.getGamesPlayed() + ") ON DUPLICATE KEY UPDATE elo=" + data.getELO() + ", currency=" + data.getCurrency() + ", gamesPlayed=" + data.getGamesPlayed() + ", achievements='" + data.getAchievementString() + "';";
 			return s.executeUpdate(sql);
 		}
 	}
 	
 	public PlayerProfile getProfile(UUID uuid) throws SQLException {
 		synchronized (lock) {
-			String sql = "SELECT elo, currency, gamesPlayed from " + MinigameManager.getMinigameManager().getMinigameSettings().mysqlTables().get("profiles") + " WHERE uuid=\"" + uuid + "\";";
+			String sql = "SELECT elo, currency, gamesPlayed, achievements from " + MinigameManager.getMinigameManager().getMinigameSettings().mysqlTables().get("profiles") + " WHERE uuid=\"" + uuid + "\";";
 			ResultSet rs = s.executeQuery(sql);
 			if (rs.next()) {
 				ProfileData data = new ProfileData();
 				data.setELO(rs.getLong("elo"));
 				data.setCurrency(rs.getDouble("currency"));
 				data.setGamesPlayed(rs.getLong("gamesPlayed"));
+				data.setAchievements(ProfileData.getAchievementsFromString(rs.getString("achievements")));
 				try {
 					Class<PlayerProfile> clazz = PlayerProfile.class;
 					Constructor<PlayerProfile> cons = clazz.getDeclaredConstructor(UUID.class, ProfileData.class);
