@@ -31,6 +31,12 @@ next-minigame: "&eThe next minigame will be &l%minigame%&e!"
 # %minigame% - The next minigame
 # %time% - The time remaining
 countdown: "&e%minigame% will start in &l%time%&e!"
+# When a player unlocks an achievement
+# Variables:
+# %name% - The player's name (e.g. "Steve123")
+# %display% - The player's display name (e.g. "&c[Admin] &rSteve")
+# %achievement% - The achievement that was unlocked
+unlock-achievement: "&aYou unlocked the achievement: &2%achievement%!"
 
 ### Lobby ###
 
@@ -44,11 +50,11 @@ lobby-scoreboard:
   title: "&e&lLobby %id%"
   # The rest of the scoreboard
   # Variables:
-  # %display% - Display name of the player (may be nickname)
+  # %display% - Display name of the player (e.g. "&c[Admin] &rSteve")
   # %id% - ID of rotation
   # %money% - Formatted amount of money the player owns
   # %moneyname% - Name of the money
-  # %name% - Name of the player (not nickname)
+  # %name% - Name of the player (e.g. "Steve123")
   # %players% - Players in the rotation
   # %maxplayers% - Maximum players allowed in the rotation
   # %status% - The status of the lobby. If everything is going smoothly, this is the name of the next minigame

@@ -33,6 +33,9 @@ import net.milkbowl.vault.economy.Economy;
 /*
  * TODO:
  * - Achievement API (includes saving to playerprofiles and such)
+ *   - Menu to browse collected and available achievements
+ * - Menu API (mainly for achievements)
+ * - Config-Item API (to show achievements)
  * - create entire minigame from external script (probably lua and/or config)
  * - multiserver support
  * - more things that make minigames easier

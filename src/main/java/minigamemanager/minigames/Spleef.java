@@ -97,7 +97,7 @@ public class Spleef extends Minigame {
 		updateScoreboard();
 		// We have a winner!
 		if (getAliveAmount() == 1) {
-			UUID winner = getPlayerUUIDs()[0];
+			UUID winner = getAliveUUIDs()[0];
 			PlayerProfile.getPlayerProfile(winner).giveAchievement(WIN);
 			end(new SingleWinnerList(winner, secondPlace, thirdPlace));
 		// We're just testing with a single person, everything seemed to work fine

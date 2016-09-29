@@ -409,6 +409,14 @@ public abstract class Minigame {
 		return names;
 	}
 	
+	/**
+	 * Set a player's status as being alive or not
+	 * 
+	 * @param player The player to modify
+	 * @param alive Whether they are alive or not
+	 * 
+	 * @return Whether the state was changed
+	 */
 	public boolean setAlive(Player player, boolean alive) {
 		UUID u = player.getUniqueId();
 		if (this.alive.contains(u) && alive)

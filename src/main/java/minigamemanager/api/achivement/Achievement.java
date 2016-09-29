@@ -23,20 +23,37 @@ public class Achievement {
 	 * The description of the achievement
 	 */
 	private final String description;
+	/**
+	 * The ID of the achievement. 0 = generated ID
+	 */
+	private final int id;
 	
 	/**
-	 * Create a new achievement
+	 * Create a new achievement. Its ID is generated from its parent minigame, name, and description.
 	 * 
 	 * @param parent The class of the minigame that owns this achievement
 	 * @param name The display name of the achievement
 	 * @param description The description of the achievement
 	 */
 	public Achievement(Class<? extends Minigame> parent, String name, String description) {
+		this(parent, name, description, 0);
+	}
+	
+	/**
+	 * Create a new achievement with a specific ID number
+	 * 
+	 * @param parent The class of the minigame that owns this achievement
+	 * @param name The display name of the achievement
+	 * @param description The description of the achievement
+	 * @param id The ID number to identify this achievement
+	 */
+	public Achievement(Class<? extends Minigame> parent, String name, String description, int id) {
 		Validate.notEmpty(name, "The name of the achievement cannot be empty");
 		Validate.notEmpty(description, "The description of the achievement cannot be null");
 		this.parent = parent;
 		this.name = name;
 		this.description = description;
+		this.id = id;
 	}
 	
 	/**
@@ -75,6 +92,8 @@ public class Achievement {
 	 */
 	@Override
 	public int hashCode() {
+		if(id != 0) // custom ID
+			return id;
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((description == null) ? 0 : description.hashCode());

@@ -8,10 +8,12 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import minigamemanager.api.achivement.Achievement;
 import minigamemanager.api.util.ELO;
 import minigamemanager.api.util.ELO.GameResult;
+import minigamemanager.config.MessageType;
 import minigamemanager.config.MinigameSettings;
 import minigamemanager.core.MinigameManager;
 
@@ -194,12 +196,15 @@ public class PlayerProfile {
 		int[] old = data.getAchievements();
 		int[] achievements = new int[old.length + 1];
 		for (int i = 0; i < old.length; i++) {
-			if (hashCode == (achievements[i] = old[i])) // copy and compare, make sure no weird duplicates
+			if (hashCode == (achievements[i] = old[i])) { // copy and compare, make sure no weird duplicates
+				MinigameManager.getPlugin().getLogger().warning("A duplicate achievement that MinigameManager wasn't aware of exists!");
 				return false;
+			}
 		}
 		achievements[old.length] = hashCode;
 		data.setAchievements(achievements);
-		Bukkit.getPlayer(uuid).sendMessage("\u00a7aYou unlocked the achievement: " + achievement);
+		Player player = Bukkit.getPlayer(uuid);
+		Bukkit.getPlayer(uuid).sendMessage(MinigameManager.getMinigameManager().getMessages().getMessage(MessageType.UNLOCK_ACHIEVEMENT).replace("%name%", player.getName()).replace("%display%", player.getDisplayName()).replace("%achievement%", achievement.getName()));
 		return true;
 	}
 	
