@@ -15,7 +15,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
-import minigamemanager.api.achivement.Achievement;
+import minigamemanager.api.achievement.Achievement;
 import minigamemanager.api.config.MinigameConfig;
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.Minigame.EventListener;

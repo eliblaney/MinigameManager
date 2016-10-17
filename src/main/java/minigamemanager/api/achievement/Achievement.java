@@ -1,4 +1,4 @@
-package minigamemanager.api.achivement;
+package minigamemanager.api.achievement;
 
 import org.apache.commons.lang.Validate;
 

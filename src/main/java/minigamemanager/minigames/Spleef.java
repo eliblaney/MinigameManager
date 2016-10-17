@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
 
-import minigamemanager.api.achivement.Achievement;
+import minigamemanager.api.achievement.Achievement;
 import minigamemanager.api.items.ItemStackBuilder;
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.MinigameAttributes;

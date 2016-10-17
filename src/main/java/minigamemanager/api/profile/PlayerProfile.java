@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import minigamemanager.api.achivement.Achievement;
+import minigamemanager.api.achievement.Achievement;
 import minigamemanager.api.util.ELO;
 import minigamemanager.api.util.ELO.GameResult;
 import minigamemanager.config.MessageType;
