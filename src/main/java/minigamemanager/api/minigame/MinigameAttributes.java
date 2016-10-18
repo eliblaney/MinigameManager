@@ -22,6 +22,13 @@ public @interface MinigameAttributes {
 	String name();
 	
 	/**
+	 * The shortened name of the minigame
+	 * 
+	 * @return The shortened name of the minigame, or empty string ("") if not specified
+	 */
+	String shortName() default "";
+	
+	/**
 	 * The type of the minigame
 	 * 
 	 * @return An instance of MinigameType

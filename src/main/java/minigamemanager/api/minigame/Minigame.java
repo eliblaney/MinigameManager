@@ -44,7 +44,7 @@ import minigamemanager.core.MinigameManager;
  * 
  * @author DonkeyCore
  */
-public abstract class Minigame {
+public abstract class Minigame implements MinigameShell {
 	
 	/**
 	 * The map currently being played
@@ -272,6 +272,16 @@ public abstract class Minigame {
 	 */
 	public final MinigameAttributes getAttributes() {
 		return getClass().getAnnotation(MinigameAttributes.class);
+	}
+	
+	/**
+	 * Get the attributes belonging to any minigame
+	 * 
+	 * @return An instance of {@link MinigameAttributes}, or null if the
+	 *         annotation is not present (bad!)
+	 */
+	public static final MinigameAttributes getAttributes(Class<? extends Minigame> minigame) {
+		return minigame.getAnnotation(MinigameAttributes.class);
 	}
 	
 	/**

@@ -34,10 +34,25 @@ import minigamemanager.core.MinigameManager;
 @MinigameAttributes(name = "Spleef", type = MinigameType.LAST_MAN_STANDING, authors = "DonkeyCore", alwaysFullHealth = true, alwaysSaturated = true, canDropItems = false, canPickUpItems = false, isDefault = true)
 public class Spleef extends Minigame {
 	
-	public static final Achievement WIN = new Achievement(Spleef.class, "First win!", "Win your first game of spleef!");
+	/**
+	 * First win achievement
+	 */
+	public static final Achievement WIN = new Achievement(Spleef.class, "First win!", "Win your first game of spleef!", Material.SNOW_BALL);
 	
+	/**
+	 * The shovel that can break things
+	 */
 	private final ItemStack shovel;
-	private UUID secondPlace, thirdPlace;
+	
+	/**
+	 * UUID of the player in second place
+	 */
+	private UUID secondPlace;
+	
+	/**
+	 * UUID of the player in third place
+	 */
+	private UUID thirdPlace;
 	
 	public Spleef(Rotation r) {
 		super(r, randomMap(Spleef.class));
@@ -100,7 +115,7 @@ public class Spleef extends Minigame {
 			UUID winner = getAliveUUIDs()[0];
 			PlayerProfile.getPlayerProfile(winner).giveAchievement(WIN);
 			end(new SingleWinnerList(winner, secondPlace, thirdPlace));
-		// We're just testing with a single person, everything seemed to work fine
+			// We're just testing with a single person, everything seemed to work fine
 		} else if (getAliveAmount() == 0 && !MinigameManager.isRelease()) {
 			announce(ChatColor.GREEN + "Finished!");
 			end(null);

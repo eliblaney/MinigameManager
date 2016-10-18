@@ -21,6 +21,7 @@ import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.Minigame.EventListener;
 import minigamemanager.api.minigame.MinigameAttributes;
 import minigamemanager.api.minigame.MinigameData;
+import minigamemanager.api.minigame.MinigameShell;
 import minigamemanager.api.rotation.RotationManager;
 import minigamemanager.config.MinigameLocations;
 import minigamemanager.config.MinigameMessages;
@@ -32,10 +33,8 @@ import net.milkbowl.vault.economy.Economy;
 
 /*
  * TODO:
- * - Achievement API (includes saving to playerprofiles and such)
- *   - Menu to browse collected and available achievements
- * - Menu API (mainly for achievements)
- * - Config-Item API (to show achievements)
+ * - Menu to browse collected and available achievements
+ * - More events (on entering lobby, getting achievements, etc)
  * - create entire minigame from external script (probably lua and/or config)
  * - multiserver support
  * - more things that make minigames easier
@@ -285,6 +284,15 @@ public final class MinigameManager {
 			if (c != null)
 				this.minigameConfigs.remove(c);
 			Bukkit.getPluginManager().callEvent(new MinigameUnregisterEvent(minigame));
+			try {
+				// optional onUnregister method
+				Method onUnregister = minigame.getMethod("onUnregister", MinigameManager.class);
+				onUnregister.invoke(null, this);
+			} catch (NoSuchMethodException e){
+				// The method is optional, no worries if it's not there
+			}catch(SecurityException |InvocationTargetException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
 			plugin.getLogger().info("Unregistered: " + minigame.getSimpleName());
 		}
 		return b;
@@ -312,8 +320,8 @@ public final class MinigameManager {
 	 * @param event The event to listen for
 	 * @param listener What to do when the event happens
 	 */
-	public void addListener(Minigame minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
-		Validate.notNull(minigame, "Minigame must not be null");
+	public void addListener(MinigameShell minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
+		Validate.notNull(minigame, "Minigame shell must not be null");
 		Validate.notNull(event, "Event must not be null");
 		Validate.notNull(listener, "Listener must not be null");
 		listeners.add(new ListenerEntry(minigame, event, listener));
@@ -322,9 +330,9 @@ public final class MinigameManager {
 	/**
 	 * Clear all listeners for a certain minigame
 	 * 
-	 * @param minigame The minigame to clear listeners forO
+	 * @param minigame The minigame to clear listeners for
 	 */
-	public void clearListeners(Minigame minigame) {
+	public void clearListeners(MinigameShell minigame) {
 		Validate.notNull(minigame, "Minigame must not be null");
 		Iterator<ListenerEntry> it = listeners.iterator();
 		while (it.hasNext()) {
@@ -374,11 +382,11 @@ public final class MinigameManager {
 	 */
 	public static class ListenerEntry {
 		
-		public final Minigame minigame;
+		public final MinigameShell minigame;
 		public final Class<? extends Event> event;
 		public final EventListener<? extends Event> listener;
 		
-		public ListenerEntry(Minigame minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
+		public ListenerEntry(MinigameShell minigame, Class<? extends Event> event, EventListener<? extends Event> listener) {
 			this.minigame = minigame;
 			this.event = event;
 			this.listener = listener;

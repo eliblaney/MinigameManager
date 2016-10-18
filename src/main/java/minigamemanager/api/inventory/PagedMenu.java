@@ -12,15 +12,18 @@ import org.bukkit.inventory.ItemStack;
 
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.Minigame.EventListener;
+import minigamemanager.api.minigame.MinigameShell;
+import minigamemanager.core.MinigameManager;
 
 public class PagedMenu implements InventoryMenu {
 	
 	private final Inventory[] invs;
 	private final ItemStack backItem, nextItem;
+	private MinigameShell shell = null;
 	
-	public PagedMenu(final Minigame minigame, int pageRows, int pages, String title, final ItemStack backItem, final ItemStack nextItem, final EventListener<InventoryClickEvent> onClick) {
+	public PagedMenu(final MinigameShell minigame, int pageRows, int pages, String title, final ItemStack backItem, final ItemStack nextItem, final EventListener<InventoryClickEvent> onClick) {
 		Validate.notNull(minigame, "Minigame cannot be null");
-		Validate.isTrue(pageRows > 0 && pageRows <= 9, "There must be between 0-9 rows, inclusive, per page");
+		Validate.isTrue(pageRows > 0 && pageRows <= 9, "There must be between 1-9 rows, inclusive, per page");
 		Validate.isTrue(pages > 0, "There must be at least 1 page");
 		if (title == null)
 			title = "";
@@ -29,15 +32,17 @@ public class PagedMenu implements InventoryMenu {
 		this.invs = new Inventory[pages];
 		this.backItem = backItem;
 		this.nextItem = nextItem;
+		this.shell = minigame;
 		for (int i = 0; i < pages; i++)
 			this.invs[i] = Bukkit.createInventory(null, pageRows * 9, String.format(title, i + 1));
 		if (onClick != null) {
-			minigame.listenEvent(new EventListener<InventoryInteractEvent>() {
+			EventListener<InventoryInteractEvent> listener = new EventListener<InventoryInteractEvent>() {
 				@Override
 				public void onEvent(InventoryInteractEvent event) {
 					HumanEntity human = event.getWhoClicked();
-					if (!(human instanceof Player) || !minigame.isPlaying(((Player) human)))
-						return;
+					if (minigame != null && minigame instanceof Minigame)
+						if (!(human instanceof Player) || !((Minigame) minigame).isPlaying(((Player) human)))
+							return;
 					if (!(event instanceof InventoryClickEvent)) {
 						event.setCancelled(true);
 						return;
@@ -47,24 +52,45 @@ public class PagedMenu implements InventoryMenu {
 						if (invs[i].equals(e.getClickedInventory())) {
 							ItemStack item = e.getCurrentItem();
 							Player player = (Player) human;
-							if (backItem.equals(item)) {
-								player.closeInventory();
+							if (backItem.equals(item))
 								player.openInventory(invs[i - 1]);
-							} else if (nextItem.equals(item)) {
-								player.closeInventory();
+							else if (nextItem.equals(item))
 								player.openInventory(invs[i + 1]);
-							} else
+							else
 								onClick.onEvent(e);
 						}
 					}
 				}
-			});
+			};
+			// if we have a minigame instance, lets create the menu listeners based off of it 
+			if (minigame instanceof Minigame)
+				((Minigame) minigame).listenEvent(listener);
+			else
+				// otherwise, we can use a generic empty shell (warning: persists until plugin deactivates!!!!!)
+				MinigameManager.getMinigameManager().addListener(shell, InventoryInteractEvent.class, listener);
 		}
 	}
 	
-	public PagedMenu(Minigame minigame, String title, ItemStack backItem, ItemStack nextItem, EventListener<InventoryClickEvent> onClick, ItemStack... items) {
+	public PagedMenu(MinigameShell minigame, String title, ItemStack backItem, ItemStack nextItem, EventListener<InventoryClickEvent> onClick, ItemStack... items) {
 		this(minigame, Math.min(getSegmentsForSize(9, items.length), 54), getSegmentsForSize(45, items.length), title, backItem, nextItem, onClick);
 		setItems(items);
+	}
+	
+	/**
+	 * Instruct MinigameManager to discard the listener used. MUST BE CALLED IF A MINIGAME WAS NOT SPECIFIED IN THE CONSTRUCTOR. This method does nothing if the shell is not empty.
+	 */
+	public void discard() {
+		if (shell != null && !(shell instanceof Minigame)) // dont accidentally delete all minigame's listeners
+			MinigameManager.getMinigameManager().clearListeners(shell);
+	}
+	
+	/**
+	 * Get the Minigame Shell used in this particular menu
+	 * 
+	 * @return The Minigame Shell
+	 */
+	public MinigameShell getShell() {
+		return shell;
 	}
 	
 	@Override

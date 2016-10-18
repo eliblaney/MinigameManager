@@ -21,10 +21,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
+import minigamemanager.api.achievement.Achievement;
 import minigamemanager.api.items.ItemStackBuilder;
 import minigamemanager.api.minigame.Minigame;
 import minigamemanager.api.minigame.MinigameAttributes;
 import minigamemanager.api.minigame.MinigameType;
+import minigamemanager.api.profile.PlayerProfile;
 import minigamemanager.api.rotation.Rotation;
 import minigamemanager.api.scoreboard.ScoreboardHelper;
 import minigamemanager.api.scoreboard.ScoreboardBuilder;
@@ -55,9 +57,23 @@ public class OneInTheQuiver extends Minigame {
 	 */
 	private int time = 5 * 60;
 	
+	/**
+	 * First blood achievement
+	 */
+	public static final Achievement BLOOD = new Achievement(OneInTheQuiver.class, "First blood!", "Be the first one to get a kill!", Material.SNOW_BALL);
+	
+	/**
+	 * Whether the first blood achievement is still available
+	 */
+	private boolean firstBlood = true;
+	
 	public OneInTheQuiver(Rotation r) {
 		super(r, randomMap(OneInTheQuiver.class));
 		kills = new HashMap<String, Integer>();
+	}
+	
+	public static void onRegister(MinigameManager manager) {
+		manager.registerAchievements(BLOOD);
 	}
 	
 	@Override
@@ -105,6 +121,10 @@ public class OneInTheQuiver extends Minigame {
 						else {
 							announce(ChatColor.RED + entity.getName() + ChatColor.RESET + " was killed by " + ChatColor.RED + killer.getName() + ChatColor.RESET + ".");
 							killer.getInventory().addItem(new ItemStack(Material.ARROW));
+							if(firstBlood) {
+								PlayerProfile.getPlayerProfile(killer.getUniqueId()).giveAchievement(BLOOD);
+								firstBlood = false;
+							}
 							kills.put(ChatColor.GREEN + killer.getName(), kills.get(ChatColor.GREEN + killer.getName()) + 1);
 						}
 						respawn((Player) entity);
@@ -134,6 +154,10 @@ public class OneInTheQuiver extends Minigame {
 					if (killer != null) {
 						announce(ChatColor.RED + player.getName() + ChatColor.RESET + " was killed by " + ChatColor.RED + killer.getName() + ChatColor.RESET + ".");
 						killer.getInventory().addItem(new ItemStack(Material.ARROW));
+						if(firstBlood) {
+							PlayerProfile.getPlayerProfile(killer.getUniqueId()).giveAchievement(BLOOD);
+							firstBlood = false;
+						}
 						kills.put(ChatColor.GREEN + killer.getName(), kills.get(ChatColor.GREEN + killer.getName()) + 1);
 					} else
 						announce(ChatColor.GOLD + player.getName() + " " + ChatColor.RED + event.getDeathMessage().replace(player.getName(), "").trim());
